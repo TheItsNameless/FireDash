@@ -1411,6 +1411,12 @@
           <a class="nav-item" href="#trends"
             ><span class="nav-icon">&#128202;</span> Trends</a
           >
+          <a class="nav-item" href="#budget-explorer"
+            ><span class="nav-icon">&#128181;</span> Budget Explorer</a
+          >
+          <a class="nav-item" href="#category-explorer"
+            ><span class="nav-icon">&#128200;</span> Category Explorer</a
+          >
         </div>
         <div class="sidebar-bottom">
           <a class="nav-item" id="sidebarSettings"
@@ -1483,6 +1489,18 @@
             fetch: fetchTrends,
             render: renderTrends,
             bind: bindTrends,
+          },
+          "budget-explorer": {
+            title: "Budget Explorer",
+            fetch: fetchBudgetExplorer,
+            render: renderBudgetExplorer,
+            bind: bindBudgetExplorer,
+          },
+          "category-explorer": {
+            title: "Category Explorer",
+            fetch: fetchCategoryExplorer,
+            render: renderCategoryExplorer,
+            bind: bindCategoryExplorer,
           },
         };
 
@@ -2877,6 +2895,323 @@
           });
         }
 
+        // =============== BUDGET EXPLORER ===============
+        async function fetchBudgetExplorer() {
+          if (!toolState.budgets)
+            toolState.budgets = await apiAll("/api/v1/budgets");
+          if (!toolState.selectedBudget)
+            return { budgets: toolState.budgets, transactions: null, summary: null };
+          const budgetObj = toolState.budgets.find(
+            (b) => String(b.id) === String(toolState.selectedBudget),
+          );
+          if (!budgetObj) {
+            toast("Budget not found", "error");
+            return { budgets: toolState.budgets, transactions: null, summary: null };
+          }
+          const dateParams = {};
+          if (toolState.budgetStart) dateParams.start = toolState.budgetStart;
+          if (toolState.budgetEnd) dateParams.end = toolState.budgetEnd;
+          const [allTx, limitsData] = await Promise.all([
+            apiAll(
+              `/api/v1/budgets/${budgetObj.id}/transactions`,
+              dateParams,
+              (page, total, count) => {
+                const el = document.getElementById("loadProgress");
+                if (el)
+                  el.innerHTML = `<span class="spin" style="display:inline-block;font-size:16px">&#8635;</span> Fetching transactions... page ${page}/${total} (${count} found)`;
+              },
+            ),
+            dateParams.start && dateParams.end
+              ? api(`/api/v1/budgets/${budgetObj.id}/limits`, dateParams).catch(() => null)
+              : Promise.resolve(null),
+          ]);
+          const filtered = [];
+          for (const journal of allTx) {
+            for (const tx of journal.attributes?.transactions || []) {
+              if (tx.type === "withdrawal") filtered.push(tx);
+            }
+          }
+          let total = 0, minDate = "", maxDate = "";
+          const categories = {};
+          filtered.forEach((tx) => {
+            const amt = parseFloat(tx.amount) || 0;
+            total += amt;
+            const cn = tx.category_name || "Uncategorized";
+            categories[cn] = (categories[cn] || 0) + amt;
+            const d = tx.date?.split("T")[0] || "";
+            if (d && (!minDate || d < minDate)) minDate = d;
+            if (d && (!maxDate || d > maxDate)) maxDate = d;
+          });
+          if (filtered.length && !toolState.budgetDatesSet) {
+            toolState.budgetStart = minDate;
+            toolState.budgetEnd = maxDate;
+            toolState.budgetDatesSet = true;
+          }
+          const limit = parseFloat(limitsData?.data?.[0]?.attributes?.amount || "0");
+          return {
+            budgets: toolState.budgets,
+            transactions: filtered,
+            summary: { total, categories, minDate, maxDate, limit },
+            budget: budgetObj.attributes?.name || "",
+          };
+        }
+
+        function renderBudgetExplorer(d) {
+          const sym = S.detectedCurrency;
+          let budgetOpts = '<option value="">-- Select a budget --</option>';
+          (d.budgets || []).forEach((b) => {
+            const id = String(b.id);
+            const name = b.attributes?.name || "";
+            budgetOpts += `<option value="${esc(id)}"${id === String(toolState.selectedBudget) ? " selected" : ""}>${esc(name)}</option>`;
+          });
+          const defStart = toolState.budgetStart || "";
+          const defEnd = toolState.budgetEnd || "";
+          let h = `<div class="tool-header"><h1>Budget Explorer</h1>
+            <div class="tool-controls">
+              <select class="form-select" id="budgetSelect" style="min-width:180px">${budgetOpts}</select>
+              <input type="date" class="form-input" id="budgetStart" value="${defStart}" style="width:auto" title="Start date (auto-detected from data)">
+              <input type="date" class="form-input" id="budgetEnd" value="${defEnd}" style="width:auto" title="End date (auto-detected from data)">
+              <button class="btn btn-primary" id="budgetLoad">Analyze</button>
+            </div></div>`;
+          if (!d.transactions) {
+            h += '<div class="empty-state fade-in"><div class="empty-icon">&#128181;</div><p>Select a budget and click Analyze to see spending breakdown</p></div>';
+            return h;
+          }
+          const spent = d.summary.total;
+          const limit = d.summary.limit;
+          const pct = limit > 0 ? Math.round((spent / limit) * 100) : null;
+          if (limit > 0) {
+            const bc = pct >= 100 ? "danger" : pct >= 80 ? "warning" : "green";
+            h += `<div class="summary-grid">
+              <div class="summary-card spent fade-in stagger-1"><div class="card-icon">&#128176;</div><div class="card-label">Spent</div><div class="card-value">${fc(-spent, sym)}</div><div class="card-sub">of ${fc(limit, sym)} limit</div></div>
+              <div class="summary-card balance fade-in stagger-2"><div class="card-icon">&#9989;</div><div class="card-label">Remaining</div><div class="card-value ${limit - spent < 0 ? "val-neg" : "val-pos"}">${fc(limit - spent, sym)}</div><div class="card-sub">${pct}% used</div></div>
+            </div>
+            <div class="data-card fade-in" style="margin-bottom:16px">
+              <div class="card-head"><h3>Budget Usage</h3><span class="count">${pct}%</span></div>
+              <div style="padding:12px 16px">
+                <div class="progress-bar-wrap"><div class="progress-bar ${bc}" style="width:${Math.min(pct, 100)}%"></div></div>
+                <div class="progress-footer">
+                  <span class="${pct >= 100 ? "rem-over" : "rem-ok"}">${pct >= 100 ? "Over budget by " + fc(spent - limit, sym) : fc(limit - spent, sym) + " remaining"}</span>
+                  <span>${pct}%</span>
+                </div>
+              </div>
+            </div>`;
+          } else {
+            h += `<div class="summary-grid">
+              <div class="summary-card spent fade-in stagger-1"><div class="card-icon">&#128176;</div><div class="card-label">Total Spent</div><div class="card-value">${fc(-spent, sym)}</div><div class="card-sub">${d.transactions.length} transactions</div></div>
+            </div>`;
+          }
+          h += '<div class="two-col">';
+          const catEntries = Object.entries(d.summary.categories).sort((a, b) => b[1] - a[1]);
+          const maxCat = catEntries.length ? catEntries[0][1] : 1;
+          h += `<div class="data-card fade-in stagger-2"><div class="card-head"><h3>Category Breakdown</h3><span class="count">${catEntries.length}</span></div><div class="data-scroll">`;
+          if (!catEntries.length)
+            h += '<div class="empty-state"><p>No category data</p></div>';
+          else {
+            catEntries.forEach(([name, amt], i) => {
+              const w = maxCat > 0 ? (amt / maxCat) * 100 : 0;
+              h += `<div class="list-item"><span class="list-rank">${i + 1}</span><div class="list-info"><div class="list-name">${esc(name)}</div><div class="list-bar-wrap"><div class="list-bar expense" style="width:${w}%"></div></div></div><span class="list-value val-neg">${fc(-amt, sym)}</span></div>`;
+            });
+            h += `<div class="list-item" style="border-top:2px solid var(--border);background:var(--bg-card-hover)"><div class="list-info"><div class="list-name" style="font-weight:700">Total</div></div><span class="list-value val-neg" style="font-weight:700">${fc(-spent, sym)}</span></div>`;
+          }
+          h += '</div></div>';
+          h += `<div class="data-card fade-in stagger-3"><div class="card-head"><h3>Transactions</h3><div><button class="btn btn-ghost" id="budgetCsvExport">&#8615; CSV</button></div></div><div class="data-scroll">`;
+          if (!d.transactions.length)
+            h += '<div class="empty-state"><p>No transactions found</p></div>';
+          else
+            d.transactions.slice(0, 100).forEach((tx) => {
+              h += `<div class="list-item"><div class="list-info"><div class="list-name">${esc(tx.description || "No description")}</div><div class="list-meta">${esc(tx.date?.split("T")[0] || "")} &middot; ${esc(tx.category_name || "No category")}</div></div><span class="list-value val-neg">${fc(-(parseFloat(tx.amount) || 0), sym)}</span></div>`;
+            });
+          if (d.transactions.length > 100)
+            h += `<div class="list-item" style="justify-content:center;color:var(--text-muted);font-size:12px">Showing 100 of ${d.transactions.length}</div>`;
+          h += '</div></div></div>';
+          return h;
+        }
+
+        function bindBudgetExplorer(d) {
+          const triggerLoad = () => {
+            toolState.selectedBudget = $("budgetSelect").value;
+            toolState.budgetStart = $("budgetStart")?.value || "";
+            toolState.budgetEnd = $("budgetEnd")?.value || "";
+            if (!toolState.selectedBudget) {
+              toast("Select a budget first", "error");
+              return;
+            }
+            loadTool("budget-explorer");
+          };
+          $("budgetLoad")?.addEventListener("click", triggerLoad);
+          $("budgetSelect")?.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") { e.preventDefault(); triggerLoad(); }
+          });
+          $("budgetSelect")?.addEventListener("change", () => {
+            toolState.budgetDatesSet = false;
+            toolState.budgetStart = ""; toolState.budgetEnd = "";
+            if ($("budgetStart")) $("budgetStart").value = "";
+            if ($("budgetEnd")) $("budgetEnd").value = "";
+          });
+          $("budgetCsvExport")?.addEventListener("click", () => {
+            if (!d.transactions?.length) return;
+            const rows = [["Date", "Description", "Amount", "Currency", "Account", "Category", "Tags"]];
+            d.transactions.forEach((tx) =>
+              rows.push([
+                tx.date?.split("T")[0] || "",
+                tx.description || "",
+                tx.amount || "",
+                tx.currency_symbol || S.detectedCurrency,
+                tx.source_name || "",
+                tx.category_name || "",
+                (tx.tags || []).join("; "),
+              ]),
+            );
+            exportCsv(rows, `${(d.budget || "budget").replace(/\s+/g, "_")}_transactions.csv`);
+          });
+        }
+
+        // =============== CATEGORY EXPLORER ===============
+        async function fetchCategoryExplorer() {
+          if (!toolState.categoryList)
+            toolState.categoryList = await apiAll("/api/v1/categories");
+          if (!toolState.selectedCategory)
+            return { categories: toolState.categoryList, transactions: null, summary: null };
+          const catObj = toolState.categoryList.find(
+            (c) => String(c.id) === String(toolState.selectedCategory),
+          );
+          if (!catObj) {
+            toast("Category not found", "error");
+            return { categories: toolState.categoryList, transactions: null, summary: null };
+          }
+          const dateParams = {};
+          if (toolState.categoryStart) dateParams.start = toolState.categoryStart;
+          if (toolState.categoryEnd) dateParams.end = toolState.categoryEnd;
+          const allTx = await apiAll(
+            `/api/v1/categories/${catObj.id}/transactions`,
+            dateParams,
+            (page, total, count) => {
+              const el = document.getElementById("loadProgress");
+              if (el)
+                el.innerHTML = `<span class="spin" style="display:inline-block;font-size:16px">&#8635;</span> Fetching transactions... page ${page}/${total} (${count} found)`;
+            },
+          );
+          const filtered = [];
+          for (const journal of allTx) {
+            for (const tx of journal.attributes?.transactions || []) {
+              if (tx.type === "withdrawal") filtered.push(tx);
+            }
+          }
+          let total = 0, minDate = "", maxDate = "";
+          const budgets = {};
+          filtered.forEach((tx) => {
+            const amt = parseFloat(tx.amount) || 0;
+            total += amt;
+            const bn = tx.budget_name || "No budget";
+            budgets[bn] = (budgets[bn] || 0) + amt;
+            const d = tx.date?.split("T")[0] || "";
+            if (d && (!minDate || d < minDate)) minDate = d;
+            if (d && (!maxDate || d > maxDate)) maxDate = d;
+          });
+          if (filtered.length && !toolState.categoryDatesSet) {
+            toolState.categoryStart = minDate;
+            toolState.categoryEnd = maxDate;
+            toolState.categoryDatesSet = true;
+          }
+          return {
+            categories: toolState.categoryList,
+            transactions: filtered,
+            summary: { total, budgets, minDate, maxDate },
+            category: catObj.attributes?.name || "",
+          };
+        }
+
+        function renderCategoryExplorer(d) {
+          const sym = S.detectedCurrency;
+          let catOpts = '<option value="">-- Select a category --</option>';
+          (d.categories || []).forEach((c) => {
+            const id = String(c.id);
+            const name = c.attributes?.name || "";
+            catOpts += `<option value="${esc(id)}"${id === String(toolState.selectedCategory) ? " selected" : ""}>${esc(name)}</option>`;
+          });
+          const defStart = toolState.categoryStart || "";
+          const defEnd = toolState.categoryEnd || "";
+          let h = `<div class="tool-header"><h1>Category Explorer</h1>
+            <div class="tool-controls">
+              <select class="form-select" id="categorySelect" style="min-width:180px">${catOpts}</select>
+              <input type="date" class="form-input" id="categoryStart" value="${defStart}" style="width:auto" title="Start date (auto-detected from data)">
+              <input type="date" class="form-input" id="categoryEnd" value="${defEnd}" style="width:auto" title="End date (auto-detected from data)">
+              <button class="btn btn-primary" id="categoryLoad">Analyze</button>
+            </div></div>`;
+          if (!d.transactions) {
+            h += '<div class="empty-state fade-in"><div class="empty-icon">&#128200;</div><p>Select a category and click Analyze to see spending breakdown</p></div>';
+            return h;
+          }
+          h += `<div class="summary-grid">
+            <div class="summary-card spent fade-in stagger-1"><div class="card-icon">&#128200;</div><div class="card-label">Total Spent</div><div class="card-value">${fc(-d.summary.total, sym)}</div><div class="card-sub">${d.transactions.length} transactions</div></div>
+          </div>`;
+          h += '<div class="two-col">';
+          const budgetEntries = Object.entries(d.summary.budgets).sort((a, b) => b[1] - a[1]);
+          const maxBudget = budgetEntries.length ? budgetEntries[0][1] : 1;
+          h += `<div class="data-card fade-in stagger-2"><div class="card-head"><h3>Budget Breakdown</h3><span class="count">${budgetEntries.length}</span></div><div class="data-scroll">`;
+          if (!budgetEntries.length)
+            h += '<div class="empty-state"><p>No budget data</p></div>';
+          else {
+            budgetEntries.forEach(([name, amt], i) => {
+              const w = maxBudget > 0 ? (amt / maxBudget) * 100 : 0;
+              h += `<div class="list-item"><span class="list-rank">${i + 1}</span><div class="list-info"><div class="list-name">${esc(name)}</div><div class="list-bar-wrap"><div class="list-bar expense" style="width:${w}%"></div></div></div><span class="list-value val-neg">${fc(-amt, sym)}</span></div>`;
+            });
+            h += `<div class="list-item" style="border-top:2px solid var(--border);background:var(--bg-card-hover)"><div class="list-info"><div class="list-name" style="font-weight:700">Total</div></div><span class="list-value val-neg" style="font-weight:700">${fc(-d.summary.total, sym)}</span></div>`;
+          }
+          h += '</div></div>';
+          h += `<div class="data-card fade-in stagger-3"><div class="card-head"><h3>Transactions</h3><div><button class="btn btn-ghost" id="categoryCsvExport">&#8615; CSV</button></div></div><div class="data-scroll">`;
+          if (!d.transactions.length)
+            h += '<div class="empty-state"><p>No transactions found</p></div>';
+          else
+            d.transactions.slice(0, 100).forEach((tx) => {
+              h += `<div class="list-item"><div class="list-info"><div class="list-name">${esc(tx.description || "No description")}</div><div class="list-meta">${esc(tx.date?.split("T")[0] || "")} &middot; ${esc(tx.budget_name || "No budget")}</div></div><span class="list-value val-neg">${fc(-(parseFloat(tx.amount) || 0), sym)}</span></div>`;
+            });
+          if (d.transactions.length > 100)
+            h += `<div class="list-item" style="justify-content:center;color:var(--text-muted);font-size:12px">Showing 100 of ${d.transactions.length}</div>`;
+          h += '</div></div></div>';
+          return h;
+        }
+
+        function bindCategoryExplorer(d) {
+          const triggerLoad = () => {
+            toolState.selectedCategory = $("categorySelect").value;
+            toolState.categoryStart = $("categoryStart")?.value || "";
+            toolState.categoryEnd = $("categoryEnd")?.value || "";
+            if (!toolState.selectedCategory) {
+              toast("Select a category first", "error");
+              return;
+            }
+            loadTool("category-explorer");
+          };
+          $("categoryLoad")?.addEventListener("click", triggerLoad);
+          $("categorySelect")?.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") { e.preventDefault(); triggerLoad(); }
+          });
+          $("categorySelect")?.addEventListener("change", () => {
+            toolState.categoryDatesSet = false;
+            toolState.categoryStart = ""; toolState.categoryEnd = "";
+            if ($("categoryStart")) $("categoryStart").value = "";
+            if ($("categoryEnd")) $("categoryEnd").value = "";
+          });
+          $("categoryCsvExport")?.addEventListener("click", () => {
+            if (!d.transactions?.length) return;
+            const rows = [["Date", "Description", "Amount", "Currency", "Account", "Budget", "Tags"]];
+            d.transactions.forEach((tx) =>
+              rows.push([
+                tx.date?.split("T")[0] || "",
+                tx.description || "",
+                tx.amount || "",
+                tx.currency_symbol || S.detectedCurrency,
+                tx.source_name || "",
+                tx.budget_name || "",
+                (tx.tags || []).join("; "),
+              ]),
+            );
+            exportCsv(rows, `${(d.category || "category").replace(/\s+/g, "_")}_transactions.csv`);
+          });
+        }
+
         // =============== INIT ===============
         function init() {
           initTheme();
@@ -2925,6 +3260,8 @@
             "bills",
             "search",
             "trends",
+            "budget-explorer",
+            "category-explorer",
           ];
           document.addEventListener("keydown", (e) => {
             if (e.key === "Escape") {
