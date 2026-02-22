@@ -65,7 +65,7 @@ A fast, privacy-first web dashboard for [Firefly III](https://www.firefly-iii.or
 ### UX
 - Dark mode with system preference detection
 - Responsive layout with mobile sidebar
-- Keyboard shortcuts: `1`–`9` tools, `R` refresh, `S` settings, `/` search
+- Keyboard shortcuts: `1` Monthly Report, `2` Trends, `3` Budget, `4` Category, `5` Tags, `6` Accounts, `7` Savings, `8` Bills, `9` Search — `R` refresh, `S` settings, `/` focus search
 - Remembers your last viewed tool
 - Server version display after connecting
 
