@@ -11,17 +11,19 @@ A fast, privacy-first web dashboard for [Firefly III](https://www.firefly-iii.or
 - Category breakdown with ranked bars
 - Budget tracking with progress bars and over/under indicators
 - Click any category to drill down into its transactions
-- Month/year selector with auto-load
+- Month/year selector auto-populated from your actual data range
 
 ### Tag Explorer
-- Analyze spending by tag with budget breakdown
+- Analyze spending **or income** by tag with a type filter (Spending / Income / All)
+- Budget breakdown for spending; source breakdown for income
 - Auto-detected date range from your transaction data
+- Quick date presets: 1M, 3M, 6M, YTD, 1Y
 - CSV export of all transactions
-- Paginated loading with real-time progress
 
 ### Accounts
 - Grouped by type: Asset, Liability, Revenue
 - Net worth calculation (assets minus liabilities)
+- Click any account to expand and see recent transactions inline
 - CSV export
 
 ### Savings Goals
@@ -45,10 +47,25 @@ A fast, privacy-first web dashboard for [Firefly III](https://www.firefly-iii.or
 - Compare 6 or 12 months of spending, income, or net change
 - Average, highest, and lowest month summary
 
+### Budget Explorer
+- Select any budget to analyze its spending over a date range
+- Spent vs limit summary cards with usage progress bar
+- Category breakdown of spending within the budget
+- Quick date presets: 1M, 3M, 6M, YTD, 1Y
+- Auto-detected date range from transaction data
+- CSV export
+
+### Category Explorer
+- Select any category to analyze spending **or income** with a type filter
+- Budget breakdown for spending; source breakdown for income
+- Quick date presets: 1M, 3M, 6M, YTD, 1Y
+- Auto-detected date range from transaction data
+- CSV export
+
 ### UX
 - Dark mode with system preference detection
 - Responsive layout with mobile sidebar
-- Keyboard shortcuts: `1-7` tools, `R` refresh, `S` settings, `/` search
+- Keyboard shortcuts: `1`–`9` tools, `R` refresh, `S` settings, `/` search
 - Remembers your last viewed tool
 - Server version display after connecting
 
@@ -96,7 +113,7 @@ npx wrangler pages dev .
 
 ## Tech Stack
 
-- **Frontend:** Vanilla HTML/CSS/JS (single file, ~1500 lines)
+- **Frontend:** Vanilla HTML/CSS/JS (single file, ~3500 lines)
 - **Proxy:** Cloudflare Pages Function (Workers runtime)
 - **API:** Firefly III REST API v1
 - **Hosting:** Cloudflare Pages

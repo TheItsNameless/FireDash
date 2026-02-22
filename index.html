@@ -1556,6 +1556,34 @@
           toast("CSV exported", "success");
         }
 
+        function datePresetHtml() {
+          return `<div style="display:flex;gap:4px;flex-wrap:wrap">
+            <button class="btn btn-ghost" style="padding:3px 8px;font-size:11px" data-preset="1m">1M</button>
+            <button class="btn btn-ghost" style="padding:3px 8px;font-size:11px" data-preset="3m">3M</button>
+            <button class="btn btn-ghost" style="padding:3px 8px;font-size:11px" data-preset="6m">6M</button>
+            <button class="btn btn-ghost" style="padding:3px 8px;font-size:11px" data-preset="ytd">YTD</button>
+            <button class="btn btn-ghost" style="padding:3px 8px;font-size:11px" data-preset="1y">1Y</button>
+          </div>`;
+        }
+        function bindDatePresets(startId, endId, onChange) {
+          document.querySelectorAll("[data-preset]").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const now = new Date();
+              const end = fmt(now);
+              let start;
+              const p = btn.dataset.preset;
+              if (p === "1m") { const d = new Date(now); d.setMonth(d.getMonth() - 1); start = fmt(d); }
+              else if (p === "3m") { const d = new Date(now); d.setMonth(d.getMonth() - 3); start = fmt(d); }
+              else if (p === "6m") { const d = new Date(now); d.setMonth(d.getMonth() - 6); start = fmt(d); }
+              else if (p === "ytd") { start = fmt(new Date(now.getFullYear(), 0, 1)); }
+              else if (p === "1y") { const d = new Date(now); d.setFullYear(d.getFullYear() - 1); start = fmt(d); }
+              if ($(startId)) $(startId).value = start || "";
+              if ($(endId)) $(endId).value = end;
+              if (onChange) onChange(start, end);
+            });
+          });
+        }
+
         // =============== TOAST ===============
         function toast(msg, type = "info") {
           const c = $("toastContainer");
@@ -2175,28 +2203,26 @@
                 el.innerHTML = `<span class="spin" style="display:inline-block;font-size:16px">&#8635;</span> Fetching transactions... page ${page}/${total} (${count} found)`;
             },
           );
+          const txType = toolState.tagType ?? "withdrawal";
           const filtered = [];
           for (const journal of allTx) {
             for (const tx of journal.attributes?.transactions || []) {
-              if (tx.type === "withdrawal") {
-                filtered.push(tx);
-              }
+              if (!txType || tx.type === txType) filtered.push(tx);
             }
           }
-          let total = 0,
-            minDate = "",
-            maxDate = "";
-          const budgets = {};
+          let total = 0, minDate = "", maxDate = "";
+          const breakdown = {};
           filtered.forEach((tx) => {
             const amt = parseFloat(tx.amount) || 0;
-            total += amt;
-            const bn = tx.budget_name || "Uncategorized";
-            budgets[bn] = (budgets[bn] || 0) + amt;
+            total += tx.type === "deposit" ? amt : -amt;
+            const key = tx.type === "deposit"
+              ? (tx.source_name || "Unknown source")
+              : (tx.budget_name || "Uncategorized");
+            breakdown[key] = (breakdown[key] || 0) + amt;
             const d = tx.date?.split("T")[0] || "";
             if (d && (!minDate || d < minDate)) minDate = d;
             if (d && (!maxDate || d > maxDate)) maxDate = d;
           });
-          // Auto-set date range from actual data on first load (when user hasn't set dates)
           if (filtered.length && !toolState.tagDatesSet) {
             toolState.tagStart = minDate;
             toolState.tagEnd = maxDate;
@@ -2205,8 +2231,9 @@
           return {
             tags: toolState.tags,
             transactions: filtered,
-            summary: { total, budgets, minDate, maxDate },
+            summary: { total, breakdown, minDate, maxDate },
             tag: toolState.selectedTag,
+            txType,
           };
         }
 
@@ -2219,45 +2246,52 @@
           });
           const defStart = toolState.tagStart || "";
           const defEnd = toolState.tagEnd || "";
+          const curType = toolState.tagType ?? "withdrawal";
+          const typeOpts = [["withdrawal","Spending"],["deposit","Income"],["","All"]].map(([v,l]) => `<option value="${esc(v)}"${curType===v?" selected":""}>${l}</option>`).join("");
           let h = `<div class="tool-header"><h1>Tag Explorer</h1>
                 <div class="tool-controls">
                     <select class="form-select" id="tagSelect" style="min-width:180px">${tagOpts}</select>
-                    <input type="date" class="form-input" id="tagStart" value="${defStart}" style="width:auto" title="Start date (auto-detected from data)">
-                    <input type="date" class="form-input" id="tagEnd" value="${defEnd}" style="width:auto" title="End date (auto-detected from data)">
+                    <select class="form-select" id="tagType" style="width:auto">${typeOpts}</select>
+                    <input type="date" class="form-input" id="tagStart" value="${defStart}" style="width:auto" title="Start date">
+                    <input type="date" class="form-input" id="tagEnd" value="${defEnd}" style="width:auto" title="End date">
+                    ${datePresetHtml()}
                     <button class="btn btn-primary" id="tagLoad">Analyze</button>
                 </div></div>`;
 
           if (!d.transactions) {
-            h +=
-              '<div class="empty-state fade-in"><div class="empty-icon">&#127991;</div><p>Select a tag and click Analyze to see spending breakdown</p></div>';
+            h += '<div class="empty-state fade-in"><div class="empty-icon">&#127991;</div><p>Select a tag and click Analyze to see breakdown</p></div>';
             return h;
           }
 
+          const isIncome = d.txType === "deposit";
+          const barCls = isIncome ? "income" : "expense";
+          const valCls = isIncome ? "val-pos" : "val-neg";
+          const breakdownLabel = isIncome ? "Source Breakdown" : "Budget Breakdown";
+
           h += '<div class="two-col">';
-          // budget breakdown
-          const budgetEntries = Object.entries(d.summary.budgets).sort(
-            (a, b) => b[1] - a[1],
-          );
-          const maxBudget = budgetEntries.length ? budgetEntries[0][1] : 1;
-          h += `<div class="data-card fade-in stagger-2"><div class="card-head"><h3>Budget Breakdown</h3><span class="count">${budgetEntries.length}</span></div><div class="data-scroll">`;
-          if (!budgetEntries.length)
-            h += '<div class="empty-state"><p>No budget data</p></div>';
+          const breakdownEntries = Object.entries(d.summary.breakdown).sort((a, b) => b[1] - a[1]);
+          const maxBreakdown = breakdownEntries.length ? breakdownEntries[0][1] : 1;
+          h += `<div class="data-card fade-in stagger-2"><div class="card-head"><h3>${breakdownLabel}</h3><span class="count">${breakdownEntries.length}</span></div><div class="data-scroll">`;
+          if (!breakdownEntries.length)
+            h += `<div class="empty-state"><p>No data</p></div>`;
           else {
-            budgetEntries.forEach(([name, amt], i) => {
-              const w = maxBudget > 0 ? (amt / maxBudget) * 100 : 0;
-              h += `<div class="list-item"><span class="list-rank">${i + 1}</span><div class="list-info"><div class="list-name">${esc(name)}</div><div class="list-bar-wrap"><div class="list-bar expense" style="width:${w}%"></div></div></div><span class="list-value val-neg">${fc(-amt, sym)}</span></div>`;
+            breakdownEntries.forEach(([name, amt], i) => {
+              const w = maxBreakdown > 0 ? (amt / maxBreakdown) * 100 : 0;
+              h += `<div class="list-item"><span class="list-rank">${i + 1}</span><div class="list-info"><div class="list-name">${esc(name)}</div><div class="list-bar-wrap"><div class="list-bar ${barCls}" style="width:${w}%"></div></div></div><span class="list-value ${valCls}">${isIncome ? fc(amt, sym) : fc(-amt, sym)}</span></div>`;
             });
-            h += `<div class="list-item" style="border-top:2px solid var(--border);background:var(--bg-card-hover)"><div class="list-info"><div class="list-name" style="font-weight:700">Total</div></div><span class="list-value val-neg" style="font-weight:700">${fc(-d.summary.total, sym)}</span></div>`;
+            h += `<div class="list-item" style="border-top:2px solid var(--border);background:var(--bg-card-hover)"><div class="list-info"><div class="list-name" style="font-weight:700">Total</div></div><span class="list-value ${valCls}" style="font-weight:700">${fc(d.summary.total, sym)}</span></div>`;
           }
           h += "</div></div>";
 
-          // transaction list
           h += `<div class="data-card fade-in stagger-3"><div class="card-head"><h3>Transactions</h3><div><button class="btn btn-ghost" id="csvExport">&#8615; CSV</button></div></div><div class="data-scroll">`;
           if (!d.transactions.length)
             h += '<div class="empty-state"><p>No transactions found</p></div>';
           else
             d.transactions.slice(0, 100).forEach((tx) => {
-              h += `<div class="list-item"><div class="list-info"><div class="list-name">${esc(tx.description || "No description")}</div><div class="list-meta">${esc(tx.date?.split("T")[0] || "")} &middot; ${esc(tx.budget_name || "No budget")}</div></div><span class="list-value val-neg">${fc(-(parseFloat(tx.amount) || 0), sym)}</span></div>`;
+              const isOut = tx.type === "withdrawal";
+              const amt = parseFloat(tx.amount) || 0;
+              const meta = isOut ? (tx.budget_name || "No budget") : (tx.source_name || tx.destination_name || "");
+              h += `<div class="list-item"><div class="list-info"><div class="list-name">${esc(tx.description || "No description")}</div><div class="list-meta">${esc(tx.date?.split("T")[0] || "")} &middot; ${esc(meta)}</div></div><span class="list-value ${isOut ? "val-neg" : "val-pos"}">${fc(isOut ? -amt : amt, sym)}</span></div>`;
             });
           if (d.transactions.length > 100)
             h += `<div class="list-item" style="justify-content:center;color:var(--text-muted);font-size:12px">Showing 100 of ${d.transactions.length}</div>`;
@@ -2267,6 +2301,7 @@
         function bindTagExplorer(d) {
           const triggerLoad = () => {
             toolState.selectedTag = $("tagSelect").value;
+            toolState.tagType = $("tagType")?.value ?? "withdrawal";
             toolState.tagStart = $("tagStart")?.value || "";
             toolState.tagEnd = $("tagEnd")?.value || "";
             if (!toolState.selectedTag) {
@@ -2277,19 +2312,21 @@
           };
           $("tagLoad")?.addEventListener("click", triggerLoad);
           $("tagSelect")?.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              triggerLoad();
-            }
+            if (e.key === "Enter") { e.preventDefault(); triggerLoad(); }
           });
-          // Reset auto-date when tag changes so it auto-detects for new tag
           $("tagSelect")?.addEventListener("change", () => {
             toolState.tagDatesSet = false;
-            toolState.tagStart = "";
-            toolState.tagEnd = "";
+            toolState.tagStart = ""; toolState.tagEnd = "";
             if ($("tagStart")) $("tagStart").value = "";
             if ($("tagEnd")) $("tagEnd").value = "";
           });
+          $("tagType")?.addEventListener("change", () => {
+            toolState.tagDatesSet = false;
+            toolState.tagStart = ""; toolState.tagEnd = "";
+            if ($("tagStart")) $("tagStart").value = "";
+            if ($("tagEnd")) $("tagEnd").value = "";
+          });
+          bindDatePresets("tagStart", "tagEnd");
           $("csvExport")?.addEventListener("click", () => {
             if (!d.transactions?.length) return;
             const rows = [
@@ -2340,6 +2377,7 @@
             if (!a.active || skipTypes.includes(a.type)) return;
             const bal = parseFloat(a.current_balance || "0");
             const entry = {
+              id: acc.id,
               name: a.name,
               type: a.type,
               balance: bal,
@@ -2395,7 +2433,12 @@
             if (!items.length) return "";
             let g = `<div class="data-card fade-in" style="margin-bottom:20px"><div class="card-head"><h3>${title}</h3><span class="count">${items.length}</span></div><div class="data-scroll">`;
             items.forEach((a) => {
-              g += `<div class="list-item"><div class="list-info"><div class="list-name">${esc(a.name)}</div><div class="list-meta"><span class="type-badge ${badge}">${esc(a.type)}</span></div></div><span class="list-value ${a.balance >= 0 ? "val-pos" : "val-neg"}">${fc(a.balance, a.currency)}</span></div>`;
+              g += `<div class="list-item" style="cursor:pointer" data-acc-id="${esc(String(a.id))}">
+                <div class="list-info"><div class="list-name">${esc(a.name)}</div><div class="list-meta"><span class="type-badge ${badge}">${esc(a.type)}</span></div></div>
+                <span class="list-value ${a.balance >= 0 ? "val-pos" : "val-neg"}">${fc(a.balance, a.currency)}</span>
+                <span style="font-size:10px;color:var(--text-muted);margin-left:8px">&#9654;</span>
+              </div>
+              <div id="accDrill-${esc(String(a.id))}" style="display:none"></div>`;
             });
             return g + "</div></div>";
           };
@@ -2415,6 +2458,53 @@
               ),
             );
             exportCsv(rows, "accounts.csv");
+          });
+          document.querySelectorAll("[data-acc-id]").forEach((el) => {
+            el.addEventListener("click", async () => {
+              const accId = el.dataset.accId;
+              const drill = document.getElementById("accDrill-" + accId);
+              if (!drill) return;
+              if (drill.style.display !== "none") {
+                drill.style.display = "none";
+                el.querySelector("span:last-child").innerHTML = "&#9654;";
+                return;
+              }
+              drill.style.display = "block";
+              el.querySelector("span:last-child").innerHTML = "&#9660;";
+              if (drill.dataset.loaded) return;
+              drill.innerHTML = `<div style="padding:10px 16px;color:var(--text-muted);font-size:13px"><span class="spin" style="display:inline-block">&#8635;</span> Loading transactions...</div>`;
+              try {
+                const r = await api(`/api/v1/accounts/${accId}/transactions`, { page: "1" });
+                const journals = r.data || [];
+                const txs = [];
+                journals.forEach((j) => (j.attributes?.transactions || []).forEach((tx) => txs.push(tx)));
+                if (!txs.length) {
+                  drill.innerHTML = '<div style="padding:10px 16px;color:var(--text-muted);font-size:13px">No recent transactions</div>';
+                  drill.dataset.loaded = "1";
+                  return;
+                }
+                let th = '<div style="border-top:1px solid var(--border)">';
+                txs.slice(0, 25).forEach((tx) => {
+                  const isOut = tx.type === "withdrawal";
+                  const amt = parseFloat(tx.amount) || 0;
+                  const meta = tx.category_name || tx.budget_name || esc(tx.type || "");
+                  th += `<div class="list-item" style="padding-left:32px;font-size:13px">
+                    <div class="list-info">
+                      <div class="list-name">${esc(tx.description || "")}</div>
+                      <div class="list-meta">${esc(tx.date?.split("T")[0] || "")} &middot; ${esc(meta)}</div>
+                    </div>
+                    <span class="list-value ${isOut ? "val-neg" : "val-pos"}">${fc(isOut ? -amt : amt, tx.currency_symbol || S.detectedCurrency)}</span>
+                  </div>`;
+                });
+                if (txs.length > 25)
+                  th += `<div style="padding:6px 32px;color:var(--text-muted);font-size:11px">Showing 25 of ${txs.length} on this page</div>`;
+                th += "</div>";
+                drill.innerHTML = th;
+                drill.dataset.loaded = "1";
+              } catch {
+                drill.innerHTML = '<div style="padding:10px 16px;color:var(--danger);font-size:13px">Failed to load transactions</div>';
+              }
+            });
           });
         }
 
@@ -2969,8 +3059,9 @@
           let h = `<div class="tool-header"><h1>Budget Explorer</h1>
             <div class="tool-controls">
               <select class="form-select" id="budgetSelect" style="min-width:180px">${budgetOpts}</select>
-              <input type="date" class="form-input" id="budgetStart" value="${defStart}" style="width:auto" title="Start date (auto-detected from data)">
-              <input type="date" class="form-input" id="budgetEnd" value="${defEnd}" style="width:auto" title="End date (auto-detected from data)">
+              <input type="date" class="form-input" id="budgetStart" value="${defStart}" style="width:auto" title="Start date">
+              <input type="date" class="form-input" id="budgetEnd" value="${defEnd}" style="width:auto" title="End date">
+              ${datePresetHtml()}
               <button class="btn btn-primary" id="budgetLoad">Analyze</button>
             </div></div>`;
           if (!d.transactions) {
@@ -3049,6 +3140,7 @@
             if ($("budgetStart")) $("budgetStart").value = "";
             if ($("budgetEnd")) $("budgetEnd").value = "";
           });
+          bindDatePresets("budgetStart", "budgetEnd");
           $("budgetCsvExport")?.addEventListener("click", () => {
             if (!d.transactions?.length) return;
             const rows = [["Date", "Description", "Amount", "Currency", "Account", "Category", "Tags"]];
@@ -3092,19 +3184,22 @@
                 el.innerHTML = `<span class="spin" style="display:inline-block;font-size:16px">&#8635;</span> Fetching transactions... page ${page}/${total} (${count} found)`;
             },
           );
+          const txType = toolState.catType ?? "withdrawal";
           const filtered = [];
           for (const journal of allTx) {
             for (const tx of journal.attributes?.transactions || []) {
-              if (tx.type === "withdrawal") filtered.push(tx);
+              if (!txType || tx.type === txType) filtered.push(tx);
             }
           }
           let total = 0, minDate = "", maxDate = "";
-          const budgets = {};
+          const breakdown = {};
           filtered.forEach((tx) => {
             const amt = parseFloat(tx.amount) || 0;
-            total += amt;
-            const bn = tx.budget_name || "No budget";
-            budgets[bn] = (budgets[bn] || 0) + amt;
+            total += tx.type === "deposit" ? amt : -amt;
+            const key = tx.type === "deposit"
+              ? (tx.source_name || "Unknown source")
+              : (tx.budget_name || "No budget");
+            breakdown[key] = (breakdown[key] || 0) + amt;
             const d = tx.date?.split("T")[0] || "";
             if (d && (!minDate || d < minDate)) minDate = d;
             if (d && (!maxDate || d > maxDate)) maxDate = d;
@@ -3117,8 +3212,9 @@
           return {
             categories: toolState.categoryList,
             transactions: filtered,
-            summary: { total, budgets, minDate, maxDate },
+            summary: { total, breakdown, minDate, maxDate },
             category: catObj.attributes?.name || "",
+            txType,
           };
         }
 
@@ -3132,32 +3228,41 @@
           });
           const defStart = toolState.categoryStart || "";
           const defEnd = toolState.categoryEnd || "";
+          const curType = toolState.catType ?? "withdrawal";
+          const typeOpts = [["withdrawal","Spending"],["deposit","Income"],["","All"]].map(([v,l]) => `<option value="${esc(v)}"${curType===v?" selected":""}>${l}</option>`).join("");
           let h = `<div class="tool-header"><h1>Category Explorer</h1>
             <div class="tool-controls">
               <select class="form-select" id="categorySelect" style="min-width:180px">${catOpts}</select>
-              <input type="date" class="form-input" id="categoryStart" value="${defStart}" style="width:auto" title="Start date (auto-detected from data)">
-              <input type="date" class="form-input" id="categoryEnd" value="${defEnd}" style="width:auto" title="End date (auto-detected from data)">
+              <select class="form-select" id="catType" style="width:auto">${typeOpts}</select>
+              <input type="date" class="form-input" id="categoryStart" value="${defStart}" style="width:auto" title="Start date">
+              <input type="date" class="form-input" id="categoryEnd" value="${defEnd}" style="width:auto" title="End date">
+              ${datePresetHtml()}
               <button class="btn btn-primary" id="categoryLoad">Analyze</button>
             </div></div>`;
           if (!d.transactions) {
-            h += '<div class="empty-state fade-in"><div class="empty-icon">&#128200;</div><p>Select a category and click Analyze to see spending breakdown</p></div>';
+            h += '<div class="empty-state fade-in"><div class="empty-icon">&#128200;</div><p>Select a category and click Analyze to see breakdown</p></div>';
             return h;
           }
+          const isIncome = d.txType === "deposit";
+          const barCls = isIncome ? "income" : "expense";
+          const valCls = isIncome ? "val-pos" : "val-neg";
+          const cardLabel = isIncome ? "Total Income" : "Total Spent";
+          const breakdownLabel = isIncome ? "Source Breakdown" : "Budget Breakdown";
           h += `<div class="summary-grid">
-            <div class="summary-card spent fade-in stagger-1"><div class="card-icon">&#128200;</div><div class="card-label">Total Spent</div><div class="card-value">${fc(-d.summary.total, sym)}</div><div class="card-sub">${d.transactions.length} transactions</div></div>
+            <div class="summary-card ${isIncome ? "earned" : "spent"} fade-in stagger-1"><div class="card-icon">&#128200;</div><div class="card-label">${cardLabel}</div><div class="card-value ${valCls}">${fc(d.summary.total, sym)}</div><div class="card-sub">${d.transactions.length} transactions</div></div>
           </div>`;
           h += '<div class="two-col">';
-          const budgetEntries = Object.entries(d.summary.budgets).sort((a, b) => b[1] - a[1]);
-          const maxBudget = budgetEntries.length ? budgetEntries[0][1] : 1;
-          h += `<div class="data-card fade-in stagger-2"><div class="card-head"><h3>Budget Breakdown</h3><span class="count">${budgetEntries.length}</span></div><div class="data-scroll">`;
-          if (!budgetEntries.length)
-            h += '<div class="empty-state"><p>No budget data</p></div>';
+          const breakdownEntries = Object.entries(d.summary.breakdown).sort((a, b) => b[1] - a[1]);
+          const maxBreakdown = breakdownEntries.length ? breakdownEntries[0][1] : 1;
+          h += `<div class="data-card fade-in stagger-2"><div class="card-head"><h3>${breakdownLabel}</h3><span class="count">${breakdownEntries.length}</span></div><div class="data-scroll">`;
+          if (!breakdownEntries.length)
+            h += '<div class="empty-state"><p>No data</p></div>';
           else {
-            budgetEntries.forEach(([name, amt], i) => {
-              const w = maxBudget > 0 ? (amt / maxBudget) * 100 : 0;
-              h += `<div class="list-item"><span class="list-rank">${i + 1}</span><div class="list-info"><div class="list-name">${esc(name)}</div><div class="list-bar-wrap"><div class="list-bar expense" style="width:${w}%"></div></div></div><span class="list-value val-neg">${fc(-amt, sym)}</span></div>`;
+            breakdownEntries.forEach(([name, amt], i) => {
+              const w = maxBreakdown > 0 ? (amt / maxBreakdown) * 100 : 0;
+              h += `<div class="list-item"><span class="list-rank">${i + 1}</span><div class="list-info"><div class="list-name">${esc(name)}</div><div class="list-bar-wrap"><div class="list-bar ${barCls}" style="width:${w}%"></div></div></div><span class="list-value ${valCls}">${isIncome ? fc(amt, sym) : fc(-amt, sym)}</span></div>`;
             });
-            h += `<div class="list-item" style="border-top:2px solid var(--border);background:var(--bg-card-hover)"><div class="list-info"><div class="list-name" style="font-weight:700">Total</div></div><span class="list-value val-neg" style="font-weight:700">${fc(-d.summary.total, sym)}</span></div>`;
+            h += `<div class="list-item" style="border-top:2px solid var(--border);background:var(--bg-card-hover)"><div class="list-info"><div class="list-name" style="font-weight:700">Total</div></div><span class="list-value ${valCls}" style="font-weight:700">${fc(d.summary.total, sym)}</span></div>`;
           }
           h += '</div></div>';
           h += `<div class="data-card fade-in stagger-3"><div class="card-head"><h3>Transactions</h3><div><button class="btn btn-ghost" id="categoryCsvExport">&#8615; CSV</button></div></div><div class="data-scroll">`;
@@ -3165,7 +3270,10 @@
             h += '<div class="empty-state"><p>No transactions found</p></div>';
           else
             d.transactions.slice(0, 100).forEach((tx) => {
-              h += `<div class="list-item"><div class="list-info"><div class="list-name">${esc(tx.description || "No description")}</div><div class="list-meta">${esc(tx.date?.split("T")[0] || "")} &middot; ${esc(tx.budget_name || "No budget")}</div></div><span class="list-value val-neg">${fc(-(parseFloat(tx.amount) || 0), sym)}</span></div>`;
+              const isOut = tx.type === "withdrawal";
+              const amt = parseFloat(tx.amount) || 0;
+              const meta = isOut ? (tx.budget_name || "No budget") : (tx.source_name || "");
+              h += `<div class="list-item"><div class="list-info"><div class="list-name">${esc(tx.description || "No description")}</div><div class="list-meta">${esc(tx.date?.split("T")[0] || "")} &middot; ${esc(meta)}</div></div><span class="list-value ${isOut ? "val-neg" : "val-pos"}">${fc(isOut ? -amt : amt, sym)}</span></div>`;
             });
           if (d.transactions.length > 100)
             h += `<div class="list-item" style="justify-content:center;color:var(--text-muted);font-size:12px">Showing 100 of ${d.transactions.length}</div>`;
@@ -3176,6 +3284,7 @@
         function bindCategoryExplorer(d) {
           const triggerLoad = () => {
             toolState.selectedCategory = $("categorySelect").value;
+            toolState.catType = $("catType")?.value ?? "withdrawal";
             toolState.categoryStart = $("categoryStart")?.value || "";
             toolState.categoryEnd = $("categoryEnd")?.value || "";
             if (!toolState.selectedCategory) {
@@ -3194,6 +3303,13 @@
             if ($("categoryStart")) $("categoryStart").value = "";
             if ($("categoryEnd")) $("categoryEnd").value = "";
           });
+          $("catType")?.addEventListener("change", () => {
+            toolState.categoryDatesSet = false;
+            toolState.categoryStart = ""; toolState.categoryEnd = "";
+            if ($("categoryStart")) $("categoryStart").value = "";
+            if ($("categoryEnd")) $("categoryEnd").value = "";
+          });
+          bindDatePresets("categoryStart", "categoryEnd");
           $("categoryCsvExport")?.addEventListener("click", () => {
             if (!d.transactions?.length) return;
             const rows = [["Date", "Description", "Amount", "Currency", "Account", "Budget", "Tags"]];
