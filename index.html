@@ -2372,9 +2372,10 @@
         // ============================================================
         async function fetchAccounts() {
           const accounts = await apiAll("/api/v1/accounts");
-          const groups = { asset: [], liability: [], expense: [], revenue: [] };
+          const groups = { asset: [], creditCard: [], liability: [], expense: [], revenue: [] };
           let totalAssets = 0,
-            totalLiabilities = 0;
+            totalLiabilities = 0,
+            totalCreditCard = 0;
           const skipTypes = [
             "initial-balance",
             "initialBalance",
@@ -2389,11 +2390,15 @@
               id: acc.id,
               name: a.name,
               type: a.type,
+              role: a.account_role,
               balance: bal,
               currency: a.currency_symbol || S.detectedCurrency,
               active: a.active,
             };
-            if (
+            if (a.account_role === "ccAsset") {
+              groups.creditCard.push(entry);
+              totalCreditCard += Math.abs(bal);
+            } else if (
               ["asset", "default", "Default asset account"].includes(a.type) ||
               a.type?.includes("asset")
             ) {
@@ -2420,6 +2425,7 @@
             groups,
             totalAssets,
             totalLiabilities,
+            totalCreditCard,
             netWorth: totalAssets - totalLiabilities,
           };
         }
@@ -2428,22 +2434,24 @@
           const sym = S.detectedCurrency;
           let h = `<div class="tool-header"><h1>Accounts</h1><div class="tool-controls"><button class="btn btn-ghost" id="accExport">&#8615; CSV</button></div></div>`;
           const hasLiab = d.groups.liability.length > 0;
+          const hasCC = d.groups.creditCard.length > 0;
           h += `<div class="summary-grid">
                 <div class="summary-card assets fade-in stagger-1"><div class="card-icon">&uarr;</div><div class="card-label">Total Assets</div><div class="card-value val-pos">${fc(d.totalAssets, sym)}</div><div class="card-sub">${d.groups.asset.length} accounts</div></div>
+                ${hasCC ? `<div class="summary-card liabilities fade-in stagger-2"><div class="card-icon">&#128179;</div><div class="card-label">Credit Cards</div><div class="card-value val-neg">${fc(-d.totalCreditCard, sym)}</div><div class="card-sub">${d.groups.creditCard.length} card${d.groups.creditCard.length !== 1 ? "s" : ""}</div></div>` : ""}
                 ${
                   hasLiab
-                    ? `<div class="summary-card liabilities fade-in stagger-2"><div class="card-icon">&darr;</div><div class="card-label">Total Liabilities</div><div class="card-value val-neg">${fc(-d.totalLiabilities, sym)}</div><div class="card-sub">${d.groups.liability.length} accounts</div></div>
-                <div class="summary-card networth fade-in stagger-3"><div class="card-icon">&#9733;</div><div class="card-label">Net Worth</div><div class="card-value">${fc(d.netWorth, sym)}</div></div>`
+                    ? `<div class="summary-card liabilities fade-in stagger-3"><div class="card-icon">&darr;</div><div class="card-label">Total Liabilities</div><div class="card-value val-neg">${fc(-d.totalLiabilities, sym)}</div><div class="card-sub">${d.groups.liability.length} accounts</div></div>`
                     : ""
                 }
+                <div class="summary-card networth fade-in stagger-4"><div class="card-icon">&#9733;</div><div class="card-label">Net Worth</div><div class="card-value">${fc(d.netWorth, sym)}</div></div>
             </div>`;
 
-          const renderGroup = (title, items, badge) => {
+          const renderGroup = (title, items, badge, badgeLabel) => {
             if (!items.length) return "";
             let g = `<div class="data-card fade-in" style="margin-bottom:20px"><div class="card-head"><h3>${title}</h3><span class="count">${items.length}</span></div><div class="data-scroll">`;
             items.forEach((a) => {
               g += `<div class="list-item" style="cursor:pointer" data-acc-id="${esc(String(a.id))}">
-                <div class="list-info"><div class="list-name">${esc(a.name)}</div><div class="list-meta"><span class="type-badge ${badge}">${esc(a.type)}</span></div></div>
+                <div class="list-info"><div class="list-name">${esc(a.name)}</div><div class="list-meta"><span class="type-badge ${badge}">${badgeLabel || esc(a.type)}</span></div></div>
                 <span class="list-value ${a.balance >= 0 ? "val-pos" : "val-neg"}">${fc(a.balance, a.currency)}</span>
                 <span style="font-size:10px;color:var(--text-muted);margin-left:8px">&#9654;</span>
               </div>
@@ -2452,6 +2460,7 @@
             return g + "</div></div>";
           };
           h += renderGroup("Asset Accounts", d.groups.asset, "asset");
+          h += renderGroup("Credit Cards", d.groups.creditCard, "liability", "Credit Card");
           h += renderGroup("Liabilities", d.groups.liability, "liability");
           if (d.groups.revenue.length)
             h += renderGroup("Revenue Accounts", d.groups.revenue, "revenue");
@@ -2461,9 +2470,9 @@
         function bindAccounts(d) {
           $("accExport")?.addEventListener("click", () => {
             const rows = [["Name", "Type", "Balance", "Currency"]];
-            ["asset", "liability", "revenue"].forEach((t) =>
+            ["asset", "creditCard", "liability", "revenue"].forEach((t) =>
               d.groups[t].forEach((a) =>
-                rows.push([a.name, a.type, a.balance, a.currency]),
+                rows.push([a.name, t === "creditCard" ? "Credit Card" : a.type, a.balance, a.currency]),
               ),
             );
             exportCsv(rows, "accounts.csv");
@@ -2518,47 +2527,90 @@
         }
 
         // ============================================================
-        //  CREDIT CARDS
+        //  CREDIT CARDS DASHBOARD
         // ============================================================
         async function fetchCreditCards() {
           const accounts = await apiAll("/api/v1/accounts");
           const cards = [];
           accounts.forEach((acc) => {
             const a = acc.attributes || {};
-            if (!a.active) return;
-            // In Firefly III, credit cards are asset accounts with role "ccAsset"
-            const isCreditCard = a.account_role === "ccAsset";
-            if (!isCreditCard) return;
-            const bal = parseFloat(a.current_balance || "0");
+            if (!a.active || a.account_role !== "ccAsset") return;
             cards.push({
               id: acc.id,
               name: a.name,
-              type: a.type,
-              role: a.account_role,
-              balance: bal,
+              balance: parseFloat(a.current_balance || "0"),
+              creditLimit: parseFloat(a.credit_card_limit || "0"),
               currency: a.currency_symbol || S.detectedCurrency,
+              transactions: [],
+              periodSpent: 0,
+              periodPaid: 0,
             });
           });
           cards.sort((a, b) => Math.abs(b.balance) - Math.abs(a.balance));
+
+          const dateParams = {};
+          if (toolState.ccStart) dateParams.start = toolState.ccStart;
+          if (toolState.ccEnd) dateParams.end = toolState.ccEnd;
+
+          const el = document.getElementById("loadProgress");
+          if (el && cards.length)
+            el.innerHTML = `<span class="spin" style="display:inline-block;font-size:16px">&#8635;</span> Fetching transactions for ${cards.length} card${cards.length !== 1 ? "s" : ""}...`;
+
+          await Promise.all(
+            cards.map(async (card) => {
+              try {
+                const raw = await apiAll(`/api/v1/accounts/${card.id}/transactions`, dateParams);
+                const flat = [];
+                raw.forEach((j) => (j.attributes?.transactions || []).forEach((tx) => flat.push(tx)));
+                card.transactions = flat.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+                card.periodSpent = flat.reduce((s, tx) => s + (tx.type === "withdrawal" ? parseFloat(tx.amount) || 0 : 0), 0);
+                card.periodPaid = flat.reduce((s, tx) => s + (tx.type === "deposit" ? parseFloat(tx.amount) || 0 : 0), 0);
+              } catch {
+                card.transactions = [];
+              }
+            }),
+          );
+
           const totalOwed = cards.reduce((s, c) => s + Math.abs(c.balance), 0);
-          return { cards, totalOwed };
+          const totalSpent = cards.reduce((s, c) => s + c.periodSpent, 0);
+          const totalPaid = cards.reduce((s, c) => s + c.periodPaid, 0);
+          const txCount = cards.reduce((s, c) => s + c.transactions.length, 0);
+
+          const catMap = {};
+          cards.forEach((card) =>
+            card.transactions.forEach((tx) => {
+              if (tx.type !== "withdrawal") return;
+              const cat = tx.category_name || "Uncategorized";
+              catMap[cat] = (catMap[cat] || 0) + (parseFloat(tx.amount) || 0);
+            }),
+          );
+          const categoryList = Object.entries(catMap)
+            .map(([name, amt]) => ({ name, amt }))
+            .sort((a, b) => b.amt - a.amt);
+
+          return { cards, totalOwed, totalSpent, totalPaid, txCount, categoryList };
         }
 
         function renderCreditCards(d) {
           const sym = S.detectedCurrency;
           const defStart = toolState.ccStart || "";
           const defEnd = toolState.ccEnd || "";
-          let h = `<div class="tool-header"><h1>Credit Cards</h1>
+          const hasPeriod = !!(defStart || defEnd);
+
+          let h = `<div class="tool-header"><h1>&#128179; Credit Cards</h1>
             <div class="tool-controls">
               <input type="date" class="form-input" id="ccStart" value="${defStart}" style="width:auto" title="Period start">
               <span style="color:var(--text-muted);font-size:13px">to</span>
               <input type="date" class="form-input" id="ccEnd" value="${defEnd}" style="width:auto" title="Period end">
               ${datePresetHtml()}
             </div></div>`;
+
           if (!d.cards.length) {
-            h += '<div class="empty-state fade-in"><div class="empty-icon">&#128179;</div><p>No credit card accounts found</p><p style="font-size:12px;margin-top:8px;color:var(--text-muted)">Add liability or credit card accounts in Firefly III</p></div>';
+            h += '<div class="empty-state fade-in"><div class="empty-icon">&#128179;</div><p>No credit card accounts found</p><p style="font-size:12px;margin-top:8px;color:var(--text-muted)">Set account role to "Credit Card Asset" in Firefly III</p></div>';
             return h;
           }
+
+          // ── Summary stat cards ──
           h += `<div class="summary-grid">
             <div class="summary-card liabilities fade-in stagger-1">
               <div class="card-icon">&#128179;</div>
@@ -2566,118 +2618,156 @@
               <div class="card-value val-neg">${fc(-d.totalOwed, sym)}</div>
               <div class="card-sub">${d.cards.length} card${d.cards.length !== 1 ? "s" : ""}</div>
             </div>
-          </div>`;
-          h += `<div class="data-card fade-in"><div class="card-head"><h3>Cards &amp; Spends</h3><span class="count">${d.cards.length}</span></div><div class="data-scroll">`;
-          d.cards.forEach((card) => {
-            h += `<div class="list-item" style="cursor:pointer" data-cc-id="${esc(String(card.id))}">
-              <div class="list-info">
-                <div class="list-name">${esc(card.name)}</div>
-                <div class="list-meta"><span class="type-badge liability">Credit Card</span></div>
-              </div>
-              <span class="list-value val-neg">${fc(card.balance, card.currency)}</span>
-              <span style="font-size:10px;color:var(--text-muted);margin-left:8px">&#9654;</span>
+            <div class="summary-card spent fade-in stagger-2">
+              <div class="card-icon">&uarr;</div>
+              <div class="card-label">Spent${hasPeriod ? " in Period" : ""}</div>
+              <div class="card-value val-neg">${fc(-d.totalSpent, sym)}</div>
+              <div class="card-sub">${d.txCount} transaction${d.txCount !== 1 ? "s" : ""}</div>
             </div>
-            <div id="ccDrill-${esc(String(card.id))}" style="display:none"></div>`;
-          });
-          h += "</div></div>";
-          return h;
-        }
+            <div class="summary-card earned fade-in stagger-3">
+              <div class="card-icon">&darr;</div>
+              <div class="card-label">Payments${hasPeriod ? " in Period" : ""}</div>
+              <div class="card-value val-pos">${fc(d.totalPaid, sym)}</div>
+              <div class="card-sub">Net: ${fc(-(d.totalSpent - d.totalPaid), sym)}</div>
+            </div>
+            <div class="summary-card balance fade-in stagger-4">
+              <div class="card-icon">&#9782;</div>
+              <div class="card-label">Categories</div>
+              <div class="card-value">${d.categoryList.length}</div>
+              <div class="card-sub">across all cards</div>
+            </div>
+          </div>`;
 
-        function bindCreditCards(d) {
-          async function loadCardTx(cardId, drill) {
-            drill.innerHTML = `<div style="padding:10px 16px;color:var(--text-muted);font-size:13px"><span class="spin" style="display:inline-block">&#8635;</span> Loading transactions...</div>`;
-            try {
-              const params = { page: "1" };
-              if (toolState.ccStart) params.start = toolState.ccStart;
-              if (toolState.ccEnd) params.end = toolState.ccEnd;
-              const r = await api(`/api/v1/accounts/${cardId}/transactions`, params);
-              let txs = [];
-              (r.data || []).forEach((j) =>
-                (j.attributes?.transactions || []).forEach((tx) => txs.push(tx)),
-              );
-              if (toolState.ccStart || toolState.ccEnd) {
-                txs = txs.filter((tx) => {
-                  const d = tx.date?.split("T")[0] || "";
-                  if (toolState.ccStart && d < toolState.ccStart) return false;
-                  if (toolState.ccEnd && d > toolState.ccEnd) return false;
-                  return true;
-                });
-              }
-              txs.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-              if (!txs.length) {
-                drill.innerHTML = `<div style="padding:10px 16px;color:var(--text-muted);font-size:13px">No transactions${toolState.ccStart || toolState.ccEnd ? " in this period" : ""}</div>`;
-                drill.dataset.loaded = "1";
-                return;
-              }
-              const totalSpend = txs.reduce(
-                (s, tx) => s + (tx.type === "withdrawal" ? parseFloat(tx.amount) || 0 : 0),
-                0,
-              );
-              let th = `<div style="border-top:1px solid var(--border)">
-                <div style="padding:8px 20px 4px;font-size:12px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center">
-                  <span>${txs.length} transaction${txs.length !== 1 ? "s" : ""}${toolState.ccStart || toolState.ccEnd ? " in period" : ""}</span>
-                  ${totalSpend > 0 ? `<span style="font-weight:600;color:var(--danger)">Spent: ${fc(-totalSpend, S.detectedCurrency)}</span>` : ""}
-                </div>`;
-              txs.forEach((tx) => {
+          // ── Card panels grid ──
+          const palette = [
+            ["#6366f1","#818cf8"],
+            ["#ef4444","#f87171"],
+            ["#10b981","#34d399"],
+            ["#f59e0b","#fbbf24"],
+            ["#8b5cf6","#a78bfa"],
+            ["#06b6d4","#22d3ee"],
+          ];
+
+          h += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px">`;
+
+          d.cards.forEach((card, i) => {
+            const [c1, c2] = palette[i % palette.length];
+            const utilPct = card.creditLimit > 0 ? Math.min((Math.abs(card.balance) / card.creditLimit) * 100, 100) : 0;
+            const hasStats = card.periodSpent > 0 || card.periodPaid > 0 || card.transactions.length > 0;
+
+            h += `<div class="data-card fade-in stagger-${Math.min(i + 1, 4)}" style="margin-bottom:0">
+              <div class="cc-panel-header" data-cc-id="${esc(String(card.id))}"
+                style="background:linear-gradient(135deg,${c1},${c2});padding:20px;cursor:pointer;border-radius:var(--radius-lg) var(--radius-lg) 0 0;user-select:none">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                  <div>
+                    <div style="color:rgba(255,255,255,0.65);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Credit Card</div>
+                    <div style="color:#fff;font-size:15px;font-weight:700;letter-spacing:-0.2px">${esc(card.name)}</div>
+                  </div>
+                  <span id="cc-arrow-${esc(String(card.id))}" style="color:rgba(255,255,255,0.75);font-size:11px">&#9654;</span>
+                </div>
+                <div style="margin-top:16px">
+                  <div style="color:rgba(255,255,255,0.65);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Current Balance</div>
+                  <div style="color:#fff;font-size:28px;font-weight:800;letter-spacing:-0.5px;line-height:1.1;margin-top:3px">${fc(card.balance, card.currency)}</div>
+                </div>
+                ${card.creditLimit > 0 ? `
+                <div style="margin-top:14px">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                    <span style="color:rgba(255,255,255,0.65);font-size:10px">Limit: ${fc(card.creditLimit, card.currency)}</span>
+                    <span style="color:#fff;font-size:10px;font-weight:700">${Math.round(utilPct)}% used</span>
+                  </div>
+                  <div style="height:4px;background:rgba(255,255,255,0.25);border-radius:2px;overflow:hidden">
+                    <div style="height:100%;width:${utilPct}%;background:#fff;border-radius:2px;opacity:0.85"></div>
+                  </div>
+                </div>` : ""}
+              </div>
+              <div style="padding:12px 16px;display:flex;border-bottom:1px solid var(--border-light)">
+                ${card.periodSpent > 0 ? `
+                <div style="flex:1;padding:4px 8px;border-right:1px solid var(--border-light)">
+                  <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:3px">Spent</div>
+                  <div style="font-size:15px;font-weight:700;color:var(--danger)">${fc(-card.periodSpent, card.currency)}</div>
+                </div>` : ""}
+                ${card.periodPaid > 0 ? `
+                <div style="flex:1;padding:4px 8px;${card.transactions.length > 0 ? "border-right:1px solid var(--border-light)" : ""}">
+                  <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:3px">Paid</div>
+                  <div style="font-size:15px;font-weight:700;color:var(--success)">${fc(card.periodPaid, card.currency)}</div>
+                </div>` : ""}
+                ${card.transactions.length > 0 ? `
+                <div style="flex:1;padding:4px 8px">
+                  <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:3px">Transactions</div>
+                  <div style="font-size:15px;font-weight:700">${card.transactions.length}</div>
+                </div>` : ""}
+                ${!hasStats ? `<div style="padding:4px 8px;color:var(--text-muted);font-size:13px">No transactions${hasPeriod ? " in period" : ""}</div>` : ""}
+              </div>
+              <div id="ccDrill-${esc(String(card.id))}" style="display:none;max-height:360px;overflow-y:auto">`;
+
+            if (card.transactions.length) {
+              card.transactions.forEach((tx) => {
                 const isOut = tx.type === "withdrawal";
                 const amt = parseFloat(tx.amount) || 0;
-                const meta = tx.category_name || tx.budget_name || tx.type || "";
-                th += `<div class="list-item" style="padding-left:32px;font-size:13px">
+                const meta = tx.category_name || tx.budget_name || "";
+                h += `<div class="list-item" style="font-size:13px">
                   <div class="list-info">
                     <div class="list-name">${esc(tx.description || "")}</div>
                     <div class="list-meta">${esc(tx.date?.split("T")[0] || "")}${meta ? " &middot; " + esc(meta) : ""}</div>
                   </div>
-                  <span class="list-value ${isOut ? "val-neg" : "val-pos"}">${fc(isOut ? -amt : amt, tx.currency_symbol || S.detectedCurrency)}</span>
+                  <span class="list-value ${isOut ? "val-neg" : "val-pos"}">${fc(isOut ? -amt : amt, tx.currency_symbol || card.currency)}</span>
                 </div>`;
               });
-              th += "</div>";
-              drill.innerHTML = th;
-              drill.dataset.loaded = "1";
-            } catch {
-              drill.innerHTML = `<div style="padding:10px 16px;color:var(--danger);font-size:13px">Failed to load transactions</div>`;
+            } else {
+              h += `<div style="padding:12px 20px;color:var(--text-muted);font-size:13px">No transactions${hasPeriod ? " in this period" : ""}</div>`;
             }
+
+            h += `</div></div>`;
+          });
+
+          h += `</div>`;
+
+          // ── Category breakdown ──
+          if (d.categoryList.length) {
+            const maxAmt = d.categoryList[0].amt;
+            h += `<div class="data-card fade-in"><div class="card-head"><h3>Spending by Category</h3><span class="count">${d.categoryList.length}</span></div><div class="data-scroll">`;
+            d.categoryList.forEach((c, i) => {
+              const w = maxAmt > 0 ? (c.amt / maxAmt) * 100 : 0;
+              h += `<div class="list-item">
+                <span class="list-rank">${i + 1}</span>
+                <div class="list-info">
+                  <div class="list-name">${esc(c.name)}</div>
+                  <div class="list-bar-wrap"><div class="list-bar expense" style="width:${w}%"></div></div>
+                </div>
+                <span class="list-value val-neg">${fc(-c.amt, sym)}</span>
+              </div>`;
+            });
+            h += `</div></div>`;
           }
 
-          document.querySelectorAll("[data-cc-id]").forEach((el) => {
-            el.addEventListener("click", async () => {
+          return h;
+        }
+
+        function bindCreditCards(d) {
+          document.querySelectorAll(".cc-panel-header[data-cc-id]").forEach((el) => {
+            el.addEventListener("click", () => {
               const cardId = el.dataset.ccId;
               const drill = document.getElementById("ccDrill-" + cardId);
+              const arrow = document.getElementById("cc-arrow-" + cardId);
               if (!drill) return;
-              if (drill.style.display !== "none") {
-                drill.style.display = "none";
-                el.querySelector("span:last-child").innerHTML = "&#9654;";
-                return;
-              }
-              drill.style.display = "block";
-              el.querySelector("span:last-child").innerHTML = "&#9660;";
-              if (drill.dataset.loaded) return;
-              await loadCardTx(cardId, drill);
+              const isOpen = drill.style.display !== "none";
+              drill.style.display = isOpen ? "none" : "block";
+              if (arrow) arrow.innerHTML = isOpen ? "&#9654;" : "&#9660;";
             });
           });
 
-          const reloadOpen = () => {
-            document.querySelectorAll("[data-cc-id]").forEach((el) => {
-              const drill = document.getElementById("ccDrill-" + el.dataset.ccId);
-              if (drill && drill.style.display !== "none") {
-                drill.dataset.loaded = "";
-                loadCardTx(el.dataset.ccId, drill);
-              }
-            });
+          const reload = () => {
+            toolState.ccStart = document.getElementById("ccStart")?.value || "";
+            toolState.ccEnd = document.getElementById("ccEnd")?.value || "";
+            loadTool("credit-cards");
           };
-
           bindDatePresets("ccStart", "ccEnd", (start, end) => {
             toolState.ccStart = start || "";
             toolState.ccEnd = end || "";
-            reloadOpen();
+            loadTool("credit-cards");
           });
-          document.getElementById("ccStart")?.addEventListener("change", (e) => {
-            toolState.ccStart = e.target.value;
-            reloadOpen();
-          });
-          document.getElementById("ccEnd")?.addEventListener("change", (e) => {
-            toolState.ccEnd = e.target.value;
-            reloadOpen();
-          });
+          document.getElementById("ccStart")?.addEventListener("change", reload);
+          document.getElementById("ccEnd")?.addEventListener("change", reload);
         }
 
         // ============================================================
