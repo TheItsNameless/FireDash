@@ -2577,18 +2577,28 @@
           const txCount = cards.reduce((s, c) => s + c.transactions.length, 0);
 
           const catMap = {};
+          const categoryTxMap = {};
+          const dailySpend = {};
           cards.forEach((card) =>
             card.transactions.forEach((tx) => {
               if (tx.type !== "withdrawal") return;
               const cat = tx.category_name || "Uncategorized";
-              catMap[cat] = (catMap[cat] || 0) + (parseFloat(tx.amount) || 0);
+              const amt = parseFloat(tx.amount) || 0;
+              catMap[cat] = (catMap[cat] || 0) + amt;
+              if (!categoryTxMap[cat]) categoryTxMap[cat] = [];
+              categoryTxMap[cat].push({ ...tx, _cardName: card.name, _cardCurrency: card.currency });
+              const date = tx.date?.split("T")[0] || "";
+              if (date) dailySpend[date] = (dailySpend[date] || 0) + amt;
             }),
+          );
+          Object.values(categoryTxMap).forEach((txs) =>
+            txs.sort((a, b) => (b.date || "").localeCompare(a.date || "")),
           );
           const categoryList = Object.entries(catMap)
             .map(([name, amt]) => ({ name, amt }))
             .sort((a, b) => b.amt - a.amt);
 
-          return { cards, totalOwed, totalSpent, totalPaid, txCount, categoryList };
+          return { cards, totalOwed, totalSpent, totalPaid, txCount, categoryList, categoryTxMap, dailySpend };
         }
 
         function renderCreditCards(d) {
@@ -2722,20 +2732,66 @@
 
           h += `</div>`;
 
-          // ── Category breakdown ──
+          // ── Daily spend chart ──
+          const days = Object.keys(d.dailySpend).sort();
+          if (days.length > 1) {
+            const W = 800, H = 130;
+            const padL = 8, padR = 8, padT = 8, padB = 30;
+            const chartW = W - padL - padR;
+            const chartH = H - padT - padB;
+            const maxAmt = Math.max(...days.map((k) => d.dailySpend[k]));
+            const slot = chartW / days.length;
+            const barW = Math.max(2, slot * 0.6);
+            let bars = "", labels = "";
+            const step = days.length <= 14 ? 1 : days.length <= 31 ? 2 : Math.ceil(days.length / 10);
+            days.forEach((date, i) => {
+              const amt = d.dailySpend[date] || 0;
+              const bh = maxAmt > 0 ? (amt / maxAmt) * chartH : 0;
+              const x = padL + i * slot + (slot - barW) / 2;
+              const y = padT + chartH - bh;
+              bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(bh, 1).toFixed(1)}" rx="2" fill="#ef4444" opacity="0.75"><title>${date}  ${fc(-amt, sym)}</title></rect>`;
+              if (i % step === 0) {
+                const label = date.slice(5);
+                labels += `<text x="${(x + barW / 2).toFixed(1)}" y="${H - 6}" text-anchor="middle" font-size="9" fill="currentColor" opacity="0.5">${label}</text>`;
+              }
+            });
+            h += `<div class="data-card fade-in" style="margin-bottom:20px">
+              <div class="card-head"><h3>Daily Spending</h3><span style="font-size:11px;color:var(--text-muted)">${days.length} days &middot; withdrawals</span></div>
+              <div style="padding:12px 16px 8px">
+                <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;overflow:visible;color:var(--text-secondary)">${bars}${labels}</svg>
+              </div>
+            </div>`;
+          }
+
+          // ── Category breakdown with drill-down ──
           if (d.categoryList.length) {
             const maxAmt = d.categoryList[0].amt;
             h += `<div class="data-card fade-in"><div class="card-head"><h3>Spending by Category</h3><span class="count">${d.categoryList.length}</span></div><div class="data-scroll">`;
             d.categoryList.forEach((c, i) => {
               const w = maxAmt > 0 ? (c.amt / maxAmt) * 100 : 0;
-              h += `<div class="list-item">
+              const catTxs = d.categoryTxMap[c.name] || [];
+              h += `<div class="list-item cc-cat-row" data-cat-idx="${i}" style="cursor:pointer;flex-wrap:wrap">
                 <span class="list-rank">${i + 1}</span>
                 <div class="list-info">
                   <div class="list-name">${esc(c.name)}</div>
                   <div class="list-bar-wrap"><div class="list-bar expense" style="width:${w}%"></div></div>
                 </div>
                 <span class="list-value val-neg">${fc(-c.amt, sym)}</span>
-              </div>`;
+                <span id="cc-cat-arrow-${i}" style="font-size:10px;color:var(--text-muted);margin-left:8px">&#9654;</span>
+              </div>
+              <div id="ccCatDrill-${i}" style="display:none;border-top:1px solid var(--border-light)">`;
+              catTxs.forEach((tx) => {
+                const amt = parseFloat(tx.amount) || 0;
+                const cardLabel = tx._cardName ? ` &middot; ${esc(tx._cardName)}` : "";
+                h += `<div class="list-item" style="padding-left:44px;font-size:12px">
+                  <div class="list-info">
+                    <div class="list-name">${esc(tx.description || "")}</div>
+                    <div class="list-meta">${esc(tx.date?.split("T")[0] || "")}${cardLabel}</div>
+                  </div>
+                  <span class="list-value val-neg">${fc(-amt, tx.currency_symbol || tx._cardCurrency || sym)}</span>
+                </div>`;
+              });
+              h += `</div>`;
             });
             h += `</div></div>`;
           }
@@ -2744,11 +2800,25 @@
         }
 
         function bindCreditCards(d) {
+          // Card panel toggle
           document.querySelectorAll(".cc-panel-header[data-cc-id]").forEach((el) => {
             el.addEventListener("click", () => {
               const cardId = el.dataset.ccId;
               const drill = document.getElementById("ccDrill-" + cardId);
               const arrow = document.getElementById("cc-arrow-" + cardId);
+              if (!drill) return;
+              const isOpen = drill.style.display !== "none";
+              drill.style.display = isOpen ? "none" : "block";
+              if (arrow) arrow.innerHTML = isOpen ? "&#9654;" : "&#9660;";
+            });
+          });
+
+          // Category drill-down toggle
+          document.querySelectorAll(".cc-cat-row[data-cat-idx]").forEach((el) => {
+            el.addEventListener("click", () => {
+              const idx = el.dataset.catIdx;
+              const drill = document.getElementById("ccCatDrill-" + idx);
+              const arrow = document.getElementById("cc-cat-arrow-" + idx);
               if (!drill) return;
               const isOpen = drill.style.display !== "none";
               drill.style.display = isOpen ? "none" : "block";
