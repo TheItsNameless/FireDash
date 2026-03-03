@@ -2523,22 +2523,18 @@
         async function fetchCreditCards() {
           const accounts = await apiAll("/api/v1/accounts");
           const cards = [];
-          const creditTypes = ["creditcard", "credit card", "credit_card"];
-          const liabilityTypes = ["loan", "debt", "mortgage", "Loan", "Debt", "Mortgage"];
           accounts.forEach((acc) => {
             const a = acc.attributes || {};
             if (!a.active) return;
-            const t = (a.type || "").toLowerCase();
-            const isCreditCard =
-              creditTypes.some((ct) => t === ct || t.includes(ct)) ||
-              liabilityTypes.includes(a.type) ||
-              t.includes("liabilit");
+            // In Firefly III, credit cards are asset accounts with role "ccAsset"
+            const isCreditCard = a.account_role === "ccAsset";
             if (!isCreditCard) return;
             const bal = parseFloat(a.current_balance || "0");
             cards.push({
               id: acc.id,
               name: a.name,
               type: a.type,
+              role: a.account_role,
               balance: bal,
               currency: a.currency_symbol || S.detectedCurrency,
             });
@@ -2576,7 +2572,7 @@
             h += `<div class="list-item" style="cursor:pointer" data-cc-id="${esc(String(card.id))}">
               <div class="list-info">
                 <div class="list-name">${esc(card.name)}</div>
-                <div class="list-meta"><span class="type-badge liability">${esc(card.type)}</span></div>
+                <div class="list-meta"><span class="type-badge liability">Credit Card</span></div>
               </div>
               <span class="list-value val-neg">${fc(card.balance, card.currency)}</span>
               <span style="font-size:10px;color:var(--text-muted);margin-left:8px">&#9654;</span>
