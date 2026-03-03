@@ -1408,6 +1408,9 @@
           <a class="nav-item" href="#accounts"
             ><span class="nav-icon">&#127974;</span> Accounts</a
           >
+          <a class="nav-item" href="#credit-cards"
+            ><span class="nav-icon">&#128179;</span> Credit Cards</a
+          >
           <a class="nav-item" href="#savings"
             ><span class="nav-icon">&#128179;</span> Savings Goals</a
           >
@@ -1465,6 +1468,12 @@
             fetch: fetchAccounts,
             render: renderAccounts,
             bind: bindAccounts,
+          },
+          "credit-cards": {
+            title: "Credit Cards",
+            fetch: fetchCreditCards,
+            render: renderCreditCards,
+            bind: bindCreditCards,
           },
           savings: {
             title: "Savings Goals",
@@ -2509,6 +2518,173 @@
         }
 
         // ============================================================
+        //  CREDIT CARDS
+        // ============================================================
+        async function fetchCreditCards() {
+          const accounts = await apiAll("/api/v1/accounts");
+          const cards = [];
+          const creditTypes = ["creditcard", "credit card", "credit_card"];
+          const liabilityTypes = ["loan", "debt", "mortgage", "Loan", "Debt", "Mortgage"];
+          accounts.forEach((acc) => {
+            const a = acc.attributes || {};
+            if (!a.active) return;
+            const t = (a.type || "").toLowerCase();
+            const isCreditCard =
+              creditTypes.some((ct) => t === ct || t.includes(ct)) ||
+              liabilityTypes.includes(a.type) ||
+              t.includes("liabilit");
+            if (!isCreditCard) return;
+            const bal = parseFloat(a.current_balance || "0");
+            cards.push({
+              id: acc.id,
+              name: a.name,
+              type: a.type,
+              balance: bal,
+              currency: a.currency_symbol || S.detectedCurrency,
+            });
+          });
+          cards.sort((a, b) => Math.abs(b.balance) - Math.abs(a.balance));
+          const totalOwed = cards.reduce((s, c) => s + Math.abs(c.balance), 0);
+          return { cards, totalOwed };
+        }
+
+        function renderCreditCards(d) {
+          const sym = S.detectedCurrency;
+          const defStart = toolState.ccStart || "";
+          const defEnd = toolState.ccEnd || "";
+          let h = `<div class="tool-header"><h1>Credit Cards</h1>
+            <div class="tool-controls">
+              <input type="date" class="form-input" id="ccStart" value="${defStart}" style="width:auto" title="Period start">
+              <span style="color:var(--text-muted);font-size:13px">to</span>
+              <input type="date" class="form-input" id="ccEnd" value="${defEnd}" style="width:auto" title="Period end">
+              ${datePresetHtml()}
+            </div></div>`;
+          if (!d.cards.length) {
+            h += '<div class="empty-state fade-in"><div class="empty-icon">&#128179;</div><p>No credit card accounts found</p><p style="font-size:12px;margin-top:8px;color:var(--text-muted)">Add liability or credit card accounts in Firefly III</p></div>';
+            return h;
+          }
+          h += `<div class="summary-grid">
+            <div class="summary-card liabilities fade-in stagger-1">
+              <div class="card-icon">&#128179;</div>
+              <div class="card-label">Total Balance</div>
+              <div class="card-value val-neg">${fc(-d.totalOwed, sym)}</div>
+              <div class="card-sub">${d.cards.length} card${d.cards.length !== 1 ? "s" : ""}</div>
+            </div>
+          </div>`;
+          h += `<div class="data-card fade-in"><div class="card-head"><h3>Cards &amp; Spends</h3><span class="count">${d.cards.length}</span></div><div class="data-scroll">`;
+          d.cards.forEach((card) => {
+            h += `<div class="list-item" style="cursor:pointer" data-cc-id="${esc(String(card.id))}">
+              <div class="list-info">
+                <div class="list-name">${esc(card.name)}</div>
+                <div class="list-meta"><span class="type-badge liability">${esc(card.type)}</span></div>
+              </div>
+              <span class="list-value val-neg">${fc(card.balance, card.currency)}</span>
+              <span style="font-size:10px;color:var(--text-muted);margin-left:8px">&#9654;</span>
+            </div>
+            <div id="ccDrill-${esc(String(card.id))}" style="display:none"></div>`;
+          });
+          h += "</div></div>";
+          return h;
+        }
+
+        function bindCreditCards(d) {
+          async function loadCardTx(cardId, drill) {
+            drill.innerHTML = `<div style="padding:10px 16px;color:var(--text-muted);font-size:13px"><span class="spin" style="display:inline-block">&#8635;</span> Loading transactions...</div>`;
+            try {
+              const params = { page: "1" };
+              if (toolState.ccStart) params.start = toolState.ccStart;
+              if (toolState.ccEnd) params.end = toolState.ccEnd;
+              const r = await api(`/api/v1/accounts/${cardId}/transactions`, params);
+              let txs = [];
+              (r.data || []).forEach((j) =>
+                (j.attributes?.transactions || []).forEach((tx) => txs.push(tx)),
+              );
+              if (toolState.ccStart || toolState.ccEnd) {
+                txs = txs.filter((tx) => {
+                  const d = tx.date?.split("T")[0] || "";
+                  if (toolState.ccStart && d < toolState.ccStart) return false;
+                  if (toolState.ccEnd && d > toolState.ccEnd) return false;
+                  return true;
+                });
+              }
+              txs.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+              if (!txs.length) {
+                drill.innerHTML = `<div style="padding:10px 16px;color:var(--text-muted);font-size:13px">No transactions${toolState.ccStart || toolState.ccEnd ? " in this period" : ""}</div>`;
+                drill.dataset.loaded = "1";
+                return;
+              }
+              const totalSpend = txs.reduce(
+                (s, tx) => s + (tx.type === "withdrawal" ? parseFloat(tx.amount) || 0 : 0),
+                0,
+              );
+              let th = `<div style="border-top:1px solid var(--border)">
+                <div style="padding:8px 20px 4px;font-size:12px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center">
+                  <span>${txs.length} transaction${txs.length !== 1 ? "s" : ""}${toolState.ccStart || toolState.ccEnd ? " in period" : ""}</span>
+                  ${totalSpend > 0 ? `<span style="font-weight:600;color:var(--danger)">Spent: ${fc(-totalSpend, S.detectedCurrency)}</span>` : ""}
+                </div>`;
+              txs.forEach((tx) => {
+                const isOut = tx.type === "withdrawal";
+                const amt = parseFloat(tx.amount) || 0;
+                const meta = tx.category_name || tx.budget_name || tx.type || "";
+                th += `<div class="list-item" style="padding-left:32px;font-size:13px">
+                  <div class="list-info">
+                    <div class="list-name">${esc(tx.description || "")}</div>
+                    <div class="list-meta">${esc(tx.date?.split("T")[0] || "")}${meta ? " &middot; " + esc(meta) : ""}</div>
+                  </div>
+                  <span class="list-value ${isOut ? "val-neg" : "val-pos"}">${fc(isOut ? -amt : amt, tx.currency_symbol || S.detectedCurrency)}</span>
+                </div>`;
+              });
+              th += "</div>";
+              drill.innerHTML = th;
+              drill.dataset.loaded = "1";
+            } catch {
+              drill.innerHTML = `<div style="padding:10px 16px;color:var(--danger);font-size:13px">Failed to load transactions</div>`;
+            }
+          }
+
+          document.querySelectorAll("[data-cc-id]").forEach((el) => {
+            el.addEventListener("click", async () => {
+              const cardId = el.dataset.ccId;
+              const drill = document.getElementById("ccDrill-" + cardId);
+              if (!drill) return;
+              if (drill.style.display !== "none") {
+                drill.style.display = "none";
+                el.querySelector("span:last-child").innerHTML = "&#9654;";
+                return;
+              }
+              drill.style.display = "block";
+              el.querySelector("span:last-child").innerHTML = "&#9660;";
+              if (drill.dataset.loaded) return;
+              await loadCardTx(cardId, drill);
+            });
+          });
+
+          const reloadOpen = () => {
+            document.querySelectorAll("[data-cc-id]").forEach((el) => {
+              const drill = document.getElementById("ccDrill-" + el.dataset.ccId);
+              if (drill && drill.style.display !== "none") {
+                drill.dataset.loaded = "";
+                loadCardTx(el.dataset.ccId, drill);
+              }
+            });
+          };
+
+          bindDatePresets("ccStart", "ccEnd", (start, end) => {
+            toolState.ccStart = start || "";
+            toolState.ccEnd = end || "";
+            reloadOpen();
+          });
+          document.getElementById("ccStart")?.addEventListener("change", (e) => {
+            toolState.ccStart = e.target.value;
+            reloadOpen();
+          });
+          document.getElementById("ccEnd")?.addEventListener("change", (e) => {
+            toolState.ccEnd = e.target.value;
+            reloadOpen();
+          });
+        }
+
+        // ============================================================
         //  TOOL 4: SAVINGS GOALS
         // ============================================================
         async function fetchSavings() {
@@ -3375,6 +3551,7 @@
             "category-explorer",
             "tag-explorer",
             "accounts",
+            "credit-cards",
             "savings",
             "bills",
             "search",
