@@ -2761,12 +2761,26 @@
           accounts.forEach((acc) => {
             const a = acc.attributes || {};
             if (!a.active || a.account_role !== "ccAsset") return;
+            // Detect network from name/notes (Firefly III has no dedicated field)
+            const nameLower = (a.name || "").toLowerCase();
+            const network =
+              nameLower.includes("ru" + "pay") ? "rp" :
+              nameLower.includes("mastercard") || nameLower.includes("master card") ? "mastercard" :
+              nameLower.includes("visa") ? "visa" :
+              nameLower.includes("amex") || nameLower.includes("american express") ? "amex" :
+              nameLower.includes("diners") ? "diners" :
+              "";
+            // account_number may hold last-4 or full number
+            const rawNum = (a.account_number || "").replace(/\s/g, "");
+            const cardNumber = rawNum.length >= 4 ? rawNum.slice(-4) : rawNum;
             cards.push({
               id: acc.id,
               name: a.name,
               balance: parseFloat(a.current_balance || "0"),
               creditLimit: parseFloat(a.credit_card_limit || "0"),
               currency: a.currency_symbol || S.detectedCurrency,
+              network,
+              cardNumber,
               transactions: [],
               periodSpent: 0,
               periodPaid: 0,
@@ -2903,10 +2917,22 @@
           const ccCols = n <= 1 ? 1 : n === 2 ? 2 : n === 3 ? 3 : n === 4 ? 2 : 3;
           h += `<div style="display:grid;grid-template-columns:repeat(${ccCols},1fr);gap:16px;margin-bottom:24px">`;
 
+          // Network logos (inline SVG / text badges)
+          const networkLogo = (net) => {
+            if (net === "visa") return `<svg viewBox="0 0 50 16" width="44" height="14" aria-label="Visa"><text x="0" y="13" font-family="Arial,sans-serif" font-size="16" font-weight="800" font-style="italic" fill="#fff" letter-spacing="-1">VISA</text></svg>`;
+            if (net === "mastercard") return `<svg viewBox="0 0 44 28" width="36" height="22" aria-label="Mastercard"><circle cx="14" cy="14" r="14" fill="#eb001b" opacity="0.92"/><circle cx="30" cy="14" r="14" fill="#f79e1b" opacity="0.92"/><path d="M22 5.7a14 14 0 0 1 0 16.6A14 14 0 0 1 22 5.7z" fill="#ff5f00" opacity="0.92"/></svg>`;
+            if (net === "rp") return `<svg viewBox="0 0 60 22" width="48" height="18" aria-label="RuPay"><rect width="60" height="22" rx="3" fill="rgba(255,255,255,0.18)"/><text x="6" y="16" font-family="Arial,sans-serif" font-size="13" font-weight="800" fill="#fff">Ru</text><text x="24" y="16" font-family="Arial,sans-serif" font-size="13" font-weight="800" fill="#f59e0b">Pay</text></svg>`;
+            if (net === "amex") return `<svg viewBox="0 0 56 18" width="48" height="14" aria-label="Amex"><text x="0" y="14" font-family="Arial,sans-serif" font-size="13" font-weight="800" fill="#fff" letter-spacing="0.5">AMEX</text></svg>`;
+            if (net === "diners") return `<svg viewBox="0 0 72 18" width="56" height="14" aria-label="Diners Club"><text x="0" y="14" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="rgba(255,255,255,0.85)">DINERS CLUB</text></svg>`;
+            return "";
+          };
+
           d.cards.forEach((card, i) => {
             const [c1, c2] = palette[i % palette.length];
             const utilPct = card.creditLimit > 0 ? Math.min((Math.abs(card.balance) / card.creditLimit) * 100, 100) : 0;
             const hasStats = card.periodSpent > 0 || card.periodPaid > 0 || card.transactions.length > 0;
+            const netLogo = networkLogo(card.network);
+            const maskedNum = card.cardNumber ? `•••• ${esc(card.cardNumber)}` : "";
 
             h += `<div class="data-card fade-in stagger-${Math.min(i + 1, 4)}" style="margin-bottom:0">
               <div class="cc-panel-header" data-cc-id="${esc(String(card.id))}"
@@ -2915,8 +2941,12 @@
                   <div>
                     <div style="color:rgba(255,255,255,0.65);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Credit Card</div>
                     <div style="color:#fff;font-size:15px;font-weight:700;letter-spacing:-0.2px">${esc(card.name)}</div>
+                    ${maskedNum ? `<div style="color:rgba(255,255,255,0.6);font-size:12px;font-family:monospace;letter-spacing:1.5px;margin-top:4px">${maskedNum}</div>` : ""}
                   </div>
-                  <span id="cc-arrow-${esc(String(card.id))}">${iFwdW}</span>
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+                    <span id="cc-arrow-${esc(String(card.id))}">${iFwdW}</span>
+                    ${netLogo ? `<div style="line-height:0">${netLogo}</div>` : ""}
+                  </div>
                 </div>
                 <div style="margin-top:16px">
                   <div style="color:rgba(255,255,255,0.65);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Current Balance</div>
