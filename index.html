@@ -3697,9 +3697,7 @@
           ];
 
           const n = d.cards.length;
-          const ccCols =
-            n <= 1 ? 1 : n === 2 ? 2 : n === 3 ? 3 : n === 4 ? 2 : 3;
-          h += `<div style="display:grid;grid-template-columns:repeat(${ccCols},1fr);gap:16px;margin-bottom:24px">`;
+          h += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px">`;
 
           // Detect card network from card number if not provided
           const detectNetwork = (cardNumber) => {
