@@ -993,6 +993,41 @@
       .bill-due.ok {
         color: var(--text-muted);
       }
+      .nav-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 17px;
+        height: 17px;
+        padding: 0 4px;
+        border-radius: 9px;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1;
+        margin-left: auto;
+        background: var(--danger);
+        color: #fff;
+      }
+      .alert-banner {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: var(--warning-bg);
+        border: 1px solid var(--warning);
+        border-radius: var(--radius-md);
+        padding: 14px 16px;
+        margin-bottom: 20px;
+        color: var(--text-primary);
+        font-size: 13px;
+      }
+      .alert-banner.danger {
+        background: var(--danger-bg);
+        border-color: var(--danger);
+      }
+      .alert-banner-icon { flex-shrink: 0; margin-top: 1px; }
+      .alert-banner-body { flex: 1; }
+      .alert-banner-title { font-weight: 700; margin-bottom: 6px; }
+      .alert-banner-items { display: flex; flex-direction: column; gap: 4px; }
 
       /* ===== ANIMATIONS ===== */
       @keyframes slideIn {
@@ -1783,6 +1818,8 @@
             $("headerTitle").innerHTML =
               `FireDash <span style="font-size:10px;font-weight:400;opacity:0.5">v${esc(S.serverVersion)}</span>`;
           toast("Connected", "success");
+          // Background: pre-fetch bills to show badge
+          fetchBills().catch(() => {});
           const lastTool = localStorage.getItem("ff3_lastTool");
           if (!location.hash || location.hash === "#")
             location.hash =
@@ -2030,11 +2067,26 @@
           )
             .filter((b) => b && (b.limit > 0 || b.spent > 0))
             .sort((a, b) => b.spent - a.spent);
+          // Net worth trend: last 6 months up to selected month
+          const nwHistory = [];
+          const mNames2 = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+          for (let i = 5; i >= 0; i--) {
+            const d2 = new Date(y, m - i, 1);
+            const { end: nwEnd } = dateRange(d2.getMonth(), d2.getFullYear());
+            try {
+              const sm2 = await api("/api/v1/summary/basic", { start: new Date(d2.getFullYear(), d2.getMonth(), 1).toISOString().split("T")[0], end: nwEnd });
+              let cc2 = "";
+              for (const k of Object.keys(sm2)) { const m2 = k.match(ccPattern); if (m2) { cc2 = m2[1]; break; } }
+              const nw = parseFloat(sm2[`net-worth-in-${cc2}`]?.monetary_value || "0");
+              nwHistory.push({ label: mNames2[d2.getMonth()], nw });
+            } catch { nwHistory.push({ label: mNames2[d2.getMonth()], nw: 0 }); }
+          }
           return {
             monthly,
             ytd,
             categories: categoryData,
             budgets: budgetData,
+            nwHistory,
           };
         }
         function parseSummary(s, cc) {
@@ -2090,6 +2142,31 @@
                 <div class="summary-card networth fade-in stagger-4"><div class="card-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="card-label">Net Worth</div><div class="card-value">${fc(d.ytd.netWorth, sym)}</div><div class="card-sub">End of period</div></div>
             </div>`;
 
+          // ── Budget progress strip ──
+          if (d.budgets.length) {
+            const overBudget = d.budgets.filter(b => b.over);
+            h += `<div class="data-card fade-in stagger-2" style="margin-bottom:24px"><div class="card-head"><h3>Budget Status</h3><div style="display:flex;gap:8px;align-items:center"><span class="count">${d.budgets.length}</span>${overBudget.length ? `<span style="font-size:11px;font-weight:700;color:var(--danger);background:var(--danger-bg);padding:2px 8px;border-radius:9px">${overBudget.length} over</span>` : `<span style="font-size:11px;font-weight:700;color:var(--success);background:var(--success-bg);padding:2px 8px;border-radius:9px">On track</span>`}</div></div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;padding:4px 20px 16px">`;
+            d.budgets.forEach(b => {
+              const pct = b.limit > 0 ? Math.round((b.spent / b.limit) * 100) : 0;
+              const bc = pct >= 100 ? "var(--danger)" : pct >= 75 ? "var(--warning)" : "var(--success)";
+              h += `<div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+                  <span style="font-size:12px;font-weight:600;color:var(--text-primary)">${esc(b.name)}</span>
+                  <span style="font-size:11px;color:${bc};font-weight:700">${pct}%</span>
+                </div>
+                <div style="height:6px;border-radius:3px;background:var(--border);overflow:hidden">
+                  <div style="height:100%;width:${Math.min(pct,100)}%;background:${bc};border-radius:3px;transition:width 0.4s ease"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:3px;font-size:10px;color:var(--text-muted)">
+                  <span>${fc(-b.spent, sym)}</span>
+                  <span>${b.limit > 0 ? (b.over ? `<span style="color:var(--danger)">Over ${fc(Math.abs(b.remaining),sym)}</span>` : `${fc(b.remaining,sym)} left`) : "No limit"}</span>
+                </div>
+              </div>`;
+            });
+            h += `</div></div>`;
+          }
+
           h += '<div class="two-col">';
           // categories
           const maxCat = d.categories.length
@@ -2124,6 +2201,33 @@
                     }</div>`;
             });
           h += "</div></div></div>";
+
+          // ── Net Worth trend chart ──
+          if (d.nwHistory && d.nwHistory.length > 1) {
+            const nwVals = d.nwHistory.map(p => p.nw);
+            const minNW = Math.min(...nwVals);
+            const maxNW = Math.max(...nwVals);
+            const range = maxNW - minNW || 1;
+            const W = 600, H = 120, padL = 10, padR = 10, padT = 12, padB = 28;
+            const iW = W - padL - padR, iH = H - padT - padB;
+            const n = nwVals.length;
+            const xs = nwVals.map((_, i) => padL + (i / (n - 1)) * iW);
+            const ys = nwVals.map(v => padT + iH - ((v - minNW) / range) * iH);
+            const pts = xs.map((x, i) => `${x},${ys[i]}`).join(" ");
+            // filled area path
+            const areaD = `M${xs[0]},${ys[0]} ` + xs.slice(1).map((x,i)=>`L${x},${ys[i+1]}`).join(" ") + ` L${xs[n-1]},${padT+iH} L${xs[0]},${padT+iH} Z`;
+            h += `<div class="data-card fade-in stagger-4" style="margin-bottom:0"><div class="card-head"><h3>Net Worth Trend</h3><span style="font-size:12px;color:var(--text-muted)">${nwVals[nwVals.length-1] >= nwVals[0] ? '<span style="color:var(--success)">↑</span>' : '<span style="color:var(--danger)">↓</span>'} 6-month</span></div>
+            <div style="padding:0 20px 16px">
+            <svg viewBox="0 0 ${W} ${H}" width="100%" style="overflow:visible;display:block">
+              <defs><linearGradient id="nwGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity="0.25"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0.02"/></linearGradient></defs>
+              <path d="${areaD}" fill="url(#nwGrad)"/>
+              <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              ${xs.map((x,i)=>`<circle cx="${x}" cy="${ys[i]}" r="3.5" fill="var(--accent)"/>`).join("")}
+              ${d.nwHistory.map((p,i)=>`<text x="${xs[i]}" y="${H-6}" text-anchor="middle" font-size="10" fill="var(--text-muted)" font-family="Inter,sans-serif">${esc(p.label)}</text>`).join("")}
+              ${d.nwHistory.map((p,i)=>`<text x="${xs[i]}" y="${ys[i]-8}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}" font-size="9.5" fill="var(--accent)" font-family="Inter,sans-serif" font-weight="600">${fc(p.nw, sym)}</text>`).join("")}
+            </svg></div></div>`;
+          }
+
           return h;
         }
         function bindMonthlyReport(d) {
@@ -3005,7 +3109,24 @@
             totalMin += b.min * b.mult;
             totalMax += b.max * b.mult;
           });
+          // expose for badge update
+          S._billsData = { items };
+          updateBillsBadge(items);
           return { items, totalMin, totalMax };
+        }
+
+        function updateBillsBadge(items) {
+          const urgent = (items || []).filter(b => b.daysUntil !== null && b.daysUntil <= 7);
+          const navEl = document.querySelector('a[href="#bills"]');
+          if (!navEl) return;
+          const existing = navEl.querySelector(".nav-badge");
+          if (existing) existing.remove();
+          if (urgent.length > 0) {
+            const badge = document.createElement("span");
+            badge.className = "nav-badge";
+            badge.textContent = urgent.length;
+            navEl.appendChild(badge);
+          }
         }
 
         function renderBills(d) {
@@ -3019,9 +3140,22 @@
               yearly: "Yearly",
             })[f] || f;
           let h = `<div class="tool-header"><h1>Bills &amp; Subscriptions</h1><div class="tool-controls"><button class="btn btn-ghost" id="billExport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" style="vertical-align:-1px"><line x1="12" y1="3" x2="12" y2="15"/><polyline points="8 11 12 15 16 11"/><line x1="5" y1="21" x2="19" y2="21"/></svg> CSV</button></div></div>`;
+
+          // ── Alert banners ──
+          const overdue = d.items.filter(b => b.daysUntil !== null && b.daysUntil < 0);
+          const dueSoon = d.items.filter(b => b.daysUntil !== null && b.daysUntil >= 0 && b.daysUntil <= 7);
+          if (overdue.length) {
+            h += `<div class="alert-banner danger fade-in"><div class="alert-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="alert-banner-body"><div class="alert-banner-title">${overdue.length} bill${overdue.length > 1 ? "s" : ""} overdue</div><div class="alert-banner-items">${overdue.map(b => `<span>${esc(b.name)} &mdash; ${Math.abs(b.daysUntil)}d ago &middot; ${fc(b.max, b.currency)}</span>`).join("")}</div></div></div>`;
+          }
+          if (dueSoon.length) {
+            h += `<div class="alert-banner fade-in"><div class="alert-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="alert-banner-body"><div class="alert-banner-title">Due within 7 days</div><div class="alert-banner-items">${dueSoon.map(b => `<span>${esc(b.name)} &mdash; ${b.daysUntil === 0 ? "today" : "in " + b.daysUntil + "d"} &middot; ${fc(b.max, b.currency)}</span>`).join("")}</div></div></div>`;
+          }
+
           if (d.items.length) {
             h += `<div class="summary-grid">
                     <div class="summary-card bills-total fade-in stagger-1"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="card-label">Monthly Estimate</div><div class="card-value">${fc(d.totalMin, sym)}${d.totalMin !== d.totalMax ? " - " + fc(d.totalMax, sym) : ""}</div><div class="card-sub">${d.items.length} active bills</div></div>
+                    ${overdue.length ? `<div class="summary-card fade-in stagger-2"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="card-label">Overdue</div><div class="card-value" style="color:var(--danger)">${overdue.length}</div><div class="card-sub">Need attention</div></div>` : ""}
+                    ${dueSoon.length ? `<div class="summary-card fade-in stagger-3"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="card-label">Due This Week</div><div class="card-value" style="color:var(--warning)">${dueSoon.length}</div><div class="card-sub">Coming up soon</div></div>` : ""}
                 </div>`;
           }
 
@@ -3087,7 +3221,19 @@
         //  TOOL 6: TRANSACTION SEARCH
         // ============================================================
         async function fetchSearch() {
-          if (!toolState.searchQuery) return { results: null };
+          // Always load accounts+categories for filter dropdowns
+          if (!toolState.searchAccounts) {
+            const allAccounts = await apiAll("/api/v1/accounts");
+            toolState.searchAccounts = allAccounts
+              .filter(a => a.attributes?.active && ["asset","expense","revenue"].includes(a.attributes?.type))
+              .map(a => ({ id: a.id, name: a.attributes?.name || "" }))
+              .sort((a, b) => a.name.localeCompare(b.name));
+          }
+          if (!toolState.searchCategories) {
+            const cats = await apiAll("/api/v1/categories");
+            toolState.searchCategories = cats.map(c => ({ id: c.id, name: c.attributes?.name || "" })).sort((a, b) => a.name.localeCompare(b.name));
+          }
+          if (!toolState.searchQuery) return { results: null, accounts: toolState.searchAccounts, categories: toolState.searchCategories };
           const params = { query: toolState.searchQuery };
           if (toolState.searchType && toolState.searchType !== "all")
             params.type = toolState.searchType;
@@ -3106,13 +3252,18 @@
               const d = tx.date?.split("T")[0] || "";
               if (toolState.searchStart && d < toolState.searchStart) continue;
               if (toolState.searchEnd && d > toolState.searchEnd) continue;
+              const amt = parseFloat(tx.amount) || 0;
+              if (toolState.searchMinAmt && amt < parseFloat(toolState.searchMinAmt)) continue;
+              if (toolState.searchMaxAmt && amt > parseFloat(toolState.searchMaxAmt)) continue;
+              if (toolState.searchAccount && tx.source_name !== toolState.searchAccount && tx.destination_name !== toolState.searchAccount) continue;
+              if (toolState.searchCategory && tx.category_name !== toolState.searchCategory) continue;
               transactions.push(tx);
             }
           }
           transactions.sort((a, b) =>
             (b.date || "").localeCompare(a.date || ""),
           );
-          return { results: transactions, query: toolState.searchQuery };
+          return { results: transactions, query: toolState.searchQuery, accounts: toolState.searchAccounts, categories: toolState.searchCategories };
         }
 
         function renderSearch(d) {
@@ -3125,13 +3276,22 @@
                 `<option value="${t}"${t === st ? " selected" : ""}>${t === "all" ? "All Types" : t.charAt(0).toUpperCase() + t.slice(1) + "s"}</option>`,
             )
             .join("");
+          const accOpts = `<option value="">All Accounts</option>` + (d.accounts || []).map(a => `<option value="${esc(a.name)}"${a.name === toolState.searchAccount ? " selected" : ""}>${esc(a.name)}</option>`).join("");
+          const catOpts = `<option value="">All Categories</option>` + (d.categories || []).map(c => `<option value="${esc(c.name)}"${c.name === toolState.searchCategory ? " selected" : ""}>${esc(c.name)}</option>`).join("");
           let h = `<div class="tool-header"><h1>Transaction Search</h1></div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-end">
-                    <div class="form-group" style="flex:2;min-width:180px;margin-bottom:0"><label>Search</label><input type="text" class="form-input" id="searchInput" value="${esc(q)}" placeholder="Description, amount, notes..."></div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:8px;align-items:flex-end">
+                    <div class="form-group" style="grid-column:span 2;margin-bottom:0"><label>Search</label><input type="text" class="form-input" id="searchInput" value="${esc(q)}" placeholder="Description, notes..."></div>
                     <div class="form-group" style="margin-bottom:0"><label>Type</label><select class="form-select" id="searchType">${typeOpts}</select></div>
-                    <div class="form-group" style="margin-bottom:0"><label>From</label><input type="date" class="form-input" id="searchStart" value="${toolState.searchStart || ""}" style="width:auto"></div>
-                    <div class="form-group" style="margin-bottom:0"><label>To</label><input type="date" class="form-input" id="searchEnd" value="${toolState.searchEnd || ""}" style="width:auto"></div>
-                    <button class="btn btn-primary" id="searchBtn" style="height:36px">Search</button>
+                    <div class="form-group" style="margin-bottom:0"><label>Account</label><select class="form-select" id="searchAccount">${accOpts}</select></div>
+                    <div class="form-group" style="margin-bottom:0"><label>Category</label><select class="form-select" id="searchCategory">${catOpts}</select></div>
+                    <div class="form-group" style="margin-bottom:0"><label>Min Amount</label><input type="number" class="form-input" id="searchMinAmt" value="${toolState.searchMinAmt || ""}" placeholder="0" min="0" style="width:100%"></div>
+                    <div class="form-group" style="margin-bottom:0"><label>Max Amount</label><input type="number" class="form-input" id="searchMaxAmt" value="${toolState.searchMaxAmt || ""}" placeholder="Any" min="0" style="width:100%"></div>
+                    <div class="form-group" style="margin-bottom:0"><label>From</label><input type="date" class="form-input" id="searchStart" value="${toolState.searchStart || ""}" style="width:100%"></div>
+                    <div class="form-group" style="margin-bottom:0"><label>To</label><input type="date" class="form-input" id="searchEnd" value="${toolState.searchEnd || ""}" style="width:100%"></div>
+                </div>
+                <div style="display:flex;gap:8px;margin-bottom:20px">
+                    <button class="btn btn-primary" id="searchBtn">Search</button>
+                    <button class="btn btn-ghost" id="searchClear">Clear filters</button>
                 </div>`;
 
           if (!d.results) {
@@ -3165,12 +3325,27 @@
             toolState.searchType = $("searchType")?.value || "all";
             toolState.searchStart = $("searchStart")?.value || "";
             toolState.searchEnd = $("searchEnd")?.value || "";
+            toolState.searchAccount = $("searchAccount")?.value || "";
+            toolState.searchCategory = $("searchCategory")?.value || "";
+            toolState.searchMinAmt = $("searchMinAmt")?.value || "";
+            toolState.searchMaxAmt = $("searchMaxAmt")?.value || "";
             if (!toolState.searchQuery) {
               toast("Enter a search term", "error");
               return;
             }
             loadTool("search");
           };
+          $("searchClear")?.addEventListener("click", () => {
+            toolState.searchQuery = "";
+            toolState.searchType = "all";
+            toolState.searchStart = "";
+            toolState.searchEnd = "";
+            toolState.searchAccount = "";
+            toolState.searchCategory = "";
+            toolState.searchMinAmt = "";
+            toolState.searchMaxAmt = "";
+            loadTool("search");
+          });
           $("searchBtn")?.addEventListener("click", triggerSearch);
           $("searchInput")?.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
@@ -3304,23 +3479,44 @@
                 </div></div>`;
 
           h += `<div class="summary-grid">
-                <div class="summary-card ${mode === "earned" ? "earned" : "spent"} fade-in stagger-1"><div class="card-icon">${mode === "earned" ? "&uarr;" : "&darr;"}</div><div class="card-label">Average / Month</div><div class="card-value">${fc(avg, sym)}</div></div>
+                <div class="summary-card ${mode === "earned" ? "earned" : "spent"} fade-in stagger-1"><div class="card-icon">${mode === "earned" ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`}</div><div class="card-label">Average / Month</div><div class="card-value">${fc(avg, sym)}</div></div>
                 ${highest ? `<div class="summary-card networth fade-in stagger-2"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="18 15 12 9 6 15"/></svg></div><div class="card-label">Highest</div><div class="card-value">${fc(Math.max(...values), sym)}</div><div class="card-sub">${esc(highest.label)}</div></div>` : ""}
                 ${lowest ? `<div class="summary-card balance fade-in stagger-3"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg></div><div class="card-label">Lowest</div><div class="card-value">${fc(Math.min(...values.filter((v) => v > 0)), sym)}</div><div class="card-sub">${esc(lowest.label)}</div></div>` : ""}
             </div>`;
 
-          const barColor =
-            mode === "earned" ? "ok" : mode === "balance" ? "purple" : "over";
-          h += `<div class="data-card fade-in stagger-2"><div class="card-head"><h3>Monthly ${mode === "spent" ? "Spending" : mode === "earned" ? "Income" : "Net Change"}</h3></div>`;
+          // ── Grouped bar chart: Spending vs Income ──
+          const allMax = Math.max(...d.data.map(m => Math.max(m.spent, m.earned)), 1);
+          const n = d.data.length;
+          const W = 600, H = 180, padL = 8, padR = 8, padT = 16, padB = 28;
+          const iW = W - padL - padR, iH = H - padT - padB;
+          const grpW = iW / n;
+          const barW = Math.min(grpW * 0.35, 28);
+          h += `<div class="data-card fade-in stagger-2"><div class="card-head"><h3>Spending vs Income</h3>
+            <span style="display:flex;gap:12px;align-items:center;font-size:12px">
+              <span style="display:flex;gap:4px;align-items:center"><span style="width:10px;height:10px;border-radius:2px;background:var(--danger);display:inline-block"></span> Spent</span>
+              <span style="display:flex;gap:4px;align-items:center"><span style="width:10px;height:10px;border-radius:2px;background:var(--success);display:inline-block"></span> Income</span>
+            </span></div>
+            <div style="padding:0 16px 16px">
+            <svg viewBox="0 0 ${W} ${H}" width="100%" style="overflow:visible;display:block">`;
+          d.data.forEach((m, i) => {
+            const cx = padL + i * grpW + grpW / 2;
+            const spH = allMax > 0 ? (m.spent / allMax) * iH : 0;
+            const erH = allMax > 0 ? (m.earned / allMax) * iH : 0;
+            const spY = padT + iH - spH, erY = padT + iH - erH;
+            h += `<rect x="${cx - barW - 2}" y="${spY}" width="${barW}" height="${spH}" rx="3" fill="var(--danger)" opacity="0.85"/>`;
+            h += `<rect x="${cx + 2}" y="${erY}" width="${barW}" height="${erH}" rx="3" fill="var(--success)" opacity="0.85"/>`;
+            h += `<text x="${cx}" y="${H - 6}" text-anchor="middle" font-size="10" fill="var(--text-muted)" font-family="Inter,sans-serif">${esc(m.label)}</text>`;
+          });
+          h += `<line x1="${padL}" y1="${padT + iH}" x2="${W - padR}" y2="${padT + iH}" stroke="var(--border)" stroke-width="1"/>`;
+          h += `</svg></div></div>`;
+
+          // ── Detail list ──
+          h += `<div class="data-card fade-in stagger-3"><div class="card-head"><h3>Monthly ${mode === "spent" ? "Spending" : mode === "earned" ? "Income" : "Net Change"}</h3></div>`;
           d.data.forEach((m) => {
-            const val =
-              mode === "spent"
-                ? m.spent
-                : mode === "earned"
-                  ? m.earned
-                  : m.balance;
+            const val = mode === "spent" ? m.spent : mode === "earned" ? m.earned : m.balance;
             const pct = maxVal > 0 ? (Math.abs(val) / maxVal) * 100 : 0;
-            h += `<div class="progress-item"><div class="progress-row"><span class="progress-name">${esc(m.label)}</span><span class="progress-amounts"><span class="pval ${val < 0 ? "val-neg" : mode === "spent" ? "val-neg" : "val-pos"}">${mode === "balance" ? fc(val, sym) : fc(val, sym)}</span></span></div>
+            const barColor = mode === "earned" ? "ok" : mode === "balance" ? (val >= 0 ? "ok" : "over") : "over";
+            h += `<div class="progress-item"><div class="progress-row"><span class="progress-name">${esc(m.label)}</span><span class="progress-amounts"><span class="pval ${val < 0 ? "val-neg" : mode === "spent" ? "val-neg" : "val-pos"}">${fc(val, sym)}</span></span></div>
                     <div class="progress-bar-wrap"><div class="progress-bar ${barColor}" style="width:${pct}%"></div></div></div>`;
           });
           h += "</div>";
