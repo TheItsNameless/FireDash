@@ -227,6 +227,77 @@
         font-size: 16px;
         flex-shrink: 0;
       }
+      .nav-label {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: opacity 0.2s ease, width 0.2s ease;
+      }
+
+      /* ── Sidebar collapsed (icon-only) ── */
+      .sidebar.collapsed {
+        width: var(--sidebar-collapsed);
+      }
+      .sidebar.collapsed .nav-label {
+        display: none;
+      }
+      .sidebar.collapsed ~ .main-content {
+        margin-left: var(--sidebar-collapsed);
+        width: calc(100% - var(--sidebar-collapsed));
+      }
+      /* Tooltip shown when sidebar is collapsed */
+      .sidebar.collapsed .nav-item {
+        position: relative;
+        justify-content: center;
+        padding: 10px 0;
+      }
+      .sidebar.collapsed .nav-item::after {
+        content: attr(data-tip);
+        position: absolute;
+        left: calc(var(--sidebar-collapsed) + 8px);
+        top: 50%;
+        transform: translateY(-50%);
+        background: #1a1a2e;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        padding: 5px 10px;
+        border-radius: 6px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        z-index: 200;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      }
+      .sidebar.collapsed .nav-item:hover::after {
+        opacity: 1;
+      }
+      /* Collapse toggle button */
+      .sidebar-collapse-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: rgba(255,255,255,0.07);
+        border: none;
+        cursor: pointer;
+        color: rgba(255,255,255,0.55);
+        margin-left: auto;
+        flex-shrink: 0;
+        transition: all var(--transition);
+      }
+      .sidebar-collapse-btn:hover {
+        background: rgba(255,255,255,0.14);
+        color: #fff;
+      }
+      .sidebar.collapsed .sidebar-collapse-btn {
+        margin-left: 0;
+        margin: 0 auto;
+      }
 
       /* ===== MAIN CONTENT ===== */
       .app-layout {
@@ -1431,43 +1502,51 @@
     <div class="app-layout">
       <nav class="sidebar hidden" id="sidebar">
         <div class="sidebar-nav">
-          <a class="nav-item" href="#monthly-report"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span> Monthly Report</a
+          <a class="nav-item" href="#monthly-report" data-tip="Monthly Report"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span class="nav-label"> Monthly Report</span></a
           >
-          <a class="nav-item" href="#trends"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg></span> Trends</a
+          <a class="nav-item" href="#trends" data-tip="Trends"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg></span><span class="nav-label"> Trends</span></a
           >
-          <a class="nav-item" href="#budget-explorer"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></span> Budget Explorer</a
+          <a class="nav-item" href="#budget-explorer" data-tip="Budget Explorer"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></span><span class="nav-label"> Budget Explorer</span></a
           >
-          <a class="nav-item" href="#category-explorer"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21.21 15.89A9 9 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span> Category Explorer</a
+          <a class="nav-item" href="#category-explorer" data-tip="Category Explorer"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21.21 15.89A9 9 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span><span class="nav-label"> Category Explorer</span></a
           >
-          <a class="nav-item" href="#tag-explorer"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span> Tag Explorer</a
+          <a class="nav-item" href="#tag-explorer" data-tip="Tag Explorer"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span><span class="nav-label"> Tag Explorer</span></a
           >
-          <a class="nav-item" href="#accounts"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></span> Accounts</a
+          <a class="nav-item" href="#accounts" data-tip="Accounts"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></span><span class="nav-label"> Accounts</span></a
           >
-          <a class="nav-item" href="#credit-cards"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> Credit Cards</a
+          <a class="nav-item" href="#credit-cards" data-tip="Credit Cards"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span><span class="nav-label"> Credit Cards</span></a
           >
-          <a class="nav-item" href="#savings"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> Savings Goals</a
+          <a class="nav-item" href="#savings" data-tip="Savings Goals"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span class="nav-label"> Savings Goals</span></a
           >
-          <a class="nav-item" href="#bills"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Bills &amp; Subs</a
+          <a class="nav-item" href="#bills" data-tip="Bills &amp; Subs"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="nav-label"> Bills &amp; Subs</span></a
           >
-          <a class="nav-item" href="#search"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> Search</a
+          <a class="nav-item" href="#recurring" data-tip="Recurring"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span><span class="nav-label"> Recurring</span></a
+          >
+          <a class="nav-item" href="#search" data-tip="Search"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><span class="nav-label"> Search</span></a
           >
         </div>
         <div class="sidebar-bottom">
-          <a class="nav-item" id="sidebarSettings"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Settings</a
+          <div style="display:flex;align-items:center;padding:4px 4px 8px;justify-content:flex-end">
+            <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar">
+              <svg id="sidebarCollapseIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
+          </div>
+          <a class="nav-item" id="sidebarSettings" data-tip="Settings"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="nav-label"> Settings</span></a
           >
-          <a class="nav-item" href="https://github.com/yemzikk/FireDash" target="_blank" rel="noopener" style="opacity:0.5;font-size:12px"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg></span> GitHub</a
+          <a class="nav-item" href="https://github.com/yemzikk/FireDash" target="_blank" rel="noopener" data-tip="GitHub" style="opacity:0.5;font-size:12px"
+            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg></span><span class="nav-label"> GitHub</span></a
           >
         </div>
       </nav>
@@ -1527,6 +1606,12 @@
             fetch: fetchBills,
             render: renderBills,
             bind: bindBills,
+          },
+          recurring: {
+            title: "Recurring Transactions",
+            fetch: fetchRecurring,
+            render: renderRecurring,
+            bind: bindRecurring,
           },
           search: {
             title: "Transaction Search",
@@ -3273,6 +3358,147 @@
         }
 
         // ============================================================
+        //  TOOL: RECURRING TRANSACTIONS
+        // ============================================================
+        async function fetchRecurring() {
+          // Fetch last 3 months of withdrawals and deposits to detect patterns
+          const now = new Date();
+          const start = fmt(new Date(now.getFullYear(), now.getMonth() - 2, 1));
+          const end = fmt(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+          const raw = await apiAll("/api/v1/transactions", { start, end, type: "withdrawal" },
+            (page, total, count) => {
+              const el = document.getElementById("loadProgress");
+              if (el) el.innerHTML = `<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Scanning transactions... page ${page}/${total} (${count} found)`;
+            }
+          );
+          // Flatten transactions
+          const txs = [];
+          for (const journal of raw) {
+            for (const tx of journal.attributes?.transactions || []) {
+              txs.push({
+                description: tx.description || "",
+                destination: tx.destination_name || "",
+                amount: parseFloat(tx.amount) || 0,
+                date: tx.date?.split("T")[0] || "",
+                category: tx.category_name || "",
+                currency: tx.currency_symbol || S.detectedCurrency,
+              });
+            }
+          }
+          // Group by (merchant key, rounded amount bucket)
+          // Key = destination_name (merchant), bucket amount to nearest 5% tolerance
+          const groups = {};
+          for (const tx of txs) {
+            const merchant = tx.destination || tx.description;
+            if (!merchant) continue;
+            // Round amount to 2 decimal places as bucket key for exact-match detection
+            const amtKey = tx.amount.toFixed(2);
+            const key = `${merchant}|||${amtKey}`;
+            if (!groups[key]) groups[key] = { merchant, amount: tx.amount, currency: tx.currency, category: tx.category, dates: [], txs: [] };
+            groups[key].dates.push(tx.date);
+            groups[key].txs.push(tx);
+          }
+          // Keep only groups that appear 2+ times (across different calendar months)
+          const recurring = [];
+          for (const g of Object.values(groups)) {
+            if (g.dates.length < 2) continue;
+            const months = new Set(g.dates.map(d => d.slice(0, 7)));
+            if (months.size < 2) continue; // must span multiple months
+            // Estimate frequency from median gap between dates
+            const sorted = [...g.dates].sort();
+            const gaps = [];
+            for (let i = 1; i < sorted.length; i++) {
+              const diff = (new Date(sorted[i]) - new Date(sorted[i - 1])) / 86400000;
+              gaps.push(diff);
+            }
+            const medGap = gaps.sort((a, b) => a - b)[Math.floor(gaps.length / 2)];
+            const freq = medGap <= 10 ? "Weekly" : medGap <= 20 ? "Bi-weekly" : medGap <= 40 ? "Monthly" : medGap <= 100 ? "Quarterly" : "Irregular";
+            recurring.push({ ...g, freq, medGap, lastDate: sorted[sorted.length - 1], occurrences: g.dates.length });
+          }
+          // Sort by amount desc
+          recurring.sort((a, b) => b.amount - a.amount);
+          const totalMonthly = recurring
+            .filter(r => r.freq === "Monthly")
+            .reduce((s, r) => s + r.amount, 0);
+          return { recurring, totalMonthly, txCount: txs.length, start, end };
+        }
+
+        function renderRecurring(d) {
+          const sym = S.detectedCurrency;
+          const freqColors = {
+            Weekly: "var(--accent)", "Bi-weekly": "#8b5cf6",
+            Monthly: "var(--success)", Quarterly: "var(--warning)", Irregular: "var(--text-muted)"
+          };
+          let h = `<div class="tool-header"><h1>Recurring Transactions</h1>
+            <div class="tool-controls"><button class="btn btn-ghost" id="recurExport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" style="vertical-align:-1px"><line x1="12" y1="3" x2="12" y2="15"/><polyline points="8 11 12 15 16 11"/><line x1="5" y1="21" x2="19" y2="21"/></svg> CSV</button></div></div>`;
+
+          if (!d.recurring.length) {
+            h += `<div class="empty-state fade-in"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div><p>No recurring patterns found in the last 3 months</p></div>`;
+            return h;
+          }
+
+          h += `<div class="summary-grid">
+            <div class="summary-card fade-in stagger-1"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div><div class="card-label">Recurring Found</div><div class="card-value">${d.recurring.length}</div><div class="card-sub">from ${d.txCount} transactions</div></div>
+            <div class="summary-card spent fade-in stagger-2"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="card-label">Monthly Recurring</div><div class="card-value val-neg">${fc(d.totalMonthly, sym)}</div><div class="card-sub">monthly charges detected</div></div>
+            <div class="summary-card fade-in stagger-3"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="card-label">Period Scanned</div><div class="card-value" style="font-size:16px">${d.start}</div><div class="card-sub">to ${d.end}</div></div>
+          </div>`;
+
+          // Group by frequency
+          const byFreq = {};
+          for (const r of d.recurring) {
+            if (!byFreq[r.freq]) byFreq[r.freq] = [];
+            byFreq[r.freq].push(r);
+          }
+          const freqOrder = ["Monthly", "Weekly", "Bi-weekly", "Quarterly", "Irregular"];
+          for (const freq of freqOrder) {
+            const items = byFreq[freq];
+            if (!items) continue;
+            h += `<div class="data-card fade-in"><div class="card-head"><h3>${freq}</h3><span class="count">${items.length}</span></div><div class="data-scroll">`;
+            items.forEach((r, i) => {
+              const col = freqColors[r.freq] || "var(--text-muted)";
+              h += `<div class="list-item" style="cursor:pointer" data-recur-idx="${freq}-${i}">
+                <span class="list-rank">${i + 1}</span>
+                <div class="list-info">
+                  <div class="list-name">${esc(r.merchant)}</div>
+                  <div class="list-meta">
+                    <span style="color:${col};font-weight:600;font-size:11px">${r.freq}</span>
+                    &middot; ${r.occurrences}× in 3 months
+                    &middot; last ${esc(r.lastDate)}
+                    ${r.category ? ` &middot; ${esc(r.category)}` : ""}
+                  </div>
+                </div>
+                <span class="list-value val-neg">${fc(r.amount, r.currency)}</span>
+              </div>
+              <div id="recurDrill-${freq}-${i}" style="display:none">`;
+              r.txs.slice().sort((a, b) => b.date.localeCompare(a.date)).forEach(tx => {
+                h += `<div class="list-item" style="padding-left:58px;background:var(--bg-card-hover);border-left:2px solid var(--accent)">
+                  <div class="list-info"><div class="list-name" style="font-size:12px">${esc(tx.description)}</div><div class="list-meta">${esc(tx.date)}</div></div>
+                  <span class="list-value val-neg" style="font-size:12px">${fc(tx.amount, tx.currency)}</span>
+                </div>`;
+              });
+              h += `</div>`;
+            });
+            h += `</div></div>`;
+          }
+          return h;
+        }
+
+        function bindRecurring(d) {
+          $("recurExport")?.addEventListener("click", () => {
+            const rows = [["Merchant", "Amount", "Currency", "Frequency", "Occurrences", "Last Date", "Category"]];
+            d.recurring.forEach(r => rows.push([r.merchant, r.amount, r.currency, r.freq, r.occurrences, r.lastDate, r.category]));
+            exportCsv(rows, "recurring.csv");
+          });
+          document.querySelectorAll("[data-recur-idx]").forEach(el => {
+            el.addEventListener("click", () => {
+              const drill = document.getElementById("recurDrill-" + el.dataset.recurIdx);
+              if (!drill) return;
+              drill.style.display = drill.style.display === "none" ? "block" : "none";
+            });
+          });
+        }
+
+        // ============================================================
         //  TOOL 6: TRANSACTION SEARCH
         // ============================================================
         async function fetchSearch() {
@@ -3979,6 +4205,28 @@
             e.preventDefault();
             openDrawer();
           });
+
+          // Sidebar collapse toggle (desktop)
+          const collapseBtn = $("sidebarCollapseBtn");
+          const collapseIcon = $("sidebarCollapseIcon");
+          const sidebar = $("sidebar");
+          const mainContent = $("mainContent");
+          const isSidebarCollapsed = () => localStorage.getItem("ff3_sidebarCollapsed") === "1";
+          const applySidebarCollapse = (collapsed) => {
+            sidebar.classList.toggle("collapsed", collapsed);
+            mainContent.style.marginLeft = collapsed ? "var(--sidebar-collapsed)" : "";
+            mainContent.style.width = collapsed ? "calc(100% - var(--sidebar-collapsed))" : "";
+            // Flip the chevron icon direction
+            collapseIcon.innerHTML = collapsed
+              ? `<polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>`
+              : `<polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>`;
+          };
+          applySidebarCollapse(isSidebarCollapsed());
+          collapseBtn?.addEventListener("click", () => {
+            const next = !isSidebarCollapsed();
+            localStorage.setItem("ff3_sidebarCollapsed", next ? "1" : "0");
+            applySidebarCollapse(next);
+          });
           $("menuToggle").addEventListener("click", () =>
             $("sidebar").classList.toggle("mobile-open"),
           );
@@ -3992,6 +4240,30 @@
             });
           });
 
+          // ── Mobile swipe gesture ──
+          let touchStartX = 0, touchStartY = 0;
+          document.addEventListener("touchstart", (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+          }, { passive: true });
+          document.addEventListener("touchend", (e) => {
+            if (window.innerWidth > 768) return;
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            const dy = e.changedTouches[0].clientY - touchStartY;
+            // Ignore mostly-vertical swipes
+            if (Math.abs(dy) > Math.abs(dx)) return;
+            // Must be a significant horizontal swipe (>50px)
+            if (Math.abs(dx) < 50) return;
+            const sb = $("sidebar");
+            if (dx > 0 && touchStartX < 40) {
+              // Swipe right from left edge → open
+              sb.classList.add("mobile-open");
+            } else if (dx < 0 && sb.classList.contains("mobile-open")) {
+              // Swipe left → close
+              sb.classList.remove("mobile-open");
+            }
+          }, { passive: true });
+
           const toolKeys = [
             "monthly-report",
             "trends",
@@ -4002,6 +4274,7 @@
             "credit-cards",
             "savings",
             "bills",
+            "recurring",
             "search",
           ];
           document.addEventListener("keydown", (e) => {
