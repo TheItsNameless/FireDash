@@ -801,6 +801,230 @@
         line-height: 1.6;
       }
 
+      /* ===== CREDIT CARD MOCKUP ===== */
+      .cc-card-wrap {
+        display: flex;
+        flex-direction: column;
+      }
+      .cc-card {
+        position: relative;
+        border-radius: 16px;
+        padding: 24px 24px 20px;
+        color: #fff;
+        cursor: pointer;
+        overflow: hidden;
+        aspect-ratio: 1.586 / 1; /* standard card ratio */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.18),
+          0 2px 8px rgba(0, 0, 0, 0.08);
+        transition:
+          transform 0.22s ease,
+          box-shadow 0.22s ease;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      .cc-card:hover {
+        transform: translateY(-4px) scale(1.01);
+        box-shadow:
+          0 16px 40px rgba(0, 0, 0, 0.22),
+          0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      .cc-card:active {
+        transform: translateY(-1px) scale(0.995);
+      }
+      /* decorative blobs */
+      .cc-deco {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+      .cc-deco-1 {
+        width: 260px;
+        height: 260px;
+        top: -80px;
+        right: -60px;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .cc-deco-2 {
+        width: 180px;
+        height: 180px;
+        bottom: -50px;
+        left: -40px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .cc-deco-3 {
+        width: 100px;
+        height: 100px;
+        top: 40%;
+        left: 50%;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      /* card chip */
+      .cc-chip {
+        line-height: 0;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+      }
+      /* top row */
+      .cc-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        position: relative;
+        z-index: 1;
+      }
+      .cc-network-logo {
+        line-height: 0;
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        padding: 6px 10px;
+        border-radius: 8px;
+      }
+      .cc-network-logo img {
+        height: 28px;
+        object-fit: contain;
+      }
+
+      /* card number */
+      .cc-number {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        gap: 14px;
+        font-family: "Courier New", "SF Mono", "Menlo", monospace;
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        color: #fff;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+      /* footer */
+      .cc-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        position: relative;
+        z-index: 1;
+      }
+      .cc-footer-col {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .cc-label {
+        font-size: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 500;
+      }
+      .cc-val-name {
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 160px;
+      }
+      .cc-val-balance {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+      }
+      /* utilization bar */
+      .cc-util-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+        z-index: 1;
+        margin-top: 2px;
+      }
+      .cc-util-track {
+        flex: 1;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .cc-util-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.6s ease;
+      }
+      .cc-util-label {
+        font-size: 9px;
+        color: rgba(255, 255, 255, 0.65);
+        white-space: nowrap;
+        letter-spacing: 0.3px;
+      }
+      /* stats strip */
+      .cc-stats-strip {
+        display: flex;
+        gap: 6px;
+        margin-top: 10px;
+      }
+      .cc-stat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 6px;
+        transition: border-color 0.2s;
+      }
+      .cc-stat:hover {
+        border-color: var(--accent);
+      }
+      .cc-stat-icon {
+        line-height: 0;
+      }
+      .cc-stat-val {
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .cc-stat-lbl {
+        font-size: 9px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+      }
+
+      @media (max-width: 600px) {
+        .cc-card {
+          padding: 18px;
+          aspect-ratio: auto;
+          min-height: 180px;
+        }
+        .cc-number {
+          font-size: 14px;
+          gap: 10px;
+          letter-spacing: 1px;
+        }
+        .cc-val-name {
+          max-width: 110px;
+          font-size: 11px;
+        }
+        .cc-val-balance {
+          font-size: 14px;
+        }
+        .cc-network-logo img {
+          height: 22px;
+        }
+      }
+
       /* ===== MODAL DIALOG ===== */
       .modal-overlay {
         position: fixed;
@@ -3520,17 +3744,17 @@
           // Network logos (using downloaded images)
           const networkLogo = (net) => {
             if (net === "visa")
-              return `<img src="assets/icons/visa.svg" alt="Visa" style="height:20px;object-fit:contain">`;
+              return `<img src="assets/icons/visa.svg" alt="Visa">`;
             if (net === "mastercard")
-              return `<img src="assets/icons/mastercard.svg" alt="Mastercard" style="height:20px;object-fit:contain">`;
+              return `<img src="assets/icons/mastercard.svg" alt="Mastercard">`;
             if (net === "rp")
-              return `<img src="assets/icons/rupay.svg" alt="RuPay" style="height:20px;object-fit:contain">`;
+              return `<img src="assets/icons/rupay.svg" alt="RuPay">`;
             if (net === "amex")
-              return `<img src="assets/icons/amex.svg" alt="American Express" style="height:20px;object-fit:contain">`;
+              return `<img src="assets/icons/amex.svg" alt="American Express">`;
             if (net === "diners")
-              return `<img src="assets/icons/diners.svg" alt="Diners Club" style="height:20px;object-fit:contain">`;
+              return `<img src="assets/icons/diners.svg" alt="Diners Club">`;
             if (net === "discover")
-              return `<img src="assets/icons/discover.svg" alt="Discover" style="height:20px;object-fit:contain">`;
+              return `<img src="assets/icons/discover.svg" alt="Discover">`;
             return "";
           };
 
@@ -3559,79 +3783,109 @@
                     100,
                   )
                 : 0;
-            const hasStats =
-              card.periodSpent > 0 ||
-              card.periodPaid > 0 ||
-              card.transactions.length > 0;
             const netLogo = networkLogo(detectedNet);
-            const maskedNum = card.cardNumber
-              ? `•••• ${esc(card.cardNumber.slice(-4))}`
-              : "";
+            const last4 = card.cardNumber
+              ? esc(card.cardNumber.slice(-4))
+              : "••••";
+            const utilColor =
+              utilPct > 80 ? "#ef4444" : utilPct > 50 ? "#f59e0b" : "#10b981";
 
-            h += `<div class="summary-card fade-in stagger-${Math.min(i + 1, 4)}" style="background:linear-gradient(135deg,${c1},${c2});cursor:pointer;position:relative;border:none;border-radius:16px;padding:24px;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,0.12);aspect-ratio:1.7/1;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden" data-cc-id="${esc(String(card.id))}" data-cc-idx="${i}" data-cc-txn='${JSON.stringify(card.transactions).replace(/'/g, "&apos;")}'>
-              <!-- Decorative pattern -->
-              <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,0.05);border-radius:50%;pointer-events:none"></div>
-              <div style="position:absolute;bottom:-30px;left:-30px;width:150px;height:150px;background:rgba(255,255,255,0.03);border-radius:50%;pointer-events:none"></div>
-              
-              <!-- Top section -->
-              <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1">
-                <div>
-                  <!-- Chip -->
-                  <div style="width:50px;height:40px;background:linear-gradient(135deg,#FFD700,#FFA500);border-radius:8px;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:8px">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" width="24" height="24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="15" y1="9" x2="15" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
-                  </div>
-                  <div style="font-size:10px;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.5px">Card</div>
+            // Wrap each card + stats in a single column container so the grid stays intact
+            h += `<div class="cc-card-wrap fade-in stagger-${Math.min(i + 1, 4)}">
+
+            <!-- ═══ Credit Card ═══ -->
+            <div class="cc-card" style="background:linear-gradient(135deg,${c1} 0%,${c2} 100%)" data-cc-id="${esc(String(card.id))}" data-cc-idx="${i}" data-cc-txn='${JSON.stringify(card.transactions).replace(/'/g, "&apos;")}'>
+              <!-- Decorative elements -->
+              <div class="cc-deco cc-deco-1"></div>
+              <div class="cc-deco cc-deco-2"></div>
+              <div class="cc-deco cc-deco-3"></div>
+
+              <!-- Row 1: Chip + Network -->
+              <div class="cc-top">
+                <div class="cc-chip">
+                  <svg viewBox="0 0 50 40" width="46" height="34">
+                    <rect x="1" y="1" width="48" height="38" rx="6" fill="url(#chipGrad${i})" stroke="#c9a227" stroke-width="1"/>
+                    <defs><linearGradient id="chipGrad${i}" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#f0d060"/><stop offset="50%" stop-color="#e6b422"/><stop offset="100%" stop-color="#d4a017"/>
+                    </linearGradient></defs>
+                    <line x1="1" y1="15" x2="49" y2="15" stroke="#c9a227" stroke-width="0.5" opacity="0.6"/>
+                    <line x1="1" y1="25" x2="49" y2="25" stroke="#c9a227" stroke-width="0.5" opacity="0.6"/>
+                    <line x1="18" y1="1" x2="18" y2="39" stroke="#c9a227" stroke-width="0.5" opacity="0.4"/>
+                    <line x1="32" y1="1" x2="32" y2="39" stroke="#c9a227" stroke-width="0.5" opacity="0.4"/>
+                  </svg>
                 </div>
-                ${netLogo ? `<div style="line-height:0;height:40px;display:flex;align-items:center">${netLogo}</div>` : ""}
+                ${netLogo ? `<div class="cc-network-logo">${netLogo}</div>` : ""}
               </div>
 
-              <!-- Middle section - Card number -->
-              <div style="position:relative;z-index:1">
-                <div style="font-size:10px;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Card Number</div>
-                <div style="font-family:'Courier New',monospace;font-size:18px;font-weight:600;letter-spacing:3px;color:#fff">${maskedNum || "•••• •••• •••• ••••"}</div>
+              <!-- Row 2: Card Number -->
+              <div class="cc-number">
+                <span>••••</span><span>••••</span><span>••••</span><span>${last4}</span>
               </div>
 
-              <!-- Bottom section -->
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;position:relative;z-index:1">
-                <div>
-                  <div style="font-size:8px;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Card Holder</div>
-                  <div style="font-size:12px;font-weight:600;color:#fff;text-transform:uppercase">${esc(card.name)}</div>
+              <!-- Row 3: Footer -->
+              <div class="cc-footer">
+                <div class="cc-footer-col">
+                  <span class="cc-label">Card Holder</span>
+                  <span class="cc-val-name">${esc(card.name)}</span>
                 </div>
-                <div>
-                  <div style="font-size:8px;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Balance</div>
-                  <div style="font-size:14px;font-weight:700;color:#fff">${fc(card.balance, card.currency)}</div>
+                <div class="cc-footer-col" style="text-align:right">
+                  <span class="cc-label">Balance</span>
+                  <span class="cc-val-balance">${fc(card.balance, card.currency)}</span>
                 </div>
               </div>
-            </div>
 
-            <!-- Card stats row below -->
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">
               ${
                 card.creditLimit > 0
-                  ? `<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
-                      <div style="font-size:9px;color:var(--text-muted);font-weight:600;text-transform:uppercase;margin-bottom:4px">Limit</div>
-                      <div style="font-size:14px;font-weight:700;color:var(--text-primary)">${fc(card.creditLimit, card.currency)}</div>
-                      <div style="font-size:10px;color:var(--text-muted);margin-top:4px">${Math.round(utilPct)}% Used</div>
-                    </div>`
+                  ? `
+              <!-- Utilization bar -->
+              <div class="cc-util-bar">
+                <div class="cc-util-track">
+                  <div class="cc-util-fill" style="width:${utilPct}%;background:${utilColor}"></div>
+                </div>
+                <span class="cc-util-label">${Math.round(utilPct)}% of ${fc(card.creditLimit, card.currency)}</span>
+              </div>`
+                  : ""
+              }
+            </div>
+
+            <!-- ═══ Stats Strip ═══ -->
+            <div class="cc-stats-strip">
+              ${
+                card.creditLimit > 0
+                  ? `<div class="cc-stat">
+                <span class="cc-stat-icon" style="color:var(--text-muted)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 100 7h5a3.5 3.5 0 010 7H6"/></svg>
+                </span>
+                <span class="cc-stat-val">${fc(card.creditLimit, card.currency)}</span>
+                <span class="cc-stat-lbl">Limit</span>
+              </div>`
                   : ""
               }
               ${
                 card.periodSpent > 0
-                  ? `<div style="background:var(--danger-bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
-                      <div style="font-size:9px;color:var(--danger);font-weight:600;text-transform:uppercase;margin-bottom:4px">Spent</div>
-                      <div style="font-size:14px;font-weight:700;color:var(--danger)">${fc(-card.periodSpent, card.currency)}</div>
-                    </div>`
+                  ? `<div class="cc-stat">
+                <span class="cc-stat-icon" style="color:var(--danger)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                </span>
+                <span class="cc-stat-val" style="color:var(--danger)">${fc(-card.periodSpent, card.currency)}</span>
+                <span class="cc-stat-lbl">Spent</span>
+              </div>`
                   : ""
               }
               ${
                 card.transactions.length > 0
-                  ? `<div style="background:var(--accent-bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
-                      <div style="font-size:9px;color:var(--accent);font-weight:600;text-transform:uppercase;margin-bottom:4px">Txns</div>
-                      <div style="font-size:14px;font-weight:700;color:var(--accent)">${card.transactions.length}</div>
-                    </div>`
+                  ? `<div class="cc-stat">
+                <span class="cc-stat-icon" style="color:var(--accent)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                </span>
+                <span class="cc-stat-val" style="color:var(--accent)">${card.transactions.length}</span>
+                <span class="cc-stat-lbl">Txns</span>
+              </div>`
                   : ""
               }
-            </div>`;
+            </div>
+
+            </div><!-- /cc-card-wrap -->`;
           });
 
           h += `</div>`;
@@ -3692,30 +3946,22 @@
           const sym = S.detectedCurrency;
 
           // Card panel toggle - open modal dialog with transactions
-          document
-            .querySelectorAll(".summary-card[data-cc-id]")
-            .forEach((el) => {
-              el.addEventListener("click", () => {
-                const cardName =
-                  el.querySelector("[data-cc-id]")?.parentElement
-                    ?.textContent || "Transactions";
-                const cardNameText =
-                  el.textContent.match(/Credit Card\s+(.+?)\n/)?.[1] || "Card";
-                const cardNameDisplay =
-                  el.querySelector("div[style*='font-size:16px']")
-                    ?.textContent || "Card";
-                const txnData = el.dataset.ccTxn;
-                let transactions = [];
-                try {
-                  transactions = JSON.parse(txnData || "[]");
-                } catch (e) {
-                  transactions = [];
-                }
+          document.querySelectorAll(".cc-card[data-cc-id]").forEach((el) => {
+            el.addEventListener("click", () => {
+              const cardNameDisplay =
+                el.querySelector(".cc-val-name")?.textContent || "Card";
+              const txnData = el.dataset.ccTxn;
+              let transactions = [];
+              try {
+                transactions = JSON.parse(txnData || "[]");
+              } catch (e) {
+                transactions = [];
+              }
 
-                // Create modal
-                const modal = document.createElement("div");
-                modal.className = "modal-overlay";
-                modal.innerHTML = `
+              // Create modal
+              const modal = document.createElement("div");
+              modal.className = "modal-overlay";
+              modal.innerHTML = `
                   <div class="modal-content">
                     <div class="modal-header">
                       <h2>${esc(cardNameDisplay)} - Transactions</h2>
@@ -3728,65 +3974,65 @@
                   </div>
                 `;
 
-                document.body.appendChild(modal);
+              document.body.appendChild(modal);
 
-                const txnList = modal.querySelector("#txnList");
-                const searchInput = modal.querySelector("#txnSearchInput");
-                const closeBtn = modal.querySelector(".modal-close");
+              const txnList = modal.querySelector("#txnList");
+              const searchInput = modal.querySelector("#txnSearchInput");
+              const closeBtn = modal.querySelector(".modal-close");
 
-                const renderTransactions = (filter = "") => {
-                  const filtered = transactions.filter((tx) => {
-                    const text = (
-                      (tx.description || "") +
-                      " " +
-                      (tx.category_name || "") +
-                      " " +
-                      (tx.budget_name || "")
-                    ).toLowerCase();
-                    return text.includes(filter.toLowerCase());
-                  });
+              const renderTransactions = (filter = "") => {
+                const filtered = transactions.filter((tx) => {
+                  const text = (
+                    (tx.description || "") +
+                    " " +
+                    (tx.category_name || "") +
+                    " " +
+                    (tx.budget_name || "")
+                  ).toLowerCase();
+                  return text.includes(filter.toLowerCase());
+                });
 
-                  if (!filtered.length) {
-                    txnList.innerHTML =
-                      '<div style="padding:20px;text-align:center;color:var(--text-muted)">No transactions found</div>';
-                    return;
-                  }
+                if (!filtered.length) {
+                  txnList.innerHTML =
+                    '<div style="padding:20px;text-align:center;color:var(--text-muted)">No transactions found</div>';
+                  return;
+                }
 
-                  let html = "";
-                  filtered.forEach((tx) => {
-                    const isOut = tx.type === "withdrawal";
-                    const amt = parseFloat(tx.amount) || 0;
-                    const meta = tx.category_name || tx.budget_name || "";
-                    html += `<div class="list-item" style="font-size:13px;border-bottom:1px solid var(--border-light)">
+                let html = "";
+                filtered.forEach((tx) => {
+                  const isOut = tx.type === "withdrawal";
+                  const amt = parseFloat(tx.amount) || 0;
+                  const meta = tx.category_name || tx.budget_name || "";
+                  html += `<div class="list-item" style="font-size:13px;border-bottom:1px solid var(--border-light)">
                       <div class="list-info">
                         <div class="list-name">${esc(tx.description || "")}</div>
                         <div class="list-meta">${esc(tx.date?.split("T")[0] || "")}${meta ? " &middot; " + esc(meta) : ""}</div>
                       </div>
                       <span class="list-value ${isOut ? "val-neg" : "val-pos"}">${fc(isOut ? -amt : amt, tx.currency_symbol || sym)}</span>
                     </div>`;
-                  });
-                  txnList.innerHTML = html;
-                };
-
-                searchInput.addEventListener("input", (e) => {
-                  renderTransactions(e.target.value);
                 });
+                txnList.innerHTML = html;
+              };
 
-                closeBtn.addEventListener("click", () => {
-                  modal.remove();
-                });
-
-                modal.addEventListener("click", (e) => {
-                  if (e.target === modal) {
-                    modal.remove();
-                  }
-                });
-
-                // Initial render
-                renderTransactions();
-                searchInput.focus();
+              searchInput.addEventListener("input", (e) => {
+                renderTransactions(e.target.value);
               });
+
+              closeBtn.addEventListener("click", () => {
+                modal.remove();
+              });
+
+              modal.addEventListener("click", (e) => {
+                if (e.target === modal) {
+                  modal.remove();
+                }
+              });
+
+              // Initial render
+              renderTransactions();
+              searchInput.focus();
             });
+          });
 
           // Category drill-down toggle
           document
