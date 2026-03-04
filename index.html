@@ -232,7 +232,9 @@
         min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
-        transition: opacity 0.2s ease, width 0.2s ease;
+        transition:
+          opacity 0.2s ease,
+          width 0.2s ease;
       }
 
       /* ── Sidebar collapsed (icon-only) ── */
@@ -269,7 +271,7 @@
         opacity: 0;
         transition: opacity 0.15s ease;
         z-index: 200;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       }
       .sidebar.collapsed .nav-item:hover::after {
         opacity: 1;
@@ -282,16 +284,16 @@
         width: 28px;
         height: 28px;
         border-radius: 6px;
-        background: rgba(255,255,255,0.07);
+        background: rgba(255, 255, 255, 0.07);
         border: none;
         cursor: pointer;
-        color: rgba(255,255,255,0.55);
+        color: rgba(255, 255, 255, 0.55);
         margin-left: auto;
         flex-shrink: 0;
         transition: all var(--transition);
       }
       .sidebar-collapse-btn:hover {
-        background: rgba(255,255,255,0.14);
+        background: rgba(255, 255, 255, 0.14);
         color: #fff;
       }
       .sidebar.collapsed .sidebar-collapse-btn {
@@ -1096,10 +1098,22 @@
         background: var(--danger-bg);
         border-color: var(--danger);
       }
-      .alert-banner-icon { flex-shrink: 0; margin-top: 1px; }
-      .alert-banner-body { flex: 1; }
-      .alert-banner-title { font-weight: 700; margin-bottom: 6px; }
-      .alert-banner-items { display: flex; flex-direction: column; gap: 4px; }
+      .alert-banner-icon {
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .alert-banner-body {
+        flex: 1;
+      }
+      .alert-banner-title {
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .alert-banner-items {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
 
       /* ===== ANIMATIONS ===== */
       @keyframes slideIn {
@@ -1397,7 +1411,19 @@
           title="Menu"
           style="display: none"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            width="16"
+            height="16"
+          >
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
         </button>
         <div class="logo">F</div>
         <div class="header-title" id="headerTitle">FireDash</div>
@@ -1409,13 +1435,54 @@
           style="margin-right: 4px; visibility: hidden"
         ></span>
         <button class="btn-icon" id="themeToggle" title="Toggle theme">
-          <span id="themeIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+          <span id="themeIcon"
+            ><svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              width="14"
+              height="14"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg
+          ></span>
         </button>
         <button class="btn-icon" id="refreshBtn" title="Refresh">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            width="14"
+            height="14"
+          >
+            <polyline points="23 4 23 10 17 10" />
+            <polyline points="1 20 1 14 7 14" />
+            <path
+              d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+            />
+          </svg>
         </button>
         <button class="btn-icon" id="settingsBtn" title="Settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            width="14"
+            height="14"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+            />
+          </svg>
         </button>
       </div>
     </header>
@@ -1449,7 +1516,21 @@
               id="settingsKey"
               placeholder="eyJ0eXAiOiJKV1Q..."
             />
-            <button class="toggle-vis" id="toggleKeyVis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="toggle-vis" id="toggleKeyVis">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="14"
+                height="14"
+              >
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
           </div>
           <div class="hint">
             Create at Firefly III &rarr; Profile &rarr; OAuth
@@ -1472,7 +1553,26 @@
           />
         </div>
         <div class="notice warn">
-          <div class="notice-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="vertical-align:-2px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> How your data is handled</div>
+          <div class="notice-title">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              width="14"
+              height="14"
+              style="vertical-align: -2px"
+            >
+              <path
+                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+              />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            How your data is handled
+          </div>
           <p>
             Your URL and token are saved
             <strong>only in this browser's local storage</strong> and never
@@ -1482,7 +1582,24 @@
           </p>
         </div>
         <div class="notice info" style="margin-top: 10px">
-          <div class="notice-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="vertical-align:-2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> How it works</div>
+          <div class="notice-title">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              width="14"
+              height="14"
+              style="vertical-align: -2px"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            How it works
+          </div>
           <p>
             Requests route through this site's built-in proxy to avoid browser
             cross-origin restrictions. No configuration needed on your Firefly
@@ -1503,50 +1620,265 @@
       <nav class="sidebar hidden" id="sidebar">
         <div class="sidebar-nav">
           <a class="nav-item" href="#monthly-report" data-tip="Monthly Report"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span><span class="nav-label"> Monthly Report</span></a
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <polyline
+                  points="22 12 18 12 15 21 9 3 6 12 2 12"
+                /></svg></span
+            ><span class="nav-label"> Monthly Report</span></a
           >
           <a class="nav-item" href="#trends" data-tip="Trends"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg></span><span class="nav-label"> Trends</span></a
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <rect x="18" y="3" width="4" height="18" />
+                <rect x="10" y="8" width="4" height="13" />
+                <rect x="2" y="13" width="4" height="8" /></svg></span
+            ><span class="nav-label"> Trends</span></a
           >
           <a class="nav-item" href="#budget-explorer" data-tip="Budget Explorer"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></span><span class="nav-label"> Budget Explorer</span></a
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+                <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+                <path d="M18 12a2 2 0 0 0 0 4h4v-4z" /></svg></span
+            ><span class="nav-label"> Budget Explorer</span></a
           >
-          <a class="nav-item" href="#category-explorer" data-tip="Category Explorer"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21.21 15.89A9 9 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span><span class="nav-label"> Category Explorer</span></a
+          <a
+            class="nav-item"
+            href="#category-explorer"
+            data-tip="Category Explorer"
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <path d="M21.21 15.89A9 9 0 1 1 8 2.83" />
+                <path d="M22 12A10 10 0 0 0 12 2v10z" /></svg></span
+            ><span class="nav-label"> Category Explorer</span></a
           >
           <a class="nav-item" href="#tag-explorer" data-tip="Tag Explorer"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span><span class="nav-label"> Tag Explorer</span></a
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <path
+                  d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+                />
+                <line x1="7" y1="7" x2="7.01" y2="7" /></svg></span
+            ><span class="nav-label"> Tag Explorer</span></a
           >
           <a class="nav-item" href="#accounts" data-tip="Accounts"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></span><span class="nav-label"> Accounts</span></a
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <line x1="3" y1="22" x2="21" y2="22" />
+                <line x1="6" y1="18" x2="6" y2="11" />
+                <line x1="10" y1="18" x2="10" y2="11" />
+                <line x1="14" y1="18" x2="14" y2="11" />
+                <line x1="18" y1="18" x2="18" y2="11" />
+                <polygon points="12 2 20 7 4 7" /></svg></span
+            ><span class="nav-label"> Accounts</span></a
           >
           <a class="nav-item" href="#credit-cards" data-tip="Credit Cards"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span><span class="nav-label"> Credit Cards</span></a
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <rect x="1" y="4" width="22" height="16" rx="2" />
+                <line x1="1" y1="10" x2="23" y2="10" /></svg></span
+            ><span class="nav-label"> Credit Cards</span></a
           >
           <a class="nav-item" href="#savings" data-tip="Savings Goals"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span class="nav-label"> Savings Goals</span></a
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <circle cx="12" cy="12" r="6" />
+                <circle cx="12" cy="12" r="2" /></svg></span
+            ><span class="nav-label"> Savings Goals</span></a
           >
           <a class="nav-item" href="#bills" data-tip="Bills &amp; Subs"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="nav-label"> Bills &amp; Subs</span></a
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" /></svg></span
+            ><span class="nav-label"> Bills &amp; Subs</span></a
           >
           <a class="nav-item" href="#recurring" data-tip="Recurring"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span><span class="nav-label"> Recurring</span></a
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <polyline points="17 1 21 5 17 9" />
+                <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                <polyline points="7 23 3 19 7 15" />
+                <path d="M21 13v2a4 4 0 0 1-4 4H3" /></svg></span
+            ><span class="nav-label"> Recurring</span></a
           >
           <a class="nav-item" href="#search" data-tip="Search"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><span class="nav-label"> Search</span></a
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" /></svg></span
+            ><span class="nav-label"> Search</span></a
           >
         </div>
         <div class="sidebar-bottom">
-          <div style="display:flex;align-items:center;padding:4px 4px 8px;justify-content:flex-end">
-            <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar">
-              <svg id="sidebarCollapseIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              padding: 4px 4px 8px;
+              justify-content: flex-end;
+            "
+          >
+            <button
+              class="sidebar-collapse-btn"
+              id="sidebarCollapseBtn"
+              title="Collapse sidebar"
+            >
+              <svg
+                id="sidebarCollapseIcon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="14"
+                height="14"
+              >
+                <polyline points="11 17 6 12 11 7" />
+                <polyline points="18 17 13 12 18 7" />
+              </svg>
             </button>
           </div>
           <a class="nav-item" id="sidebarSettings" data-tip="Settings"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="nav-label"> Settings</span></a
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+                /></svg></span
+            ><span class="nav-label"> Settings</span></a
           >
-          <a class="nav-item" href="https://github.com/yemzikk/FireDash" target="_blank" rel="noopener" data-tip="GitHub" style="opacity:0.5;font-size:12px"
-            ><span class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg></span><span class="nav-label"> GitHub</span></a
+          <a
+            class="nav-item"
+            href="https://github.com/yemzikk/FireDash"
+            target="_blank"
+            rel="noopener"
+            data-tip="GitHub"
+            style="opacity: 0.5; font-size: 12px"
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                width="16"
+                height="16"
+              >
+                <path
+                  d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"
+                /></svg></span
+            ><span class="nav-label"> GitHub</span></a
           >
         </div>
       </nav>
@@ -1721,11 +2053,25 @@
               const end = fmt(now);
               let start;
               const p = btn.dataset.preset;
-              if (p === "1m") { const d = new Date(now); d.setMonth(d.getMonth() - 1); start = fmt(d); }
-              else if (p === "3m") { const d = new Date(now); d.setMonth(d.getMonth() - 3); start = fmt(d); }
-              else if (p === "6m") { const d = new Date(now); d.setMonth(d.getMonth() - 6); start = fmt(d); }
-              else if (p === "ytd") { start = fmt(new Date(now.getFullYear(), 0, 1)); }
-              else if (p === "1y") { const d = new Date(now); d.setFullYear(d.getFullYear() - 1); start = fmt(d); }
+              if (p === "1m") {
+                const d = new Date(now);
+                d.setMonth(d.getMonth() - 1);
+                start = fmt(d);
+              } else if (p === "3m") {
+                const d = new Date(now);
+                d.setMonth(d.getMonth() - 3);
+                start = fmt(d);
+              } else if (p === "6m") {
+                const d = new Date(now);
+                d.setMonth(d.getMonth() - 6);
+                start = fmt(d);
+              } else if (p === "ytd") {
+                start = fmt(new Date(now.getFullYear(), 0, 1));
+              } else if (p === "1y") {
+                const d = new Date(now);
+                d.setFullYear(d.getFullYear() - 1);
+                start = fmt(d);
+              }
               if ($(startId)) $(startId).value = start || "";
               if ($(endId)) $(endId).value = end;
               if (onChange) onChange(start, end);
@@ -2169,17 +2515,45 @@
             .sort((a, b) => b.spent - a.spent);
           // Net worth trend: last 6 months up to selected month
           const nwHistory = [];
-          const mNames2 = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+          const mNames2 = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
           for (let i = 5; i >= 0; i--) {
             const d2 = new Date(y, m - i, 1);
             const { end: nwEnd } = dateRange(d2.getMonth(), d2.getFullYear());
             try {
-              const sm2 = await api("/api/v1/summary/basic", { start: new Date(d2.getFullYear(), d2.getMonth(), 1).toISOString().split("T")[0], end: nwEnd });
+              const sm2 = await api("/api/v1/summary/basic", {
+                start: new Date(d2.getFullYear(), d2.getMonth(), 1)
+                  .toISOString()
+                  .split("T")[0],
+                end: nwEnd,
+              });
               let cc2 = "";
-              for (const k of Object.keys(sm2)) { const m2 = k.match(ccPattern); if (m2) { cc2 = m2[1]; break; } }
-              const nw = parseFloat(sm2[`net-worth-in-${cc2}`]?.monetary_value || "0");
+              for (const k of Object.keys(sm2)) {
+                const m2 = k.match(ccPattern);
+                if (m2) {
+                  cc2 = m2[1];
+                  break;
+                }
+              }
+              const nw = parseFloat(
+                sm2[`net-worth-in-${cc2}`]?.monetary_value || "0",
+              );
               nwHistory.push({ label: mNames2[d2.getMonth()], nw });
-            } catch { nwHistory.push({ label: mNames2[d2.getMonth()], nw: 0 }); }
+            } catch {
+              nwHistory.push({ label: mNames2[d2.getMonth()], nw: 0 });
+            }
           }
           return {
             monthly,
@@ -2244,23 +2618,29 @@
 
           // ── Budget progress strip ──
           if (d.budgets.length) {
-            const overBudget = d.budgets.filter(b => b.over);
+            const overBudget = d.budgets.filter((b) => b.over);
             h += `<div class="data-card fade-in stagger-2" style="margin-bottom:24px"><div class="card-head"><h3>Budget Status</h3><div style="display:flex;gap:8px;align-items:center"><span class="count">${d.budgets.length}</span>${overBudget.length ? `<span style="font-size:11px;font-weight:700;color:var(--danger);background:var(--danger-bg);padding:2px 8px;border-radius:9px">${overBudget.length} over</span>` : `<span style="font-size:11px;font-weight:700;color:var(--success);background:var(--success-bg);padding:2px 8px;border-radius:9px">On track</span>`}</div></div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;padding:4px 20px 16px">`;
-            d.budgets.forEach(b => {
-              const pct = b.limit > 0 ? Math.round((b.spent / b.limit) * 100) : 0;
-              const bc = pct >= 100 ? "var(--danger)" : pct >= 75 ? "var(--warning)" : "var(--success)";
+            d.budgets.forEach((b) => {
+              const pct =
+                b.limit > 0 ? Math.round((b.spent / b.limit) * 100) : 0;
+              const bc =
+                pct >= 100
+                  ? "var(--danger)"
+                  : pct >= 75
+                    ? "var(--warning)"
+                    : "var(--success)";
               h += `<div>
                 <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
                   <span style="font-size:12px;font-weight:600;color:var(--text-primary)">${esc(b.name)}</span>
                   <span style="font-size:11px;color:${bc};font-weight:700">${pct}%</span>
                 </div>
                 <div style="height:6px;border-radius:3px;background:var(--border);overflow:hidden">
-                  <div style="height:100%;width:${Math.min(pct,100)}%;background:${bc};border-radius:3px;transition:width 0.4s ease"></div>
+                  <div style="height:100%;width:${Math.min(pct, 100)}%;background:${bc};border-radius:3px;transition:width 0.4s ease"></div>
                 </div>
                 <div style="display:flex;justify-content:space-between;margin-top:3px;font-size:10px;color:var(--text-muted)">
                   <span>${fc(-b.spent, sym)}</span>
-                  <span>${b.limit > 0 ? (b.over ? `<span style="color:var(--danger)">Over ${fc(Math.abs(b.remaining),sym)}</span>` : `${fc(b.remaining,sym)} left`) : "No limit"}</span>
+                  <span>${b.limit > 0 ? (b.over ? `<span style="color:var(--danger)">Over ${fc(Math.abs(b.remaining), sym)}</span>` : `${fc(b.remaining, sym)} left`) : "No limit"}</span>
                 </div>
               </div>`;
             });
@@ -2304,7 +2684,7 @@
 
           // ── Net Worth trend chart ──
           if (d.nwHistory && d.nwHistory.length > 1) {
-            const nwVals = d.nwHistory.map(p => p.nw);
+            const nwVals = d.nwHistory.map((p) => p.nw);
             const trend = nwVals[nwVals.length - 1] >= nwVals[0];
             h += `<div class="data-card fade-in stagger-4" style="margin-bottom:0"><div class="card-head"><h3>Net Worth Trend</h3><span style="font-size:12px;color:var(--text-muted)"><span style="color:${trend ? "var(--success)" : "var(--danger)"}">${trend ? "↑" : "↓"}</span> 6-month</span></div>
             <div style="padding:8px 20px 16px;position:relative;height:180px">
@@ -2331,36 +2711,55 @@
             $(id)?.addEventListener("change", triggerLoad);
           });
           // Net Worth chart
-          if (d.nwHistory && d.nwHistory.length > 1 && document.getElementById("nwChart")) {
+          if (
+            d.nwHistory &&
+            d.nwHistory.length > 1 &&
+            document.getElementById("nwChart")
+          ) {
             const { gridColor, labelColor } = chartDefaults();
             const sym = S.detectedCurrency;
             makeChart("nwChart", {
               type: "line",
               data: {
-                labels: d.nwHistory.map(p => p.label),
-                datasets: [{
-                  data: d.nwHistory.map(p => p.nw),
-                  borderColor: "#6366f1",
-                  backgroundColor: "rgba(99,102,241,0.12)",
-                  borderWidth: 2.5,
-                  pointBackgroundColor: "#6366f1",
-                  pointRadius: 4,
-                  pointHoverRadius: 6,
-                  fill: true,
-                  tension: 0.35,
-                }]
+                labels: d.nwHistory.map((p) => p.label),
+                datasets: [
+                  {
+                    data: d.nwHistory.map((p) => p.nw),
+                    borderColor: "#6366f1",
+                    backgroundColor: "rgba(99,102,241,0.12)",
+                    borderWidth: 2.5,
+                    pointBackgroundColor: "#6366f1",
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    tension: 0.35,
+                  },
+                ],
               },
               options: {
-                responsive: true, maintainAspectRatio: false,
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                   legend: { display: false },
-                  tooltip: { callbacks: { label: ctx => fc(ctx.parsed.y, sym) } }
+                  tooltip: {
+                    callbacks: { label: (ctx) => fc(ctx.parsed.y, sym) },
+                  },
                 },
                 scales: {
-                  x: { grid: { color: gridColor }, ticks: { color: labelColor, font: { family: "Inter" } } },
-                  y: { grid: { color: gridColor }, ticks: { color: labelColor, font: { family: "Inter" }, callback: v => fc(v, sym) } }
-                }
-              }
+                  x: {
+                    grid: { color: gridColor },
+                    ticks: { color: labelColor, font: { family: "Inter" } },
+                  },
+                  y: {
+                    grid: { color: gridColor },
+                    ticks: {
+                      color: labelColor,
+                      font: { family: "Inter" },
+                      callback: (v) => fc(v, sym),
+                    },
+                  },
+                },
+              },
             });
           }
           // Category drill-down
@@ -2445,14 +2844,17 @@
               if (!txType || tx.type === txType) filtered.push(tx);
             }
           }
-          let total = 0, minDate = "", maxDate = "";
+          let total = 0,
+            minDate = "",
+            maxDate = "";
           const breakdown = {};
           filtered.forEach((tx) => {
             const amt = parseFloat(tx.amount) || 0;
             total += tx.type === "deposit" ? amt : -amt;
-            const key = tx.type === "deposit"
-              ? (tx.source_name || "Unknown source")
-              : (tx.budget_name || "Uncategorized");
+            const key =
+              tx.type === "deposit"
+                ? tx.source_name || "Unknown source"
+                : tx.budget_name || "Uncategorized";
             breakdown[key] = (breakdown[key] || 0) + amt;
             const d = tx.date?.split("T")[0] || "";
             if (d && (!minDate || d < minDate)) minDate = d;
@@ -2482,7 +2884,16 @@
           const defStart = toolState.tagStart || "";
           const defEnd = toolState.tagEnd || "";
           const curType = toolState.tagType ?? "withdrawal";
-          const typeOpts = [["withdrawal","Spending"],["deposit","Income"],["","All"]].map(([v,l]) => `<option value="${esc(v)}"${curType===v?" selected":""}>${l}</option>`).join("");
+          const typeOpts = [
+            ["withdrawal", "Spending"],
+            ["deposit", "Income"],
+            ["", "All"],
+          ]
+            .map(
+              ([v, l]) =>
+                `<option value="${esc(v)}"${curType === v ? " selected" : ""}>${l}</option>`,
+            )
+            .join("");
           let h = `<div class="tool-header"><h1>Tag Explorer</h1>
                 <div class="tool-controls">
                     <select class="form-select" id="tagSelect" style="min-width:180px">${tagOpts}</select>
@@ -2494,18 +2905,25 @@
                 </div></div>`;
 
           if (!d.transactions) {
-            h += '<div class="empty-state fade-in"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div><p>Select a tag and click Analyze to see breakdown</p></div>';
+            h +=
+              '<div class="empty-state fade-in"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div><p>Select a tag and click Analyze to see breakdown</p></div>';
             return h;
           }
 
           const isIncome = d.txType === "deposit";
           const barCls = isIncome ? "income" : "expense";
           const valCls = isIncome ? "val-pos" : "val-neg";
-          const breakdownLabel = isIncome ? "Source Breakdown" : "Budget Breakdown";
+          const breakdownLabel = isIncome
+            ? "Source Breakdown"
+            : "Budget Breakdown";
 
           h += '<div class="two-col">';
-          const breakdownEntries = Object.entries(d.summary.breakdown).sort((a, b) => b[1] - a[1]);
-          const maxBreakdown = breakdownEntries.length ? breakdownEntries[0][1] : 1;
+          const breakdownEntries = Object.entries(d.summary.breakdown).sort(
+            (a, b) => b[1] - a[1],
+          );
+          const maxBreakdown = breakdownEntries.length
+            ? breakdownEntries[0][1]
+            : 1;
           h += `<div class="data-card fade-in stagger-2"><div class="card-head"><h3>${breakdownLabel}</h3><span class="count">${breakdownEntries.length}</span></div><div class="data-scroll">`;
           if (!breakdownEntries.length)
             h += `<div class="empty-state"><p>No data</p></div>`;
@@ -2525,7 +2943,9 @@
             d.transactions.slice(0, 100).forEach((tx) => {
               const isOut = tx.type === "withdrawal";
               const amt = parseFloat(tx.amount) || 0;
-              const meta = isOut ? (tx.budget_name || "No budget") : (tx.source_name || tx.destination_name || "");
+              const meta = isOut
+                ? tx.budget_name || "No budget"
+                : tx.source_name || tx.destination_name || "";
               h += `<div class="list-item"><div class="list-info"><div class="list-name">${esc(tx.description || "No description")}</div><div class="list-meta">${esc(tx.date?.split("T")[0] || "")} &middot; ${esc(meta)}</div></div><span class="list-value ${isOut ? "val-neg" : "val-pos"}">${fc(isOut ? -amt : amt, sym)}</span></div>`;
             });
           if (d.transactions.length > 100)
@@ -2547,17 +2967,22 @@
           };
           $("tagLoad")?.addEventListener("click", triggerLoad);
           $("tagSelect")?.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") { e.preventDefault(); triggerLoad(); }
+            if (e.key === "Enter") {
+              e.preventDefault();
+              triggerLoad();
+            }
           });
           $("tagSelect")?.addEventListener("change", () => {
             toolState.tagDatesSet = false;
-            toolState.tagStart = ""; toolState.tagEnd = "";
+            toolState.tagStart = "";
+            toolState.tagEnd = "";
             if ($("tagStart")) $("tagStart").value = "";
             if ($("tagEnd")) $("tagEnd").value = "";
           });
           $("tagType")?.addEventListener("change", () => {
             toolState.tagDatesSet = false;
-            toolState.tagStart = ""; toolState.tagEnd = "";
+            toolState.tagStart = "";
+            toolState.tagEnd = "";
             if ($("tagStart")) $("tagStart").value = "";
             if ($("tagEnd")) $("tagEnd").value = "";
           });
@@ -2598,7 +3023,13 @@
         // ============================================================
         async function fetchAccounts() {
           const accounts = await apiAll("/api/v1/accounts");
-          const groups = { asset: [], creditCard: [], liability: [], expense: [], revenue: [] };
+          const groups = {
+            asset: [],
+            creditCard: [],
+            liability: [],
+            expense: [],
+            revenue: [],
+          };
           let totalAssets = 0,
             totalLiabilities = 0,
             totalCreditCard = 0;
@@ -2686,7 +3117,12 @@
             return g + "</div></div>";
           };
           h += renderGroup("Asset Accounts", d.groups.asset, "asset");
-          h += renderGroup("Credit Cards", d.groups.creditCard, "liability", "Credit Card");
+          h += renderGroup(
+            "Credit Cards",
+            d.groups.creditCard,
+            "liability",
+            "Credit Card",
+          );
           h += renderGroup("Liabilities", d.groups.liability, "liability");
           if (d.groups.revenue.length)
             h += renderGroup("Revenue Accounts", d.groups.revenue, "revenue");
@@ -2698,7 +3134,12 @@
             const rows = [["Name", "Type", "Balance", "Currency"]];
             ["asset", "creditCard", "liability", "revenue"].forEach((t) =>
               d.groups[t].forEach((a) =>
-                rows.push([a.name, t === "creditCard" ? "Credit Card" : a.type, a.balance, a.currency]),
+                rows.push([
+                  a.name,
+                  t === "creditCard" ? "Credit Card" : a.type,
+                  a.balance,
+                  a.currency,
+                ]),
               ),
             );
             exportCsv(rows, "accounts.csv");
@@ -2710,20 +3151,29 @@
               if (!drill) return;
               if (drill.style.display !== "none") {
                 drill.style.display = "none";
-                el.querySelector("span:last-child").innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="9 18 15 12 9 6"/></svg>';
+                el.querySelector("span:last-child").innerHTML =
+                  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="9 18 15 12 9 6"/></svg>';
                 return;
               }
               drill.style.display = "block";
-              el.querySelector("span:last-child").innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="6 9 12 15 18 9"/></svg>';
+              el.querySelector("span:last-child").innerHTML =
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="6 9 12 15 18 9"/></svg>';
               if (drill.dataset.loaded) return;
               drill.innerHTML = `<div style="padding:10px 16px;color:var(--text-muted);font-size:13px"><svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Loading transactions...</div>`;
               try {
-                const r = await api(`/api/v1/accounts/${accId}/transactions`, { page: "1" });
+                const r = await api(`/api/v1/accounts/${accId}/transactions`, {
+                  page: "1",
+                });
                 const journals = r.data || [];
                 const txs = [];
-                journals.forEach((j) => (j.attributes?.transactions || []).forEach((tx) => txs.push(tx)));
+                journals.forEach((j) =>
+                  (j.attributes?.transactions || []).forEach((tx) =>
+                    txs.push(tx),
+                  ),
+                );
                 if (!txs.length) {
-                  drill.innerHTML = '<div style="padding:10px 16px;color:var(--text-muted);font-size:13px">No recent transactions</div>';
+                  drill.innerHTML =
+                    '<div style="padding:10px 16px;color:var(--text-muted);font-size:13px">No recent transactions</div>';
                   drill.dataset.loaded = "1";
                   return;
                 }
@@ -2731,7 +3181,8 @@
                 txs.slice(0, 25).forEach((tx) => {
                   const isOut = tx.type === "withdrawal";
                   const amt = parseFloat(tx.amount) || 0;
-                  const meta = tx.category_name || tx.budget_name || esc(tx.type || "");
+                  const meta =
+                    tx.category_name || tx.budget_name || esc(tx.type || "");
                   th += `<div class="list-item" style="padding-left:32px;font-size:13px">
                     <div class="list-info">
                       <div class="list-name">${esc(tx.description || "")}</div>
@@ -2746,7 +3197,8 @@
                 drill.innerHTML = th;
                 drill.dataset.loaded = "1";
               } catch {
-                drill.innerHTML = '<div style="padding:10px 16px;color:var(--danger);font-size:13px">Failed to load transactions</div>';
+                drill.innerHTML =
+                  '<div style="padding:10px 16px;color:var(--danger);font-size:13px">Failed to load transactions</div>';
               }
             });
           });
@@ -2763,13 +3215,19 @@
             if (!a.active || a.account_role !== "ccAsset") return;
             // Detect network from name/notes (Firefly III has no dedicated field)
             const nameLower = (a.name || "").toLowerCase();
-            const network =
-              nameLower.includes("ru" + "pay") ? "rp" :
-              nameLower.includes("mastercard") || nameLower.includes("master card") ? "mastercard" :
-              nameLower.includes("visa") ? "visa" :
-              nameLower.includes("amex") || nameLower.includes("american express") ? "amex" :
-              nameLower.includes("diners") ? "diners" :
-              "";
+            const network = nameLower.includes("ru" + "pay")
+              ? "rp"
+              : nameLower.includes("mastercard") ||
+                  nameLower.includes("master card")
+                ? "mastercard"
+                : nameLower.includes("visa")
+                  ? "visa"
+                  : nameLower.includes("amex") ||
+                      nameLower.includes("american express")
+                    ? "amex"
+                    : nameLower.includes("diners")
+                      ? "diners"
+                      : "";
             // account_number may hold last-4 or full number
             const rawNum = (a.account_number || "").replace(/\s/g, "");
             const cardNumber = rawNum.length >= 4 ? rawNum.slice(-4) : rawNum;
@@ -2799,12 +3257,31 @@
           await Promise.all(
             cards.map(async (card) => {
               try {
-                const raw = await apiAll(`/api/v1/accounts/${card.id}/transactions`, dateParams);
+                const raw = await apiAll(
+                  `/api/v1/accounts/${card.id}/transactions`,
+                  dateParams,
+                );
                 const flat = [];
-                raw.forEach((j) => (j.attributes?.transactions || []).forEach((tx) => flat.push(tx)));
-                card.transactions = flat.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-                card.periodSpent = flat.reduce((s, tx) => s + (tx.type === "withdrawal" ? parseFloat(tx.amount) || 0 : 0), 0);
-                card.periodPaid = flat.reduce((s, tx) => s + (tx.type === "deposit" ? parseFloat(tx.amount) || 0 : 0), 0);
+                raw.forEach((j) =>
+                  (j.attributes?.transactions || []).forEach((tx) =>
+                    flat.push(tx),
+                  ),
+                );
+                card.transactions = flat.sort((a, b) =>
+                  (b.date || "").localeCompare(a.date || ""),
+                );
+                card.periodSpent = flat.reduce(
+                  (s, tx) =>
+                    s +
+                    (tx.type === "withdrawal" ? parseFloat(tx.amount) || 0 : 0),
+                  0,
+                );
+                card.periodPaid = flat.reduce(
+                  (s, tx) =>
+                    s +
+                    (tx.type === "deposit" ? parseFloat(tx.amount) || 0 : 0),
+                  0,
+                );
               } catch {
                 card.transactions = [];
               }
@@ -2827,12 +3304,20 @@
               const amt = parseFloat(tx.amount) || 0;
               catMap[cat] = (catMap[cat] || 0) + amt;
               if (!categoryTxMap[cat]) categoryTxMap[cat] = [];
-              categoryTxMap[cat].push({ ...tx, _cardName: card.name, _cardCurrency: card.currency });
+              categoryTxMap[cat].push({
+                ...tx,
+                _cardName: card.name,
+                _cardCurrency: card.currency,
+              });
               const date = tx.date?.split("T")[0] || "";
               if (date) {
                 dailySpend[date] = (dailySpend[date] || 0) + amt;
                 if (!dailyTxMap[date]) dailyTxMap[date] = [];
-                dailyTxMap[date].push({ ...tx, _cardName: card.name, _cardCurrency: card.currency });
+                dailyTxMap[date].push({
+                  ...tx,
+                  _cardName: card.name,
+                  _cardCurrency: card.currency,
+                });
               }
             }),
           );
@@ -2843,7 +3328,17 @@
             .map(([name, amt]) => ({ name, amt }))
             .sort((a, b) => b.amt - a.amt);
 
-          return { cards, totalOwed, totalSpent, totalPaid, txCount, categoryList, categoryTxMap, dailySpend, dailyTxMap };
+          return {
+            cards,
+            totalOwed,
+            totalSpent,
+            totalPaid,
+            txCount,
+            categoryList,
+            categoryTxMap,
+            dailySpend,
+            dailyTxMap,
+          };
         }
 
         function renderCreditCards(d) {
@@ -2853,12 +3348,12 @@
           const hasPeriod = !!(defStart || defEnd);
 
           // SVG icon helpers
-          const iCC   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`;
-          const iUp   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`;
+          const iCC = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`;
+          const iUp = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`;
           const iDown = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
-          const iTag  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`;
-          const iFwd  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="9 18 15 12 9 6"/></svg>`;
-          const iDwn  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="6 9 12 15 18 9"/></svg>`;
+          const iTag = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`;
+          const iFwd = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="9 18 15 12 9 6"/></svg>`;
+          const iDwn = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="6 9 12 15 18 9"/></svg>`;
           const iFwdW = `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="9 18 15 12 9 6"/></svg>`;
           const iDwnW = `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="6 9 12 15 18 9"/></svg>`;
 
@@ -2905,34 +3400,51 @@
 
           // ── Card panels grid ──
           const palette = [
-            ["#6366f1","#818cf8"],
-            ["#ef4444","#f87171"],
-            ["#10b981","#34d399"],
-            ["#f59e0b","#fbbf24"],
-            ["#8b5cf6","#a78bfa"],
-            ["#06b6d4","#22d3ee"],
+            ["#6366f1", "#818cf8"],
+            ["#ef4444", "#f87171"],
+            ["#10b981", "#34d399"],
+            ["#f59e0b", "#fbbf24"],
+            ["#8b5cf6", "#a78bfa"],
+            ["#06b6d4", "#22d3ee"],
           ];
 
           const n = d.cards.length;
-          const ccCols = n <= 1 ? 1 : n === 2 ? 2 : n === 3 ? 3 : n === 4 ? 2 : 3;
+          const ccCols =
+            n <= 1 ? 1 : n === 2 ? 2 : n === 3 ? 3 : n === 4 ? 2 : 3;
           h += `<div style="display:grid;grid-template-columns:repeat(${ccCols},1fr);gap:16px;margin-bottom:24px">`;
 
-          // Network logos (inline SVG / text badges)
+          // Network logos (using downloaded images)
           const networkLogo = (net) => {
-            if (net === "visa") return `<svg viewBox="0 0 50 16" width="44" height="14" aria-label="Visa"><text x="0" y="13" font-family="Arial,sans-serif" font-size="16" font-weight="800" font-style="italic" fill="#fff" letter-spacing="-1">VISA</text></svg>`;
-            if (net === "mastercard") return `<svg viewBox="0 0 44 28" width="36" height="22" aria-label="Mastercard"><circle cx="14" cy="14" r="14" fill="#eb001b" opacity="0.92"/><circle cx="30" cy="14" r="14" fill="#f79e1b" opacity="0.92"/><path d="M22 5.7a14 14 0 0 1 0 16.6A14 14 0 0 1 22 5.7z" fill="#ff5f00" opacity="0.92"/></svg>`;
-            if (net === "rp") return `<svg viewBox="0 0 60 22" width="48" height="18" aria-label="RuPay"><rect width="60" height="22" rx="3" fill="rgba(255,255,255,0.18)"/><text x="6" y="16" font-family="Arial,sans-serif" font-size="13" font-weight="800" fill="#fff">Ru</text><text x="24" y="16" font-family="Arial,sans-serif" font-size="13" font-weight="800" fill="#f59e0b">Pay</text></svg>`;
-            if (net === "amex") return `<svg viewBox="0 0 56 18" width="48" height="14" aria-label="Amex"><text x="0" y="14" font-family="Arial,sans-serif" font-size="13" font-weight="800" fill="#fff" letter-spacing="0.5">AMEX</text></svg>`;
-            if (net === "diners") return `<svg viewBox="0 0 72 18" width="56" height="14" aria-label="Diners Club"><text x="0" y="14" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="rgba(255,255,255,0.85)">DINERS CLUB</text></svg>`;
+            if (net === "visa")
+              return `<img src="assets/icons/visa.svg" alt="Visa" style="height:18px;object-fit:contain">`;
+            if (net === "mastercard")
+              return `<img src="assets/icons/mastercard.svg" alt="Mastercard" style="height:18px;object-fit:contain">`;
+            if (net === "rp")
+              return `<img src="assets/icons/rupay.svg" alt="RuPay" style="height:18px;object-fit:contain">`;
+            if (net === "amex")
+              return `<img src="assets/icons/amex.svg" alt="American Express" style="height:18px;object-fit:contain">`;
+            if (net === "diners")
+              return `<img src="assets/icons/diners.svg" alt="Diners Club" style="height:18px;object-fit:contain">`;
             return "";
           };
 
           d.cards.forEach((card, i) => {
             const [c1, c2] = palette[i % palette.length];
-            const utilPct = card.creditLimit > 0 ? Math.min((Math.abs(card.balance) / card.creditLimit) * 100, 100) : 0;
-            const hasStats = card.periodSpent > 0 || card.periodPaid > 0 || card.transactions.length > 0;
+            const utilPct =
+              card.creditLimit > 0
+                ? Math.min(
+                    (Math.abs(card.balance) / card.creditLimit) * 100,
+                    100,
+                  )
+                : 0;
+            const hasStats =
+              card.periodSpent > 0 ||
+              card.periodPaid > 0 ||
+              card.transactions.length > 0;
             const netLogo = networkLogo(card.network);
-            const maskedNum = card.cardNumber ? `•••• ${esc(card.cardNumber)}` : "";
+            const maskedNum = card.cardNumber
+              ? `•••• ${esc(card.cardNumber)}`
+              : "";
 
             h += `<div class="data-card fade-in stagger-${Math.min(i + 1, 4)}" style="margin-bottom:0">
               <div class="cc-panel-header" data-cc-id="${esc(String(card.id))}"
@@ -2952,7 +3464,9 @@
                   <div style="color:rgba(255,255,255,0.65);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Current Balance</div>
                   <div style="color:#fff;font-size:28px;font-weight:800;letter-spacing:-0.5px;line-height:1.1;margin-top:3px">${fc(card.balance, card.currency)}</div>
                 </div>
-                ${card.creditLimit > 0 ? `
+                ${
+                  card.creditLimit > 0
+                    ? `
                 <div style="margin-top:14px">
                   <div style="display:flex;justify-content:space-between;margin-bottom:5px">
                     <span style="color:rgba(255,255,255,0.65);font-size:10px">Limit: ${fc(card.creditLimit, card.currency)}</span>
@@ -2961,24 +3475,38 @@
                   <div style="height:4px;background:rgba(255,255,255,0.25);border-radius:2px;overflow:hidden">
                     <div style="height:100%;width:${utilPct}%;background:#fff;border-radius:2px;opacity:0.85"></div>
                   </div>
-                </div>` : ""}
+                </div>`
+                    : ""
+                }
               </div>
               <div style="padding:12px 16px;display:flex;border-bottom:1px solid var(--border-light)">
-                ${card.periodSpent > 0 ? `
+                ${
+                  card.periodSpent > 0
+                    ? `
                 <div style="flex:1;padding:4px 8px;border-right:1px solid var(--border-light)">
                   <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:3px">Spent</div>
                   <div style="font-size:15px;font-weight:700;color:var(--danger)">${fc(-card.periodSpent, card.currency)}</div>
-                </div>` : ""}
-                ${card.periodPaid > 0 ? `
+                </div>`
+                    : ""
+                }
+                ${
+                  card.periodPaid > 0
+                    ? `
                 <div style="flex:1;padding:4px 8px;${card.transactions.length > 0 ? "border-right:1px solid var(--border-light)" : ""}">
                   <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:3px">Paid</div>
                   <div style="font-size:15px;font-weight:700;color:var(--success)">${fc(card.periodPaid, card.currency)}</div>
-                </div>` : ""}
-                ${card.transactions.length > 0 ? `
+                </div>`
+                    : ""
+                }
+                ${
+                  card.transactions.length > 0
+                    ? `
                 <div style="flex:1;padding:4px 8px">
                   <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:3px">Transactions</div>
                   <div style="font-size:15px;font-weight:700">${card.transactions.length}</div>
-                </div>` : ""}
+                </div>`
+                    : ""
+                }
                 ${!hasStats ? `<div style="padding:4px 8px;color:var(--text-muted);font-size:13px">No transactions${hasPeriod ? " in period" : ""}</div>` : ""}
               </div>
               <div id="ccDrill-${esc(String(card.id))}" style="display:none;max-height:360px;overflow-y:auto">`;
@@ -3036,7 +3564,9 @@
               <div id="ccCatDrill-${i}" style="display:none;border-top:1px solid var(--border-light)">`;
               catTxs.forEach((tx) => {
                 const amt = parseFloat(tx.amount) || 0;
-                const cardLabel = tx._cardName ? ` &middot; ${esc(tx._cardName)}` : "";
+                const cardLabel = tx._cardName
+                  ? ` &middot; ${esc(tx._cardName)}`
+                  : "";
                 h += `<div class="list-item" style="padding-left:44px;font-size:12px">
                   <div class="list-info">
                     <div class="list-name">${esc(tx.description || "")}</div>
@@ -3056,34 +3586,38 @@
         function bindCreditCards(d) {
           const svgFwdW = `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="9 18 15 12 9 6"/></svg>`;
           const svgDwnW = `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="6 9 12 15 18 9"/></svg>`;
-          const svgFwd  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="9 18 15 12 9 6"/></svg>`;
-          const svgDwn  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="6 9 12 15 18 9"/></svg>`;
+          const svgFwd = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="9 18 15 12 9 6"/></svg>`;
+          const svgDwn = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="6 9 12 15 18 9"/></svg>`;
 
           // Card panel toggle
-          document.querySelectorAll(".cc-panel-header[data-cc-id]").forEach((el) => {
-            el.addEventListener("click", () => {
-              const cardId = el.dataset.ccId;
-              const drill = document.getElementById("ccDrill-" + cardId);
-              const arrow = document.getElementById("cc-arrow-" + cardId);
-              if (!drill) return;
-              const isOpen = drill.style.display !== "none";
-              drill.style.display = isOpen ? "none" : "block";
-              if (arrow) arrow.innerHTML = isOpen ? svgFwdW : svgDwnW;
+          document
+            .querySelectorAll(".cc-panel-header[data-cc-id]")
+            .forEach((el) => {
+              el.addEventListener("click", () => {
+                const cardId = el.dataset.ccId;
+                const drill = document.getElementById("ccDrill-" + cardId);
+                const arrow = document.getElementById("cc-arrow-" + cardId);
+                if (!drill) return;
+                const isOpen = drill.style.display !== "none";
+                drill.style.display = isOpen ? "none" : "block";
+                if (arrow) arrow.innerHTML = isOpen ? svgFwdW : svgDwnW;
+              });
             });
-          });
 
           // Category drill-down toggle
-          document.querySelectorAll(".cc-cat-row[data-cat-idx]").forEach((el) => {
-            el.addEventListener("click", () => {
-              const idx = el.dataset.catIdx;
-              const drill = document.getElementById("ccCatDrill-" + idx);
-              const arrow = document.getElementById("cc-cat-arrow-" + idx);
-              if (!drill) return;
-              const isOpen = drill.style.display !== "none";
-              drill.style.display = isOpen ? "none" : "block";
-              if (arrow) arrow.innerHTML = isOpen ? svgFwd : svgDwn;
+          document
+            .querySelectorAll(".cc-cat-row[data-cat-idx]")
+            .forEach((el) => {
+              el.addEventListener("click", () => {
+                const idx = el.dataset.catIdx;
+                const drill = document.getElementById("ccCatDrill-" + idx);
+                const arrow = document.getElementById("cc-cat-arrow-" + idx);
+                if (!drill) return;
+                const isOpen = drill.style.display !== "none";
+                drill.style.display = isOpen ? "none" : "block";
+                if (arrow) arrow.innerHTML = isOpen ? svgFwd : svgDwn;
+              });
             });
-          });
 
           const reload = () => {
             toolState.ccStart = document.getElementById("ccStart")?.value || "";
@@ -3095,7 +3629,9 @@
             toolState.ccEnd = end || "";
             loadTool("credit-cards");
           });
-          document.getElementById("ccStart")?.addEventListener("change", reload);
+          document
+            .getElementById("ccStart")
+            ?.addEventListener("change", reload);
           document.getElementById("ccEnd")?.addEventListener("change", reload);
 
           // Daily spending chart
@@ -3108,36 +3644,44 @@
             const activeColor = "rgba(239,68,68,1)";
             const dimColor = "rgba(239,68,68,0.25)";
 
-            const bgColors = () => days.map((_, i) =>
-              activeDayIdx === null ? baseColor : i === activeDayIdx ? activeColor : dimColor
-            );
+            const bgColors = () =>
+              days.map((_, i) =>
+                activeDayIdx === null
+                  ? baseColor
+                  : i === activeDayIdx
+                    ? activeColor
+                    : dimColor,
+              );
 
             const chart = makeChart("ccDailyChart", {
               type: "bar",
               data: {
-                labels: days.map(d2 => d2.slice(5)),
-                datasets: [{
-                  label: "Spent",
-                  data: days.map(d2 => d.dailySpend[d2]),
-                  backgroundColor: bgColors(),
-                  borderRadius: 3,
-                  borderSkipped: false,
-                  hoverBackgroundColor: activeColor,
-                }]
+                labels: days.map((d2) => d2.slice(5)),
+                datasets: [
+                  {
+                    label: "Spent",
+                    data: days.map((d2) => d.dailySpend[d2]),
+                    backgroundColor: bgColors(),
+                    borderRadius: 3,
+                    borderSkipped: false,
+                    hoverBackgroundColor: activeColor,
+                  },
+                ],
               },
               options: {
-                responsive: true, maintainAspectRatio: false,
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                   legend: { display: false },
                   tooltip: {
                     callbacks: {
-                      title: ctx => days[ctx[0].dataIndex],   // full YYYY-MM-DD
-                      label: ctx => `  ${fc(ctx.parsed.y, sym)}`,
+                      title: (ctx) => days[ctx[0].dataIndex], // full YYYY-MM-DD
+                      label: (ctx) => `  ${fc(ctx.parsed.y, sym)}`,
                       afterLabel: () => "  Click to view transactions",
                     },
                     bodyFont: { family: "Inter" },
                     titleFont: { family: "Inter", weight: "700" },
-                  }
+                  },
                 },
                 scales: {
                   x: {
@@ -3148,12 +3692,16 @@
                       maxRotation: 0,
                       autoSkip: true,
                       maxTicksLimit: 15,
-                    }
+                    },
                   },
                   y: {
                     grid: { color: gridColor },
-                    ticks: { color: labelColor, font: { family: "Inter" }, callback: v => fc(v, sym) }
-                  }
+                    ticks: {
+                      color: labelColor,
+                      font: { family: "Inter" },
+                      callback: (v) => fc(v, sym),
+                    },
+                  },
                 },
                 onClick(_, elements) {
                   if (!elements.length) return;
@@ -3175,13 +3723,20 @@
                   chart.data.datasets[0].backgroundColor = bgColors();
                   chart.update("none");
 
-                  const txs = (d.dailyTxMap?.[date] || []).slice().sort((a, b) => (a.description || "").localeCompare(b.description || ""));
-                  const total = txs.reduce((s, tx) => s + (parseFloat(tx.amount) || 0), 0);
+                  const txs = (d.dailyTxMap?.[date] || [])
+                    .slice()
+                    .sort((a, b) =>
+                      (a.description || "").localeCompare(b.description || ""),
+                    );
+                  const total = txs.reduce(
+                    (s, tx) => s + (parseFloat(tx.amount) || 0),
+                    0,
+                  );
                   let html = `<div style="padding:10px 20px 4px;display:flex;justify-content:space-between;align-items:center">
                     <span style="font-size:13px;font-weight:700;color:var(--text-primary)">${date} &mdash; ${txs.length} transaction${txs.length !== 1 ? "s" : ""}</span>
                     <span style="font-size:13px;font-weight:700;color:var(--danger)">${fc(total, sym)}</span>
                   </div>`;
-                  txs.forEach(tx => {
+                  txs.forEach((tx) => {
                     const amt = parseFloat(tx.amount) || 0;
                     html += `<div class="list-item" style="padding-left:20px">
                       <div class="list-info">
@@ -3193,8 +3748,8 @@
                   });
                   drill.innerHTML = html;
                   drill.style.display = "block";
-                }
-              }
+                },
+              },
             });
           }
         }
@@ -3349,7 +3904,9 @@
         }
 
         function updateBillsBadge(items) {
-          const urgent = (items || []).filter(b => b.daysUntil !== null && b.daysUntil <= 7);
+          const urgent = (items || []).filter(
+            (b) => b.daysUntil !== null && b.daysUntil <= 7,
+          );
           const navEl = document.querySelector('a[href="#bills"]');
           if (!navEl) return;
           const existing = navEl.querySelector(".nav-badge");
@@ -3375,13 +3932,17 @@
           let h = `<div class="tool-header"><h1>Bills &amp; Subscriptions</h1><div class="tool-controls"><button class="btn btn-ghost" id="billExport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" style="vertical-align:-1px"><line x1="12" y1="3" x2="12" y2="15"/><polyline points="8 11 12 15 16 11"/><line x1="5" y1="21" x2="19" y2="21"/></svg> CSV</button></div></div>`;
 
           // ── Alert banners ──
-          const overdue = d.items.filter(b => b.daysUntil !== null && b.daysUntil < 0);
-          const dueSoon = d.items.filter(b => b.daysUntil !== null && b.daysUntil >= 0 && b.daysUntil <= 7);
+          const overdue = d.items.filter(
+            (b) => b.daysUntil !== null && b.daysUntil < 0,
+          );
+          const dueSoon = d.items.filter(
+            (b) => b.daysUntil !== null && b.daysUntil >= 0 && b.daysUntil <= 7,
+          );
           if (overdue.length) {
-            h += `<div class="alert-banner danger fade-in"><div class="alert-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="alert-banner-body"><div class="alert-banner-title">${overdue.length} bill${overdue.length > 1 ? "s" : ""} overdue</div><div class="alert-banner-items">${overdue.map(b => `<span>${esc(b.name)} &mdash; ${Math.abs(b.daysUntil)}d ago &middot; ${fc(b.max, b.currency)}</span>`).join("")}</div></div></div>`;
+            h += `<div class="alert-banner danger fade-in"><div class="alert-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="alert-banner-body"><div class="alert-banner-title">${overdue.length} bill${overdue.length > 1 ? "s" : ""} overdue</div><div class="alert-banner-items">${overdue.map((b) => `<span>${esc(b.name)} &mdash; ${Math.abs(b.daysUntil)}d ago &middot; ${fc(b.max, b.currency)}</span>`).join("")}</div></div></div>`;
           }
           if (dueSoon.length) {
-            h += `<div class="alert-banner fade-in"><div class="alert-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="alert-banner-body"><div class="alert-banner-title">Due within 7 days</div><div class="alert-banner-items">${dueSoon.map(b => `<span>${esc(b.name)} &mdash; ${b.daysUntil === 0 ? "today" : "in " + b.daysUntil + "d"} &middot; ${fc(b.max, b.currency)}</span>`).join("")}</div></div></div>`;
+            h += `<div class="alert-banner fade-in"><div class="alert-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="alert-banner-body"><div class="alert-banner-title">Due within 7 days</div><div class="alert-banner-items">${dueSoon.map((b) => `<span>${esc(b.name)} &mdash; ${b.daysUntil === 0 ? "today" : "in " + b.daysUntil + "d"} &middot; ${fc(b.max, b.currency)}</span>`).join("")}</div></div></div>`;
           }
 
           if (d.items.length) {
@@ -3458,11 +4019,14 @@
           const now = new Date();
           const start = fmt(new Date(now.getFullYear(), now.getMonth() - 2, 1));
           const end = fmt(new Date(now.getFullYear(), now.getMonth() + 1, 0));
-          const raw = await apiAll("/api/v1/transactions", { start, end, type: "withdrawal" },
+          const raw = await apiAll(
+            "/api/v1/transactions",
+            { start, end, type: "withdrawal" },
             (page, total, count) => {
               const el = document.getElementById("loadProgress");
-              if (el) el.innerHTML = `<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Scanning transactions... page ${page}/${total} (${count} found)`;
-            }
+              if (el)
+                el.innerHTML = `<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Scanning transactions... page ${page}/${total} (${count} found)`;
+            },
           );
           // Flatten transactions
           const txs = [];
@@ -3494,7 +4058,15 @@
             const key = `${dest}|||${descKey}|||${amtKey}`;
             // Prefer description as display name — it's more specific than the payee
             const displayName = desc || dest;
-            if (!groups[key]) groups[key] = { merchant: displayName, amount: tx.amount, currency: tx.currency, category: tx.category, dates: [], txs: [] };
+            if (!groups[key])
+              groups[key] = {
+                merchant: displayName,
+                amount: tx.amount,
+                currency: tx.currency,
+                category: tx.category,
+                dates: [],
+                txs: [],
+              };
             groups[key].dates.push(tx.date);
             groups[key].txs.push(tx);
           }
@@ -3502,23 +4074,41 @@
           const recurring = [];
           for (const g of Object.values(groups)) {
             if (g.dates.length < 2) continue;
-            const months = new Set(g.dates.map(d => d.slice(0, 7)));
+            const months = new Set(g.dates.map((d) => d.slice(0, 7)));
             if (months.size < 2) continue; // must span multiple months
             // Estimate frequency from median gap between dates
             const sorted = [...g.dates].sort();
             const gaps = [];
             for (let i = 1; i < sorted.length; i++) {
-              const diff = (new Date(sorted[i]) - new Date(sorted[i - 1])) / 86400000;
+              const diff =
+                (new Date(sorted[i]) - new Date(sorted[i - 1])) / 86400000;
               gaps.push(diff);
             }
-            const medGap = gaps.sort((a, b) => a - b)[Math.floor(gaps.length / 2)];
-            const freq = medGap <= 10 ? "Weekly" : medGap <= 20 ? "Bi-weekly" : medGap <= 40 ? "Monthly" : medGap <= 100 ? "Quarterly" : "Irregular";
-            recurring.push({ ...g, freq, medGap, lastDate: sorted[sorted.length - 1], occurrences: g.dates.length });
+            const medGap = gaps.sort((a, b) => a - b)[
+              Math.floor(gaps.length / 2)
+            ];
+            const freq =
+              medGap <= 10
+                ? "Weekly"
+                : medGap <= 20
+                  ? "Bi-weekly"
+                  : medGap <= 40
+                    ? "Monthly"
+                    : medGap <= 100
+                      ? "Quarterly"
+                      : "Irregular";
+            recurring.push({
+              ...g,
+              freq,
+              medGap,
+              lastDate: sorted[sorted.length - 1],
+              occurrences: g.dates.length,
+            });
           }
           // Sort by amount desc
           recurring.sort((a, b) => b.amount - a.amount);
           const totalMonthly = recurring
-            .filter(r => r.freq === "Monthly")
+            .filter((r) => r.freq === "Monthly")
             .reduce((s, r) => s + r.amount, 0);
           return { recurring, totalMonthly, txCount: txs.length, start, end };
         }
@@ -3526,8 +4116,11 @@
         function renderRecurring(d) {
           const sym = S.detectedCurrency;
           const freqColors = {
-            Weekly: "var(--accent)", "Bi-weekly": "#8b5cf6",
-            Monthly: "var(--success)", Quarterly: "var(--warning)", Irregular: "var(--text-muted)"
+            Weekly: "var(--accent)",
+            "Bi-weekly": "#8b5cf6",
+            Monthly: "var(--success)",
+            Quarterly: "var(--warning)",
+            Irregular: "var(--text-muted)",
           };
           let h = `<div class="tool-header"><h1>Recurring Transactions</h1>
             <div class="tool-controls"><button class="btn btn-ghost" id="recurExport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" style="vertical-align:-1px"><line x1="12" y1="3" x2="12" y2="15"/><polyline points="8 11 12 15 16 11"/><line x1="5" y1="21" x2="19" y2="21"/></svg> CSV</button></div></div>`;
@@ -3549,7 +4142,13 @@
             if (!byFreq[r.freq]) byFreq[r.freq] = [];
             byFreq[r.freq].push(r);
           }
-          const freqOrder = ["Monthly", "Weekly", "Bi-weekly", "Quarterly", "Irregular"];
+          const freqOrder = [
+            "Monthly",
+            "Weekly",
+            "Bi-weekly",
+            "Quarterly",
+            "Irregular",
+          ];
           for (const freq of freqOrder) {
             const items = byFreq[freq];
             if (!items) continue;
@@ -3570,12 +4169,15 @@
                 <span class="list-value val-neg">${fc(r.amount, r.currency)}</span>
               </div>
               <div id="recurDrill-${freq}-${i}" style="display:none">`;
-              r.txs.slice().sort((a, b) => b.date.localeCompare(a.date)).forEach(tx => {
-                h += `<div class="list-item" style="padding-left:58px;background:var(--bg-card-hover);border-left:2px solid var(--accent)">
+              r.txs
+                .slice()
+                .sort((a, b) => b.date.localeCompare(a.date))
+                .forEach((tx) => {
+                  h += `<div class="list-item" style="padding-left:58px;background:var(--bg-card-hover);border-left:2px solid var(--accent)">
                   <div class="list-info"><div class="list-name" style="font-size:12px">${esc(tx.description)}</div><div class="list-meta">${esc(tx.date)}</div></div>
                   <span class="list-value val-neg" style="font-size:12px">${fc(tx.amount, tx.currency)}</span>
                 </div>`;
-              });
+                });
               h += `</div>`;
             });
             h += `</div></div>`;
@@ -3585,15 +4187,38 @@
 
         function bindRecurring(d) {
           $("recurExport")?.addEventListener("click", () => {
-            const rows = [["Merchant", "Amount", "Currency", "Frequency", "Occurrences", "Last Date", "Category"]];
-            d.recurring.forEach(r => rows.push([r.merchant, r.amount, r.currency, r.freq, r.occurrences, r.lastDate, r.category]));
+            const rows = [
+              [
+                "Merchant",
+                "Amount",
+                "Currency",
+                "Frequency",
+                "Occurrences",
+                "Last Date",
+                "Category",
+              ],
+            ];
+            d.recurring.forEach((r) =>
+              rows.push([
+                r.merchant,
+                r.amount,
+                r.currency,
+                r.freq,
+                r.occurrences,
+                r.lastDate,
+                r.category,
+              ]),
+            );
             exportCsv(rows, "recurring.csv");
           });
-          document.querySelectorAll("[data-recur-idx]").forEach(el => {
+          document.querySelectorAll("[data-recur-idx]").forEach((el) => {
             el.addEventListener("click", () => {
-              const drill = document.getElementById("recurDrill-" + el.dataset.recurIdx);
+              const drill = document.getElementById(
+                "recurDrill-" + el.dataset.recurIdx,
+              );
               if (!drill) return;
-              drill.style.display = drill.style.display === "none" ? "block" : "none";
+              drill.style.display =
+                drill.style.display === "none" ? "block" : "none";
             });
           });
         }
@@ -3606,15 +4231,26 @@
           if (!toolState.searchAccounts) {
             const allAccounts = await apiAll("/api/v1/accounts");
             toolState.searchAccounts = allAccounts
-              .filter(a => a.attributes?.active && ["asset","expense","revenue"].includes(a.attributes?.type))
-              .map(a => ({ id: a.id, name: a.attributes?.name || "" }))
+              .filter(
+                (a) =>
+                  a.attributes?.active &&
+                  ["asset", "expense", "revenue"].includes(a.attributes?.type),
+              )
+              .map((a) => ({ id: a.id, name: a.attributes?.name || "" }))
               .sort((a, b) => a.name.localeCompare(b.name));
           }
           if (!toolState.searchCategories) {
             const cats = await apiAll("/api/v1/categories");
-            toolState.searchCategories = cats.map(c => ({ id: c.id, name: c.attributes?.name || "" })).sort((a, b) => a.name.localeCompare(b.name));
+            toolState.searchCategories = cats
+              .map((c) => ({ id: c.id, name: c.attributes?.name || "" }))
+              .sort((a, b) => a.name.localeCompare(b.name));
           }
-          if (!toolState.searchQuery) return { results: null, accounts: toolState.searchAccounts, categories: toolState.searchCategories };
+          if (!toolState.searchQuery)
+            return {
+              results: null,
+              accounts: toolState.searchAccounts,
+              categories: toolState.searchCategories,
+            };
           const params = { query: toolState.searchQuery };
           if (toolState.searchType && toolState.searchType !== "all")
             params.type = toolState.searchType;
@@ -3634,17 +4270,39 @@
               if (toolState.searchStart && d < toolState.searchStart) continue;
               if (toolState.searchEnd && d > toolState.searchEnd) continue;
               const amt = parseFloat(tx.amount) || 0;
-              if (toolState.searchMinAmt && amt < parseFloat(toolState.searchMinAmt)) continue;
-              if (toolState.searchMaxAmt && amt > parseFloat(toolState.searchMaxAmt)) continue;
-              if (toolState.searchAccount && tx.source_name !== toolState.searchAccount && tx.destination_name !== toolState.searchAccount) continue;
-              if (toolState.searchCategory && tx.category_name !== toolState.searchCategory) continue;
+              if (
+                toolState.searchMinAmt &&
+                amt < parseFloat(toolState.searchMinAmt)
+              )
+                continue;
+              if (
+                toolState.searchMaxAmt &&
+                amt > parseFloat(toolState.searchMaxAmt)
+              )
+                continue;
+              if (
+                toolState.searchAccount &&
+                tx.source_name !== toolState.searchAccount &&
+                tx.destination_name !== toolState.searchAccount
+              )
+                continue;
+              if (
+                toolState.searchCategory &&
+                tx.category_name !== toolState.searchCategory
+              )
+                continue;
               transactions.push(tx);
             }
           }
           transactions.sort((a, b) =>
             (b.date || "").localeCompare(a.date || ""),
           );
-          return { results: transactions, query: toolState.searchQuery, accounts: toolState.searchAccounts, categories: toolState.searchCategories };
+          return {
+            results: transactions,
+            query: toolState.searchQuery,
+            accounts: toolState.searchAccounts,
+            categories: toolState.searchCategories,
+          };
         }
 
         function renderSearch(d) {
@@ -3657,8 +4315,22 @@
                 `<option value="${t}"${t === st ? " selected" : ""}>${t === "all" ? "All Types" : t.charAt(0).toUpperCase() + t.slice(1) + "s"}</option>`,
             )
             .join("");
-          const accOpts = `<option value="">All Accounts</option>` + (d.accounts || []).map(a => `<option value="${esc(a.name)}"${a.name === toolState.searchAccount ? " selected" : ""}>${esc(a.name)}</option>`).join("");
-          const catOpts = `<option value="">All Categories</option>` + (d.categories || []).map(c => `<option value="${esc(c.name)}"${c.name === toolState.searchCategory ? " selected" : ""}>${esc(c.name)}</option>`).join("");
+          const accOpts =
+            `<option value="">All Accounts</option>` +
+            (d.accounts || [])
+              .map(
+                (a) =>
+                  `<option value="${esc(a.name)}"${a.name === toolState.searchAccount ? " selected" : ""}>${esc(a.name)}</option>`,
+              )
+              .join("");
+          const catOpts =
+            `<option value="">All Categories</option>` +
+            (d.categories || [])
+              .map(
+                (c) =>
+                  `<option value="${esc(c.name)}"${c.name === toolState.searchCategory ? " selected" : ""}>${esc(c.name)}</option>`,
+              )
+              .join("");
           let h = `<div class="tool-header"><h1>Transaction Search</h1></div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:8px;align-items:flex-end">
                     <div class="form-group" style="grid-column:span 2;margin-bottom:0"><label>Search</label><input type="text" class="form-input" id="searchInput" value="${esc(q)}" placeholder="Description, notes..."></div>
@@ -3874,9 +4546,21 @@
           // ── Detail list ──
           h += `<div class="data-card fade-in stagger-3"><div class="card-head"><h3>Monthly ${mode === "spent" ? "Spending" : mode === "earned" ? "Income" : "Net Change"}</h3></div>`;
           d.data.forEach((m) => {
-            const val = mode === "spent" ? m.spent : mode === "earned" ? m.earned : m.balance;
+            const val =
+              mode === "spent"
+                ? m.spent
+                : mode === "earned"
+                  ? m.earned
+                  : m.balance;
             const pct = maxVal > 0 ? (Math.abs(val) / maxVal) * 100 : 0;
-            const barColor = mode === "earned" ? "ok" : mode === "balance" ? (val >= 0 ? "ok" : "over") : "over";
+            const barColor =
+              mode === "earned"
+                ? "ok"
+                : mode === "balance"
+                  ? val >= 0
+                    ? "ok"
+                    : "over"
+                  : "over";
             h += `<div class="progress-item"><div class="progress-row"><span class="progress-name">${esc(m.label)}</span><span class="progress-amounts"><span class="pval ${val < 0 ? "val-neg" : mode === "spent" ? "val-neg" : "val-pos"}">${fc(val, sym)}</span></span></div>
                     <div class="progress-bar-wrap"><div class="progress-bar ${barColor}" style="width:${pct}%"></div></div></div>`;
           });
@@ -3902,35 +4586,59 @@
             makeChart("trendChart", {
               type: "bar",
               data: {
-                labels: d.data.map(m => m.label),
+                labels: d.data.map((m) => m.label),
                 datasets: [
                   {
                     label: "Spent",
-                    data: d.data.map(m => m.spent),
+                    data: d.data.map((m) => m.spent),
                     backgroundColor: "rgba(239,68,68,0.8)",
                     borderRadius: 4,
                     borderSkipped: false,
                   },
                   {
                     label: "Income",
-                    data: d.data.map(m => m.earned),
+                    data: d.data.map((m) => m.earned),
                     backgroundColor: "rgba(16,185,129,0.8)",
                     borderRadius: 4,
                     borderSkipped: false,
                   },
-                ]
+                ],
               },
               options: {
-                responsive: true, maintainAspectRatio: false,
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                  legend: { position: "top", labels: { color: labelColor, font: { family: "Inter" }, boxWidth: 12, padding: 16 } },
-                  tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${fc(ctx.parsed.y, sym)}` } }
+                  legend: {
+                    position: "top",
+                    labels: {
+                      color: labelColor,
+                      font: { family: "Inter" },
+                      boxWidth: 12,
+                      padding: 16,
+                    },
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: (ctx) =>
+                        `${ctx.dataset.label}: ${fc(ctx.parsed.y, sym)}`,
+                    },
+                  },
                 },
                 scales: {
-                  x: { grid: { color: gridColor }, ticks: { color: labelColor, font: { family: "Inter" } } },
-                  y: { grid: { color: gridColor }, ticks: { color: labelColor, font: { family: "Inter" }, callback: v => fc(v, sym) } }
-                }
-              }
+                  x: {
+                    grid: { color: gridColor },
+                    ticks: { color: labelColor, font: { family: "Inter" } },
+                  },
+                  y: {
+                    grid: { color: gridColor },
+                    ticks: {
+                      color: labelColor,
+                      font: { family: "Inter" },
+                      callback: (v) => fc(v, sym),
+                    },
+                  },
+                },
+              },
             });
           }
         }
@@ -3940,13 +4648,21 @@
           if (!toolState.budgets)
             toolState.budgets = await apiAll("/api/v1/budgets");
           if (!toolState.selectedBudget)
-            return { budgets: toolState.budgets, transactions: null, summary: null };
+            return {
+              budgets: toolState.budgets,
+              transactions: null,
+              summary: null,
+            };
           const budgetObj = toolState.budgets.find(
             (b) => String(b.id) === String(toolState.selectedBudget),
           );
           if (!budgetObj) {
             toast("Budget not found", "error");
-            return { budgets: toolState.budgets, transactions: null, summary: null };
+            return {
+              budgets: toolState.budgets,
+              transactions: null,
+              summary: null,
+            };
           }
           const dateParams = {};
           if (toolState.budgetStart) dateParams.start = toolState.budgetStart;
@@ -3962,7 +4678,9 @@
               },
             ),
             dateParams.start && dateParams.end
-              ? api(`/api/v1/budgets/${budgetObj.id}/limits`, dateParams).catch(() => null)
+              ? api(`/api/v1/budgets/${budgetObj.id}/limits`, dateParams).catch(
+                  () => null,
+                )
               : Promise.resolve(null),
           ]);
           const filtered = [];
@@ -3971,7 +4689,9 @@
               if (tx.type === "withdrawal") filtered.push(tx);
             }
           }
-          let total = 0, minDate = "", maxDate = "";
+          let total = 0,
+            minDate = "",
+            maxDate = "";
           const categories = {};
           filtered.forEach((tx) => {
             const amt = parseFloat(tx.amount) || 0;
@@ -3987,7 +4707,9 @@
             toolState.budgetEnd = maxDate;
             toolState.budgetDatesSet = true;
           }
-          const limit = parseFloat(limitsData?.data?.[0]?.attributes?.amount || "0");
+          const limit = parseFloat(
+            limitsData?.data?.[0]?.attributes?.amount || "0",
+          );
           return {
             budgets: toolState.budgets,
             transactions: filtered,
@@ -4015,7 +4737,8 @@
               <button class="btn btn-primary" id="budgetLoad">Analyze</button>
             </div></div>`;
           if (!d.transactions) {
-            h += '<div class="empty-state fade-in"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></div><p>Select a budget and click Analyze to see spending breakdown</p></div>';
+            h +=
+              '<div class="empty-state fade-in"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></div><p>Select a budget and click Analyze to see spending breakdown</p></div>';
             return h;
           }
           const spent = d.summary.total;
@@ -4043,7 +4766,9 @@
             </div>`;
           }
           h += '<div class="two-col">';
-          const catEntries = Object.entries(d.summary.categories).sort((a, b) => b[1] - a[1]);
+          const catEntries = Object.entries(d.summary.categories).sort(
+            (a, b) => b[1] - a[1],
+          );
           const maxCat = catEntries.length ? catEntries[0][1] : 1;
           h += `<div class="data-card fade-in stagger-2"><div class="card-head"><h3>Category Breakdown</h3><span class="count">${catEntries.length}</span></div><div class="data-scroll">`;
           if (!catEntries.length)
@@ -4055,7 +4780,7 @@
             });
             h += `<div class="list-item" style="border-top:2px solid var(--border);background:var(--bg-card-hover)"><div class="list-info"><div class="list-name" style="font-weight:700">Total</div></div><span class="list-value val-neg" style="font-weight:700">${fc(-spent, sym)}</span></div>`;
           }
-          h += '</div></div>';
+          h += "</div></div>";
           h += `<div class="data-card fade-in stagger-3"><div class="card-head"><h3>Transactions</h3><div><button class="btn btn-ghost" id="budgetCsvExport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" style="vertical-align:-1px"><line x1="12" y1="3" x2="12" y2="15"/><polyline points="8 11 12 15 16 11"/><line x1="5" y1="21" x2="19" y2="21"/></svg> CSV</button></div></div><div class="data-scroll">`;
           if (!d.transactions.length)
             h += '<div class="empty-state"><p>No transactions found</p></div>';
@@ -4065,7 +4790,7 @@
             });
           if (d.transactions.length > 100)
             h += `<div class="list-item" style="justify-content:center;color:var(--text-muted);font-size:12px">Showing 100 of ${d.transactions.length}</div>`;
-          h += '</div></div></div>';
+          h += "</div></div></div>";
           return h;
         }
 
@@ -4082,18 +4807,32 @@
           };
           $("budgetLoad")?.addEventListener("click", triggerLoad);
           $("budgetSelect")?.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") { e.preventDefault(); triggerLoad(); }
+            if (e.key === "Enter") {
+              e.preventDefault();
+              triggerLoad();
+            }
           });
           $("budgetSelect")?.addEventListener("change", () => {
             toolState.budgetDatesSet = false;
-            toolState.budgetStart = ""; toolState.budgetEnd = "";
+            toolState.budgetStart = "";
+            toolState.budgetEnd = "";
             if ($("budgetStart")) $("budgetStart").value = "";
             if ($("budgetEnd")) $("budgetEnd").value = "";
           });
           bindDatePresets("budgetStart", "budgetEnd");
           $("budgetCsvExport")?.addEventListener("click", () => {
             if (!d.transactions?.length) return;
-            const rows = [["Date", "Description", "Amount", "Currency", "Account", "Category", "Tags"]];
+            const rows = [
+              [
+                "Date",
+                "Description",
+                "Amount",
+                "Currency",
+                "Account",
+                "Category",
+                "Tags",
+              ],
+            ];
             d.transactions.forEach((tx) =>
               rows.push([
                 tx.date?.split("T")[0] || "",
@@ -4105,7 +4844,10 @@
                 (tx.tags || []).join("; "),
               ]),
             );
-            exportCsv(rows, `${(d.budget || "budget").replace(/\s+/g, "_")}_transactions.csv`);
+            exportCsv(
+              rows,
+              `${(d.budget || "budget").replace(/\s+/g, "_")}_transactions.csv`,
+            );
           });
         }
 
@@ -4114,16 +4856,25 @@
           if (!toolState.categoryList)
             toolState.categoryList = await apiAll("/api/v1/categories");
           if (!toolState.selectedCategory)
-            return { categories: toolState.categoryList, transactions: null, summary: null };
+            return {
+              categories: toolState.categoryList,
+              transactions: null,
+              summary: null,
+            };
           const catObj = toolState.categoryList.find(
             (c) => String(c.id) === String(toolState.selectedCategory),
           );
           if (!catObj) {
             toast("Category not found", "error");
-            return { categories: toolState.categoryList, transactions: null, summary: null };
+            return {
+              categories: toolState.categoryList,
+              transactions: null,
+              summary: null,
+            };
           }
           const dateParams = {};
-          if (toolState.categoryStart) dateParams.start = toolState.categoryStart;
+          if (toolState.categoryStart)
+            dateParams.start = toolState.categoryStart;
           if (toolState.categoryEnd) dateParams.end = toolState.categoryEnd;
           const allTx = await apiAll(
             `/api/v1/categories/${catObj.id}/transactions`,
@@ -4141,14 +4892,17 @@
               if (!txType || tx.type === txType) filtered.push(tx);
             }
           }
-          let total = 0, minDate = "", maxDate = "";
+          let total = 0,
+            minDate = "",
+            maxDate = "";
           const breakdown = {};
           filtered.forEach((tx) => {
             const amt = parseFloat(tx.amount) || 0;
             total += tx.type === "deposit" ? amt : -amt;
-            const key = tx.type === "deposit"
-              ? (tx.source_name || "Unknown source")
-              : (tx.budget_name || "No budget");
+            const key =
+              tx.type === "deposit"
+                ? tx.source_name || "Unknown source"
+                : tx.budget_name || "No budget";
             breakdown[key] = (breakdown[key] || 0) + amt;
             const d = tx.date?.split("T")[0] || "";
             if (d && (!minDate || d < minDate)) minDate = d;
@@ -4179,7 +4933,16 @@
           const defStart = toolState.categoryStart || "";
           const defEnd = toolState.categoryEnd || "";
           const curType = toolState.catType ?? "withdrawal";
-          const typeOpts = [["withdrawal","Spending"],["deposit","Income"],["","All"]].map(([v,l]) => `<option value="${esc(v)}"${curType===v?" selected":""}>${l}</option>`).join("");
+          const typeOpts = [
+            ["withdrawal", "Spending"],
+            ["deposit", "Income"],
+            ["", "All"],
+          ]
+            .map(
+              ([v, l]) =>
+                `<option value="${esc(v)}"${curType === v ? " selected" : ""}>${l}</option>`,
+            )
+            .join("");
           let h = `<div class="tool-header"><h1>Category Explorer</h1>
             <div class="tool-controls">
               <select class="form-select" id="categorySelect" style="min-width:180px">${catOpts}</select>
@@ -4190,20 +4953,27 @@
               <button class="btn btn-primary" id="categoryLoad">Analyze</button>
             </div></div>`;
           if (!d.transactions) {
-            h += '<div class="empty-state fade-in"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><path d="M21.21 15.89A9 9 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div><p>Select a category and click Analyze to see breakdown</p></div>';
+            h +=
+              '<div class="empty-state fade-in"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><path d="M21.21 15.89A9 9 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div><p>Select a category and click Analyze to see breakdown</p></div>';
             return h;
           }
           const isIncome = d.txType === "deposit";
           const barCls = isIncome ? "income" : "expense";
           const valCls = isIncome ? "val-pos" : "val-neg";
           const cardLabel = isIncome ? "Total Income" : "Total Spent";
-          const breakdownLabel = isIncome ? "Source Breakdown" : "Budget Breakdown";
+          const breakdownLabel = isIncome
+            ? "Source Breakdown"
+            : "Budget Breakdown";
           h += `<div class="summary-grid">
             <div class="summary-card ${isIncome ? "earned" : "spent"} fade-in stagger-1"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21.21 15.89A9 9 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div><div class="card-label">${cardLabel}</div><div class="card-value ${valCls}">${fc(d.summary.total, sym)}</div><div class="card-sub">${d.transactions.length} transactions</div></div>
           </div>`;
           h += '<div class="two-col">';
-          const breakdownEntries = Object.entries(d.summary.breakdown).sort((a, b) => b[1] - a[1]);
-          const maxBreakdown = breakdownEntries.length ? breakdownEntries[0][1] : 1;
+          const breakdownEntries = Object.entries(d.summary.breakdown).sort(
+            (a, b) => b[1] - a[1],
+          );
+          const maxBreakdown = breakdownEntries.length
+            ? breakdownEntries[0][1]
+            : 1;
           h += `<div class="data-card fade-in stagger-2"><div class="card-head"><h3>${breakdownLabel}</h3><span class="count">${breakdownEntries.length}</span></div><div class="data-scroll">`;
           if (!breakdownEntries.length)
             h += '<div class="empty-state"><p>No data</p></div>';
@@ -4214,7 +4984,7 @@
             });
             h += `<div class="list-item" style="border-top:2px solid var(--border);background:var(--bg-card-hover)"><div class="list-info"><div class="list-name" style="font-weight:700">Total</div></div><span class="list-value ${valCls}" style="font-weight:700">${fc(d.summary.total, sym)}</span></div>`;
           }
-          h += '</div></div>';
+          h += "</div></div>";
           h += `<div class="data-card fade-in stagger-3"><div class="card-head"><h3>Transactions</h3><div><button class="btn btn-ghost" id="categoryCsvExport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" style="vertical-align:-1px"><line x1="12" y1="3" x2="12" y2="15"/><polyline points="8 11 12 15 16 11"/><line x1="5" y1="21" x2="19" y2="21"/></svg> CSV</button></div></div><div class="data-scroll">`;
           if (!d.transactions.length)
             h += '<div class="empty-state"><p>No transactions found</p></div>';
@@ -4222,12 +4992,14 @@
             d.transactions.slice(0, 100).forEach((tx) => {
               const isOut = tx.type === "withdrawal";
               const amt = parseFloat(tx.amount) || 0;
-              const meta = isOut ? (tx.budget_name || "No budget") : (tx.source_name || "");
+              const meta = isOut
+                ? tx.budget_name || "No budget"
+                : tx.source_name || "";
               h += `<div class="list-item"><div class="list-info"><div class="list-name">${esc(tx.description || "No description")}</div><div class="list-meta">${esc(tx.date?.split("T")[0] || "")} &middot; ${esc(meta)}</div></div><span class="list-value ${isOut ? "val-neg" : "val-pos"}">${fc(isOut ? -amt : amt, sym)}</span></div>`;
             });
           if (d.transactions.length > 100)
             h += `<div class="list-item" style="justify-content:center;color:var(--text-muted);font-size:12px">Showing 100 of ${d.transactions.length}</div>`;
-          h += '</div></div></div>';
+          h += "</div></div></div>";
           return h;
         }
 
@@ -4245,24 +5017,39 @@
           };
           $("categoryLoad")?.addEventListener("click", triggerLoad);
           $("categorySelect")?.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") { e.preventDefault(); triggerLoad(); }
+            if (e.key === "Enter") {
+              e.preventDefault();
+              triggerLoad();
+            }
           });
           $("categorySelect")?.addEventListener("change", () => {
             toolState.categoryDatesSet = false;
-            toolState.categoryStart = ""; toolState.categoryEnd = "";
+            toolState.categoryStart = "";
+            toolState.categoryEnd = "";
             if ($("categoryStart")) $("categoryStart").value = "";
             if ($("categoryEnd")) $("categoryEnd").value = "";
           });
           $("catType")?.addEventListener("change", () => {
             toolState.categoryDatesSet = false;
-            toolState.categoryStart = ""; toolState.categoryEnd = "";
+            toolState.categoryStart = "";
+            toolState.categoryEnd = "";
             if ($("categoryStart")) $("categoryStart").value = "";
             if ($("categoryEnd")) $("categoryEnd").value = "";
           });
           bindDatePresets("categoryStart", "categoryEnd");
           $("categoryCsvExport")?.addEventListener("click", () => {
             if (!d.transactions?.length) return;
-            const rows = [["Date", "Description", "Amount", "Currency", "Account", "Budget", "Tags"]];
+            const rows = [
+              [
+                "Date",
+                "Description",
+                "Amount",
+                "Currency",
+                "Account",
+                "Budget",
+                "Tags",
+              ],
+            ];
             d.transactions.forEach((tx) =>
               rows.push([
                 tx.date?.split("T")[0] || "",
@@ -4274,7 +5061,10 @@
                 (tx.tags || []).join("; "),
               ]),
             );
-            exportCsv(rows, `${(d.category || "category").replace(/\s+/g, "_")}_transactions.csv`);
+            exportCsv(
+              rows,
+              `${(d.category || "category").replace(/\s+/g, "_")}_transactions.csv`,
+            );
           });
         }
 
@@ -4311,11 +5101,16 @@
           const collapseIcon = $("sidebarCollapseIcon");
           const sidebar = $("sidebar");
           const mainContent = $("mainContent");
-          const isSidebarCollapsed = () => localStorage.getItem("ff3_sidebarCollapsed") === "1";
+          const isSidebarCollapsed = () =>
+            localStorage.getItem("ff3_sidebarCollapsed") === "1";
           const applySidebarCollapse = (collapsed) => {
             sidebar.classList.toggle("collapsed", collapsed);
-            mainContent.style.marginLeft = collapsed ? "var(--sidebar-collapsed)" : "";
-            mainContent.style.width = collapsed ? "calc(100% - var(--sidebar-collapsed))" : "";
+            mainContent.style.marginLeft = collapsed
+              ? "var(--sidebar-collapsed)"
+              : "";
+            mainContent.style.width = collapsed
+              ? "calc(100% - var(--sidebar-collapsed))"
+              : "";
             // Flip the chevron icon direction
             collapseIcon.innerHTML = collapsed
               ? `<polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>`
@@ -4341,28 +5136,37 @@
           });
 
           // ── Mobile swipe gesture ──
-          let touchStartX = 0, touchStartY = 0;
-          document.addEventListener("touchstart", (e) => {
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-          }, { passive: true });
-          document.addEventListener("touchend", (e) => {
-            if (window.innerWidth > 768) return;
-            const dx = e.changedTouches[0].clientX - touchStartX;
-            const dy = e.changedTouches[0].clientY - touchStartY;
-            // Ignore mostly-vertical swipes
-            if (Math.abs(dy) > Math.abs(dx)) return;
-            // Must be a significant horizontal swipe (>50px)
-            if (Math.abs(dx) < 50) return;
-            const sb = $("sidebar");
-            if (dx > 0 && touchStartX < 40) {
-              // Swipe right from left edge → open
-              sb.classList.add("mobile-open");
-            } else if (dx < 0 && sb.classList.contains("mobile-open")) {
-              // Swipe left → close
-              sb.classList.remove("mobile-open");
-            }
-          }, { passive: true });
+          let touchStartX = 0,
+            touchStartY = 0;
+          document.addEventListener(
+            "touchstart",
+            (e) => {
+              touchStartX = e.touches[0].clientX;
+              touchStartY = e.touches[0].clientY;
+            },
+            { passive: true },
+          );
+          document.addEventListener(
+            "touchend",
+            (e) => {
+              if (window.innerWidth > 768) return;
+              const dx = e.changedTouches[0].clientX - touchStartX;
+              const dy = e.changedTouches[0].clientY - touchStartY;
+              // Ignore mostly-vertical swipes
+              if (Math.abs(dy) > Math.abs(dx)) return;
+              // Must be a significant horizontal swipe (>50px)
+              if (Math.abs(dx) < 50) return;
+              const sb = $("sidebar");
+              if (dx > 0 && touchStartX < 40) {
+                // Swipe right from left edge → open
+                sb.classList.add("mobile-open");
+              } else if (dx < 0 && sb.classList.contains("mobile-open")) {
+                // Swipe left → close
+                sb.classList.remove("mobile-open");
+              }
+            },
+            { passive: true },
+          );
 
           const toolKeys = [
             "monthly-report",
