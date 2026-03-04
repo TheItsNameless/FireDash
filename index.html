@@ -3448,16 +3448,23 @@
               });
             }
           }
-          // Group by (merchant key, rounded amount bucket)
-          // Key = destination_name (merchant), bucket amount to nearest 5% tolerance
+          // Group by (destination + normalized description + amount).
+          // Both destination AND description must match so that different services
+          // at the same merchant (e.g. "Apple iCloud" vs "Apple Music") are kept
+          // separate, and transactions where only the description is consistent
+          // (no fixed destination) are still detected.
           const groups = {};
           for (const tx of txs) {
-            const merchant = tx.destination || tx.description;
-            if (!merchant) continue;
-            // Round amount to 2 decimal places as bucket key for exact-match detection
+            const dest = (tx.destination || "").trim();
+            const desc = (tx.description || "").trim();
+            if (!dest && !desc) continue;
             const amtKey = tx.amount.toFixed(2);
-            const key = `${merchant}|||${amtKey}`;
-            if (!groups[key]) groups[key] = { merchant, amount: tx.amount, currency: tx.currency, category: tx.category, dates: [], txs: [] };
+            // Normalize description: lowercase so casing differences don't break grouping
+            const descKey = desc.toLowerCase();
+            const key = `${dest}|||${descKey}|||${amtKey}`;
+            // Prefer description as display name — it's more specific than the payee
+            const displayName = desc || dest;
+            if (!groups[key]) groups[key] = { merchant: displayName, amount: tx.amount, currency: tx.currency, category: tx.category, dates: [], txs: [] };
             groups[key].dates.push(tx.date);
             groups[key].txs.push(tx);
           }
