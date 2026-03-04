@@ -3297,7 +3297,7 @@
                       : "";
             // account_number may hold last-4 or full number
             const rawNum = (a.account_number || "").replace(/\s/g, "");
-            const cardNumber = rawNum.length >= 4 ? rawNum.slice(-4) : rawNum;
+            const cardNumber = rawNum; // Store full number for network detection
             cards.push({
               id: acc.id,
               name: a.name,
@@ -3565,7 +3565,7 @@
               card.transactions.length > 0;
             const netLogo = networkLogo(detectedNet);
             const maskedNum = card.cardNumber
-              ? `•••• ${esc(card.cardNumber)}`
+              ? `•••• ${esc(card.cardNumber.slice(-4))}`
               : "";
 
             h += `<div class="summary-card fade-in stagger-${Math.min(i + 1, 4)}" style="background:linear-gradient(135deg,${c1},${c2});color:#fff;cursor:pointer;position:relative" data-cc-id="${esc(String(card.id))}" data-cc-idx="${i}" data-cc-txn='${JSON.stringify(card.transactions).replace(/'/g, "&apos;")}'>
