@@ -1,0 +1,14 @@
+<svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="discoverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6000;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF7B00;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <-T Card background -->
+  <rect width="120" height="80" rx="6" fill="url(#discoverGrad)"/>
+  <-T Yellow circle -->
+  <circle cx="85" cy="40" r="22" fill="#FFB81C"/>
+  <-T Text -->
+  <text x="20" y="48" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#fff">Discover</text>
+</svg>

@@ -3483,12 +3483,37 @@
           // Detect card network from card number if not provided
           const detectNetwork = (cardNumber) => {
             if (!cardNumber) return null;
-            const num = cardNumber.replace(/\s+/g, "");
+
+            const num = cardNumber.replace(/\s+|-/g, "");
+
+            if (num.length < 2) return null;
+
+            // Visa
             if (/^4/.test(num)) return "visa";
-            if (/^5[1-5]/.test(num)) return "mastercard";
+
+            // American Express
             if (/^3[47]/.test(num)) return "amex";
-            if (/^3[68]/.test(num)) return "diners";
-            if (/^6(?:07|08)/.test(num)) return "rp";
+
+            // Mastercard
+            if (
+              /^(5[1-5]|222[1-9]|22[3-9]\d|2[3-6]\d{2}|27[01]\d|2720)/.test(num)
+            )
+              return "mastercard";
+
+            // RuPay
+            if (/^(6527|6528|653|654|6059|607|608)/.test(num)) return "rp";
+
+            // Discover
+            if (
+              /^(6011|622(?:12[6-9]|1[3-9]\d|[2-8]\d{2}|9[01]\d|92[0-5])|64[4-9]|65)/.test(
+                num,
+              )
+            )
+              return "discover";
+
+            // Diners Club
+            if (/^3(?:0[0-5]|[689])/.test(num)) return "diners";
+
             return null;
           };
 
@@ -3504,6 +3529,8 @@
               return `<img src="assets/icons/amex.svg" alt="American Express" style="height:20px;object-fit:contain">`;
             if (net === "diners")
               return `<img src="assets/icons/diners.svg" alt="Diners Club" style="height:20px;object-fit:contain">`;
+            if (net === "discover")
+              return `<img src="assets/icons/discover.svg" alt="Discover" style="height:20px;object-fit:contain">`;
             return "";
           };
 
@@ -3515,6 +3542,7 @@
               amex: ["#006FCF", "#0052CC"],
               diners: ["#0066B2", "#003399"],
               rp: ["#1F5BA8", "#2B7FD5"],
+              discover: ["#FF6000", "#FFB81C"],
             };
             return grads[net] || ["#6366f1", "#818cf8"];
           };
