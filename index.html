@@ -2805,6 +2805,7 @@
           const catMap = {};
           const categoryTxMap = {};
           const dailySpend = {};
+          const dailyTxMap = {};
           cards.forEach((card) =>
             card.transactions.forEach((tx) => {
               if (tx.type !== "withdrawal") return;
@@ -2814,7 +2815,11 @@
               if (!categoryTxMap[cat]) categoryTxMap[cat] = [];
               categoryTxMap[cat].push({ ...tx, _cardName: card.name, _cardCurrency: card.currency });
               const date = tx.date?.split("T")[0] || "";
-              if (date) dailySpend[date] = (dailySpend[date] || 0) + amt;
+              if (date) {
+                dailySpend[date] = (dailySpend[date] || 0) + amt;
+                if (!dailyTxMap[date]) dailyTxMap[date] = [];
+                dailyTxMap[date].push({ ...tx, _cardName: card.name, _cardCurrency: card.currency });
+              }
             }),
           );
           Object.values(categoryTxMap).forEach((txs) =>
@@ -2824,7 +2829,7 @@
             .map(([name, amt]) => ({ name, amt }))
             .sort((a, b) => b.amt - a.amt);
 
-          return { cards, totalOwed, totalSpent, totalPaid, txCount, categoryList, categoryTxMap, dailySpend };
+          return { cards, totalOwed, totalSpent, totalPaid, txCount, categoryList, categoryTxMap, dailySpend, dailyTxMap };
         }
 
         function renderCreditCards(d) {
@@ -2974,10 +2979,11 @@
           const days = Object.keys(d.dailySpend).sort();
           if (days.length > 1) {
             h += `<div class="data-card fade-in" style="margin-bottom:20px">
-              <div class="card-head"><h3>Daily Spending</h3><span style="font-size:11px;color:var(--text-muted)">${days.length} days &middot; withdrawals</span></div>
-              <div style="padding:8px 20px 16px;position:relative;height:200px">
-                <canvas id="ccDailyChart"></canvas>
+              <div class="card-head"><h3>Daily Spending</h3><span style="font-size:11px;color:var(--text-muted)">${days.length} days &middot; click a bar to see transactions</span></div>
+              <div style="padding:8px 20px 4px;position:relative;height:200px">
+                <canvas id="ccDailyChart" style="cursor:pointer"></canvas>
               </div>
+              <div id="ccDailyDrill" style="display:none;border-top:1px solid var(--border)"></div>
             </div>`;
           }
 
@@ -3067,23 +3073,41 @@
             const { gridColor, labelColor } = chartDefaults();
             const sym = S.detectedCurrency;
             const days = Object.keys(d.dailySpend).sort();
-            makeChart("ccDailyChart", {
+            let activeDayIdx = null;
+            const baseColor = "rgba(239,68,68,0.75)";
+            const activeColor = "rgba(239,68,68,1)";
+            const dimColor = "rgba(239,68,68,0.25)";
+
+            const bgColors = () => days.map((_, i) =>
+              activeDayIdx === null ? baseColor : i === activeDayIdx ? activeColor : dimColor
+            );
+
+            const chart = makeChart("ccDailyChart", {
               type: "bar",
               data: {
                 labels: days.map(d2 => d2.slice(5)),
                 datasets: [{
                   label: "Spent",
                   data: days.map(d2 => d.dailySpend[d2]),
-                  backgroundColor: "rgba(239,68,68,0.75)",
+                  backgroundColor: bgColors(),
                   borderRadius: 3,
                   borderSkipped: false,
+                  hoverBackgroundColor: activeColor,
                 }]
               },
               options: {
                 responsive: true, maintainAspectRatio: false,
                 plugins: {
                   legend: { display: false },
-                  tooltip: { callbacks: { label: ctx => fc(ctx.parsed.y, sym) } }
+                  tooltip: {
+                    callbacks: {
+                      title: ctx => days[ctx[0].dataIndex],   // full YYYY-MM-DD
+                      label: ctx => `  ${fc(ctx.parsed.y, sym)}`,
+                      afterLabel: () => "  Click to view transactions",
+                    },
+                    bodyFont: { family: "Inter" },
+                    titleFont: { family: "Inter", weight: "700" },
+                  }
                 },
                 scales: {
                   x: {
@@ -3100,6 +3124,45 @@
                     grid: { color: gridColor },
                     ticks: { color: labelColor, font: { family: "Inter" }, callback: v => fc(v, sym) }
                   }
+                },
+                onClick(_, elements) {
+                  if (!elements.length) return;
+                  const idx = elements[0].index;
+                  const date = days[idx];
+                  const drill = document.getElementById("ccDailyDrill");
+                  if (!drill) return;
+
+                  // Toggle off if same bar clicked again
+                  if (activeDayIdx === idx) {
+                    activeDayIdx = null;
+                    chart.data.datasets[0].backgroundColor = bgColors();
+                    chart.update("none");
+                    drill.style.display = "none";
+                    return;
+                  }
+
+                  activeDayIdx = idx;
+                  chart.data.datasets[0].backgroundColor = bgColors();
+                  chart.update("none");
+
+                  const txs = (d.dailyTxMap?.[date] || []).slice().sort((a, b) => (a.description || "").localeCompare(b.description || ""));
+                  const total = txs.reduce((s, tx) => s + (parseFloat(tx.amount) || 0), 0);
+                  let html = `<div style="padding:10px 20px 4px;display:flex;justify-content:space-between;align-items:center">
+                    <span style="font-size:13px;font-weight:700;color:var(--text-primary)">${date} &mdash; ${txs.length} transaction${txs.length !== 1 ? "s" : ""}</span>
+                    <span style="font-size:13px;font-weight:700;color:var(--danger)">${fc(total, sym)}</span>
+                  </div>`;
+                  txs.forEach(tx => {
+                    const amt = parseFloat(tx.amount) || 0;
+                    html += `<div class="list-item" style="padding-left:20px">
+                      <div class="list-info">
+                        <div class="list-name" style="font-size:12px">${esc(tx.description || "No description")}</div>
+                        <div class="list-meta">${esc(tx._cardName || "")}${tx.category_name ? " &middot; " + esc(tx.category_name) : ""}</div>
+                      </div>
+                      <span class="list-value val-neg" style="font-size:12px">${fc(amt, sym)}</span>
+                    </div>`;
+                  });
+                  drill.innerHTML = html;
+                  drill.style.display = "block";
                 }
               }
             });
