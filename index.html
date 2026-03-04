@@ -302,9 +302,14 @@
       /* ===== CARDS ===== */
       .summary-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
         gap: 16px;
         margin-bottom: 24px;
+      }
+      @media (max-width: 640px) {
+        .summary-grid {
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        }
       }
       .summary-card {
         background: var(--bg-card);
@@ -2668,7 +2673,9 @@
             ["#06b6d4","#22d3ee"],
           ];
 
-          h += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px">`;
+          const n = d.cards.length;
+          const ccCols = n <= 1 ? 1 : n === 2 ? 2 : n === 3 ? 3 : n === 4 ? 2 : 3;
+          h += `<div style="display:grid;grid-template-columns:repeat(${ccCols},1fr);gap:16px;margin-bottom:24px">`;
 
           d.cards.forEach((card, i) => {
             const [c1, c2] = palette[i % palette.length];
