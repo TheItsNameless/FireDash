@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img"
+    aria-labelledby="title desc">
+    <title id="title">FireDash Logo</title>
+    <desc id="desc">A rounded square icon with a stylized flame and analytics chart line.</desc>
+    <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#6366f1" />
+            <stop offset="100%" stop-color="#8b5cf6" />
+        </linearGradient>
+        <linearGradient id="flame" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#fbbf24" />
+            <stop offset="100%" stop-color="#f97316" />
+        </linearGradient>
+    </defs>
+    <rect x="16" y="16" width="224" height="224" rx="56" fill="url(#bg)" />
+    <path d="M128 56c-24 28-39 50-39 74 0 25 17 44 39 44s39-19 39-44c0-23-15-45-39-74z"
+        fill="url(#flame)" />
+    <path d="M127 92c-13 15-21 28-21 40 0 13 9 23 21 23s21-10 21-23c0-12-8-25-21-40z" fill="#fde68a"
+        opacity="0.9" />
+    <path d="M62 184l34-24 30 18 39-33 29 18" fill="none" stroke="#ffffff" stroke-width="14"
+        stroke-linecap="round" stroke-linejoin="round" />
+</svg>
