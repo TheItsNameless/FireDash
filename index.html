@@ -305,6 +305,7 @@
       /* ── Sidebar collapsed (icon-only) ── */
       .sidebar.collapsed {
         width: var(--sidebar-collapsed);
+        overflow: visible;
       }
       .sidebar.collapsed .nav-label {
         display: none;
@@ -340,6 +341,16 @@
       }
       .sidebar.collapsed .nav-item:hover::after {
         opacity: 1;
+      }
+      .sidebar.collapsed .nav-badge {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        margin-left: 0;
+        min-width: 15px;
+        height: 15px;
+        font-size: 9px;
+        padding: 0 3px;
       }
       /* Collapse toggle button */
       .sidebar-collapse-btn {
@@ -1212,6 +1223,282 @@
         flex-wrap: wrap;
       }
 
+      /* ===== LAST UPDATED BADGE ===== */
+      .last-updated {
+        font-size: 10px;
+        color: var(--text-muted);
+        white-space: nowrap;
+        display: none;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 8px;
+        border-radius: 6px;
+        background: var(--header-icon-bg);
+        border: 1px solid var(--header-icon-border);
+        cursor: default;
+        user-select: none;
+      }
+      .last-updated.visible {
+        display: flex;
+      }
+      @media (max-width: 768px) {
+        .last-updated {
+          display: none !important;
+        }
+      }
+
+      /* ===== PULL TO REFRESH ===== */
+      .ptr-indicator {
+        position: fixed;
+        top: var(--header-h);
+        left: 50%;
+        transform: translateX(-50%) translateY(-50px);
+        z-index: 150;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-md);
+        transition:
+          transform 0.25s ease,
+          opacity 0.25s ease;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .ptr-indicator.pulling {
+        opacity: 1;
+        transform: translateX(-50%) translateY(12px);
+      }
+      .ptr-indicator.refreshing {
+        opacity: 1;
+        transform: translateX(-50%) translateY(12px);
+      }
+
+      /* ===== OFFLINE BANNER ===== */
+      .offline-banner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        background: var(--danger);
+        color: #fff;
+        text-align: center;
+        padding: 6px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .offline-banner.show {
+        display: flex;
+      }
+
+      /* ===== KEYBOARD SHORTCUTS MODAL ===== */
+      .kbd-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+      .kbd-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .kbd-modal {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        max-width: 420px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: var(--shadow-xl);
+        transform: scale(0.95);
+        transition: transform 0.2s ease;
+      }
+      .kbd-overlay.open .kbd-modal {
+        transform: scale(1);
+      }
+      .kbd-modal h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .kbd-modal h3 button {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: 4px;
+        line-height: 1;
+      }
+      .kbd-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border-light);
+        font-size: 13px;
+        color: var(--text-secondary);
+      }
+      .kbd-row:last-child {
+        border-bottom: none;
+      }
+      .kbd-key {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 26px;
+        height: 24px;
+        padding: 0 6px;
+        border-radius: 5px;
+        background: var(--bg-input);
+        border: 1px solid var(--border);
+        font-family: "SF Mono", "Menlo", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-primary);
+        box-shadow: 0 1px 0 var(--border);
+      }
+
+      /* ===== SEARCH HISTORY CHIPS ===== */
+      .search-history {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+      .search-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: var(--accent-bg);
+        border: 1px solid transparent;
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .search-chip:hover {
+        background: var(--accent);
+        color: #fff;
+      }
+      .search-chip .chip-x {
+        font-size: 13px;
+        opacity: 0.6;
+        margin-left: 2px;
+      }
+      .search-chip .chip-x:hover {
+        opacity: 1;
+      }
+
+      /* ===== MONTH COMPARISON BADGE ===== */
+      .comparison-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 1px 6px;
+        border-radius: 8px;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+      .comparison-badge.up {
+        background: var(--success-bg);
+        color: var(--success);
+      }
+      .comparison-badge.down {
+        background: var(--danger-bg);
+        color: var(--danger);
+      }
+      .comparison-badge.neutral {
+        background: var(--accent-bg);
+        color: var(--text-muted);
+      }
+
+      /* ===== TRANSACTION STALENESS BANNER ===== */
+      .tx-stale-banner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        font-size: 13px;
+        font-weight: 500;
+        margin: 12px 20px 0;
+        animation: slideIn 0.3s ease;
+        line-height: 1.5;
+      }
+      .tx-stale-banner .stale-icon {
+        font-size: 22px;
+        flex-shrink: 0;
+      }
+      .tx-stale-banner .stale-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .tx-stale-banner .stale-title {
+        font-weight: 600;
+        margin-bottom: 2px;
+      }
+      .tx-stale-banner .stale-sub {
+        font-size: 12px;
+        opacity: 0.8;
+      }
+      .tx-stale-banner .stale-dismiss {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        opacity: 0.5;
+        padding: 4px;
+        line-height: 1;
+        color: inherit;
+        flex-shrink: 0;
+      }
+      .tx-stale-banner .stale-dismiss:hover {
+        opacity: 1;
+      }
+      .tx-stale-banner.stale-info {
+        background: var(--accent-bg);
+        border: 1px solid var(--accent);
+        color: var(--text-primary);
+      }
+      .tx-stale-banner.stale-warn {
+        background: var(--warning-bg);
+        border: 1px solid var(--warning);
+        color: var(--text-primary);
+      }
+      .tx-stale-banner.stale-danger {
+        background: var(--danger-bg);
+        border: 1px solid var(--danger);
+        color: var(--text-primary);
+      }
+
       /* ===== TOAST ===== */
       .toast-container {
         position: fixed;
@@ -1890,6 +2177,43 @@
           padding: 20px 14px;
         }
       }
+
+      /* ===== PRINT / EXPORT ===== */
+      @media print {
+        .sidebar,
+        .header,
+        .drawer-overlay,
+        .drawer,
+        .toast-container,
+        .offline-banner,
+        .ptr-indicator,
+        .kbd-overlay,
+        .staleness-banner,
+        #loadingOverlay {
+          display: none !important;
+        }
+        .main {
+          margin-left: 0 !important;
+          padding-top: 0 !important;
+        }
+        .main-content {
+          padding: 0 !important;
+        }
+        body {
+          background: #fff !important;
+          color: #000 !important;
+        }
+        .data-card,
+        .summary-card {
+          break-inside: avoid;
+          box-shadow: none !important;
+          border: 1px solid #ddd !important;
+        }
+        canvas {
+          max-width: 100% !important;
+          height: auto !important;
+        }
+      }
     </style>
   </head>
   <body>
@@ -1921,6 +2245,11 @@
         <div class="header-title" id="headerTitle">FireDash</div>
       </div>
       <div class="header-actions">
+        <span
+          class="last-updated"
+          id="lastUpdated"
+          title="Time since last data refresh"
+        ></span>
         <span
           class="status-dot"
           id="statusDot"
@@ -1959,6 +2288,22 @@
             />
           </svg>
         </button>
+        <button class="btn-icon" id="exportBtn" title="Export / Print (E)">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            width="14"
+            height="14"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </button>
         <button class="btn-icon" id="settingsBtn" title="Settings">
           <svg
             viewBox="0 0 24 24"
@@ -1980,6 +2325,73 @@
     </header>
 
     <div class="toast-container" id="toastContainer"></div>
+    <div class="offline-banner" id="offlineBanner">
+      📡 You're offline - data may be stale
+    </div>
+    <div class="ptr-indicator" id="ptrIndicator">
+      <svg
+        class="spin"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="var(--accent)"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        width="18"
+        height="18"
+      >
+        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+      </svg>
+    </div>
+    <div class="kbd-overlay" id="kbdOverlay">
+      <div class="kbd-modal">
+        <h3>Keyboard Shortcuts <button id="kbdClose">&times;</button></h3>
+        <div class="kbd-row">
+          <span>Monthly Report</span><span class="kbd-key">1</span>
+        </div>
+        <div class="kbd-row">
+          <span>Trends</span><span class="kbd-key">2</span>
+        </div>
+        <div class="kbd-row">
+          <span>Budget Explorer</span><span class="kbd-key">3</span>
+        </div>
+        <div class="kbd-row">
+          <span>Category Explorer</span><span class="kbd-key">4</span>
+        </div>
+        <div class="kbd-row">
+          <span>Tag Explorer</span><span class="kbd-key">5</span>
+        </div>
+        <div class="kbd-row">
+          <span>Accounts</span><span class="kbd-key">6</span>
+        </div>
+        <div class="kbd-row">
+          <span>Credit Cards</span><span class="kbd-key">7</span>
+        </div>
+        <div class="kbd-row">
+          <span>Savings Goals</span><span class="kbd-key">8</span>
+        </div>
+        <div class="kbd-row">
+          <span>Bills &amp; Subs</span><span class="kbd-key">9</span>
+        </div>
+        <div class="kbd-row">
+          <span>Refresh data</span><span class="kbd-key">R</span>
+        </div>
+        <div class="kbd-row">
+          <span>Search</span><span class="kbd-key">/</span>
+        </div>
+        <div class="kbd-row">
+          <span>Settings</span><span class="kbd-key">S</span>
+        </div>
+        <div class="kbd-row">
+          <span>Export / Print</span><span class="kbd-key">E</span>
+        </div>
+        <div class="kbd-row">
+          <span>This help</span><span class="kbd-key">?</span>
+        </div>
+        <div class="kbd-row">
+          <span>Close / Dismiss</span><span class="kbd-key">Esc</span>
+        </div>
+      </div>
+    </div>
 
     <!-- Settings Drawer -->
     <div class="drawer-overlay" id="drawerOverlay"></div>
@@ -2725,8 +3137,10 @@
               const totalPages = newest.meta?.pagination?.total_pages || 1;
               const newestDate =
                 newest.data?.[0]?.attributes?.transactions?.[0]?.date;
-              if (newestDate)
+              if (newestDate) {
                 S.dataYearEnd = new Date(newestDate).getFullYear();
+                S.lastTxDate = newestDate;
+              }
               if (totalPages > 1) {
                 const oldest = await api("/api/v1/transactions", {
                   page: String(totalPages),
@@ -2744,6 +3158,202 @@
           } catch {
             return false;
           }
+        }
+
+        // =============== TRANSACTION STALENESS CHECK ===============
+        function checkLastTransaction() {
+          if (!S.lastTxDate) return;
+          if (S.staleDismissed) return;
+          const last = new Date(S.lastTxDate);
+          const now = new Date();
+          const diffMs = now - last;
+          const days = Math.floor(diffMs / 86400000);
+          if (days < 3) return;
+          let level, icon, title, sub;
+          if (days >= 14) {
+            level = "danger";
+            icon = "⚠️";
+            title = `No transactions for ${days} days!`;
+            sub =
+              "Your records may be significantly out of date. Add your recent transactions to keep your finances accurate.";
+          } else if (days >= 7) {
+            level = "warn";
+            icon = "📢";
+            title = `It's been ${days} days since your last transaction`;
+            sub =
+              "Don't let transactions pile up - add them while they're still fresh in your memory.";
+          } else {
+            level = "info";
+            icon = "📝";
+            title = `${days} days since your last entry`;
+            sub =
+              "Did you forget to add some transactions? Keeping up daily makes tracking easier.";
+          }
+          const existing = document.querySelector(".tx-stale-banner");
+          if (existing) existing.remove();
+          const banner = document.createElement("div");
+          banner.className = `tx-stale-banner stale-${level}`;
+          const addUrl = S.url
+            ? S.url.replace(/\/$/, "") + "/transactions/create/withdrawal"
+            : "";
+          const addLink = addUrl
+            ? `<a href="${esc(addUrl)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;margin-top:4px;font-size:11px;font-weight:600;color:inherit;text-decoration:underline">Add transaction &rarr;</a>`
+            : "";
+          banner.innerHTML = `<span class="stale-icon">${icon}</span><div class="stale-body"><div class="stale-title">${esc(title)}</div><div class="stale-sub">${esc(sub)}${addLink}</div></div><button class="stale-dismiss" title="Dismiss">&times;</button>`;
+          banner
+            .querySelector(".stale-dismiss")
+            .addEventListener("click", () => {
+              S.staleDismissed = true;
+              banner.style.animation = "slideOut 0.3s ease forwards";
+              setTimeout(() => banner.remove(), 300);
+            });
+          const main = $("mainContent");
+          main.insertAdjacentElement("afterbegin", banner);
+        }
+
+        // =============== LAST UPDATED TIMER ===============
+        let _lastUpdatedInterval;
+        function startLastUpdatedTimer() {
+          clearInterval(_lastUpdatedInterval);
+          const el = $("lastUpdated");
+          if (!el) return;
+          function tick() {
+            if (!S.lastRefresh) {
+              el.classList.remove("visible");
+              return;
+            }
+            const sec = Math.floor(
+              (Date.now() - S.lastRefresh.getTime()) / 1000,
+            );
+            let txt;
+            if (sec < 10) txt = "Just now";
+            else if (sec < 60) txt = `${sec}s ago`;
+            else if (sec < 3600) txt = `${Math.floor(sec / 60)}m ago`;
+            else txt = `${Math.floor(sec / 3600)}h ago`;
+            el.textContent = "\u{1F504} " + txt;
+            el.classList.add("visible");
+          }
+          tick();
+          _lastUpdatedInterval = setInterval(tick, 10000);
+        }
+
+        // =============== OFFLINE DETECTION ===============
+        function initOfflineDetection() {
+          const banner = $("offlineBanner");
+          if (!banner) return;
+          function update() {
+            banner.classList.toggle("show", !navigator.onLine);
+          }
+          window.addEventListener("online", () => {
+            update();
+            toast("Back online", "success");
+          });
+          window.addEventListener("offline", update);
+          update();
+        }
+
+        // =============== PULL TO REFRESH (mobile) ===============
+        function initPullToRefresh() {
+          if (window.innerWidth > 768) return;
+          const indicator = $("ptrIndicator");
+          if (!indicator) return;
+          let startY = 0,
+            pulling = false;
+          const main = $("mainContent");
+          main.addEventListener(
+            "touchstart",
+            (e) => {
+              if (main.scrollTop <= 0) {
+                startY = e.touches[0].clientY;
+                pulling = true;
+              }
+            },
+            { passive: true },
+          );
+          main.addEventListener(
+            "touchmove",
+            (e) => {
+              if (!pulling) return;
+              const dy = e.touches[0].clientY - startY;
+              if (dy > 60) {
+                indicator.classList.add("pulling");
+              }
+            },
+            { passive: true },
+          );
+          main.addEventListener(
+            "touchend",
+            () => {
+              if (!pulling) return;
+              pulling = false;
+              if (indicator.classList.contains("pulling")) {
+                indicator.classList.remove("pulling");
+                indicator.classList.add("refreshing");
+                if (S.connected) {
+                  S.cache = {};
+                  route();
+                }
+                setTimeout(
+                  () => indicator.classList.remove("refreshing"),
+                  1000,
+                );
+              }
+            },
+            { passive: true },
+          );
+        }
+
+        // =============== KEYBOARD SHORTCUTS MODAL ===============
+        function openKbdModal() {
+          $("kbdOverlay")?.classList.add("open");
+        }
+        function closeKbdModal() {
+          $("kbdOverlay")?.classList.remove("open");
+        }
+
+        function exportSnapshot() {
+          track("export_snapshot", { tool: S.currentTool });
+          window.print();
+        }
+
+        // =============== SEARCH HISTORY ===============
+        function getSearchHistory() {
+          try {
+            return JSON.parse(
+              localStorage.getItem("ff3_searchHistory") || "[]",
+            );
+          } catch {
+            return [];
+          }
+        }
+        function addSearchHistory(q) {
+          if (!q) return;
+          let hist = getSearchHistory().filter((h) => h !== q);
+          hist.unshift(q);
+          if (hist.length > 5) hist = hist.slice(0, 5);
+          localStorage.setItem("ff3_searchHistory", JSON.stringify(hist));
+        }
+        function removeSearchHistory(q) {
+          const hist = getSearchHistory().filter((h) => h !== q);
+          localStorage.setItem("ff3_searchHistory", JSON.stringify(hist));
+        }
+        function renderSearchHistoryChips() {
+          const hist = getSearchHistory();
+          if (!hist.length) return "";
+          return `<div class="search-history"><span style="font-size:10px;color:var(--text-muted);margin-right:4px">Recent:</span>${hist.map((q) => `<span class="search-chip" data-query="${esc(q)}">${esc(q)}<span class="chip-x" data-remove="${esc(q)}">&times;</span></span>`).join("")}</div>`;
+        }
+
+        // =============== MONTH COMPARISON BADGE ===============
+        function compBadge(current, previous) {
+          if (!previous || previous === 0) return "";
+          const pct = Math.round(
+            ((current - previous) / Math.abs(previous)) * 100,
+          );
+          if (pct === 0)
+            return '<span class="comparison-badge neutral">0%</span>';
+          const cls = pct > 0 ? "up" : "down";
+          const arrow = pct > 0 ? "\u2191" : "\u2193";
+          return `<span class="comparison-badge ${cls}">${arrow}${Math.abs(pct)}%</span>`;
         }
 
         // =============== DID YOU KNOW TIPS ===============
@@ -2810,7 +3420,7 @@
           },
           {
             icon: "📋",
-            text: "The <strong>Monthly Report</strong> shows spent, earned, net change, and net worth — with <strong>YTD</strong> totals at a glance.",
+            text: "The <strong>Monthly Report</strong> shows spent, earned, net change, and net worth - with <strong>YTD</strong> totals at a glance.",
           },
           {
             icon: "📌",
@@ -2822,7 +3432,7 @@
           },
           {
             icon: "📱",
-            text: "FireDash is fully <strong>responsive</strong> — use it on your phone, tablet, or desktop with the same experience.",
+            text: "FireDash is fully <strong>responsive</strong> - use it on your phone, tablet, or desktop with the same experience.",
           },
           {
             icon: "⚡",
@@ -2830,7 +3440,7 @@
           },
           {
             icon: "🏦",
-            text: "The <strong>Accounts</strong> page groups your accounts by type — assets, credit cards, liabilities, and revenue.",
+            text: "The <strong>Accounts</strong> page groups your accounts by type - assets, credit cards, liabilities, and revenue.",
           },
           {
             icon: "💡",
@@ -2838,7 +3448,7 @@
           },
           {
             icon: "🔗",
-            text: "FireDash connects through a <strong>secure proxy</strong> — your Firefly III server doesn't need to be publicly exposed.",
+            text: "FireDash connects through a <strong>secure proxy</strong> - your Firefly III server doesn't need to be publicly exposed.",
           },
           {
             icon: "📆",
@@ -2866,7 +3476,7 @@
           },
           {
             icon: "🎨",
-            text: "Each credit card gets a <strong>unique gradient</strong> generated from its name — no two cards look the same.",
+            text: "Each credit card gets a <strong>unique gradient</strong> generated from its name - no two cards look the same.",
           },
         ];
         function getRandomTip() {
@@ -2947,8 +3557,10 @@
             $("headerTitle").innerHTML =
               `FireDash <span style="font-size:10px;font-weight:400;opacity:0.5">v${esc(S.serverVersion)}</span>`;
           toast("Connected", "success");
+          checkLastTransaction();
           // Background: pre-fetch bills to show badge
           fetchBills().catch(() => {});
+
           const lastTool = localStorage.getItem("ff3_lastTool");
           if (!location.hash || location.hash === "#")
             location.hash =
@@ -3008,7 +3620,9 @@
             const data = await tool.fetch();
             S.cache[name] = data;
             S.lastRefresh = new Date();
+            startLastUpdatedTimer();
             main.innerHTML = tool.render(data);
+            checkLastTransaction();
             track("tool_loaded", {
               tool_name: name,
               load_time_ms: Date.now() - _toolLoadStart,
@@ -3254,12 +3868,27 @@
               nwHistory.push({ label: mNames2[d2.getMonth()], nw: 0 });
             }
           }
+          // Fetch previous month for comparison badges
+          let prevMonthly = null;
+          try {
+            const prevDate = new Date(y, m - 1, 1);
+            const { start: ps, end: pe } = dateRange(
+              prevDate.getMonth(),
+              prevDate.getFullYear(),
+            );
+            const prevSm = await api("/api/v1/summary/basic", {
+              start: ps,
+              end: pe,
+            });
+            prevMonthly = parseSummary(prevSm, cc);
+          } catch {}
           return {
             monthly,
             ytd,
             categories: categoryData,
             budgets: budgetData,
             nwHistory,
+            prevMonthly,
           };
         }
         function parseSummary(s, cc) {
@@ -3308,10 +3937,20 @@
                     <button class="btn btn-primary" id="mrLoad">Load</button>
                 </div></div>`;
 
+          const prev = d.prevMonthly;
+          const spentBadge = prev
+            ? compBadge(Math.abs(d.monthly.spent), Math.abs(prev.spent))
+            : "";
+          const earnedBadge = prev
+            ? compBadge(d.monthly.earned, prev.earned)
+            : "";
+          const balanceBadge = prev
+            ? compBadge(d.monthly.balance, prev.balance)
+            : "";
           h += `<div class="summary-grid">
-                <div class="summary-card spent fade-in stagger-1"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div><div class="card-label">Spent</div><div class="card-value val-neg">${fc(d.monthly.spent, sym)}</div><div class="card-sub">YTD: <span class="val-neg">${fc(d.ytd.spent, sym)}</span></div></div>
-                <div class="summary-card earned fade-in stagger-2"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></div><div class="card-label">Earned</div><div class="card-value val-pos">${fc(d.monthly.earned, sym)}</div><div class="card-sub">YTD: <span class="val-pos">${fc(d.ytd.earned, sym)}</span></div></div>
-                <div class="summary-card balance fade-in stagger-3"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div><div class="card-label">Net Change</div><div class="card-value" style="color:${d.monthly.balance >= 0 ? "var(--success)" : "var(--danger)"}">${fc(d.monthly.balance, sym)}</div><div class="card-sub">YTD: <span style="color:${d.ytd.balance >= 0 ? "var(--success)" : "var(--danger)"}">${fc(d.ytd.balance, sym)}</span></div></div>
+                <div class="summary-card spent fade-in stagger-1"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div><div class="card-label">Spent ${spentBadge}</div><div class="card-value val-neg">${fc(d.monthly.spent, sym)}</div><div class="card-sub">YTD: <span class="val-neg">${fc(d.ytd.spent, sym)}</span></div></div>
+                <div class="summary-card earned fade-in stagger-2"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></div><div class="card-label">Earned ${earnedBadge}</div><div class="card-value val-pos">${fc(d.monthly.earned, sym)}</div><div class="card-sub">YTD: <span class="val-pos">${fc(d.ytd.earned, sym)}</span></div></div>
+                <div class="summary-card balance fade-in stagger-3"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div><div class="card-label">Net Change ${balanceBadge}</div><div class="card-value" style="color:${d.monthly.balance >= 0 ? "var(--success)" : "var(--danger)"}">${fc(d.monthly.balance, sym)}</div><div class="card-sub">YTD: <span style="color:${d.ytd.balance >= 0 ? "var(--success)" : "var(--danger)"}">${fc(d.ytd.balance, sym)}</span></div></div>
                 <div class="summary-card networth fade-in stagger-4"><div class="card-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="card-label">Net Worth</div><div class="card-value">${fc(d.ytd.netWorth, sym)}</div><div class="card-sub">End of period</div></div>
             </div>`;
 
@@ -4706,11 +5345,44 @@
         // ============================================================
         //  TOOL 5: BILLS & SUBSCRIPTIONS
         // ============================================================
+        function relativeTime(days) {
+          if (days === null || days === undefined) return "";
+          if (days < 0) {
+            const abs = Math.abs(days);
+            if (abs === 1) return "1 day ago";
+            if (abs < 7) return `${abs} days ago`;
+            if (abs < 14) return "1 week ago";
+            if (abs < 30) return `${Math.floor(abs / 7)} weeks ago`;
+            if (abs < 60) return "1 month ago";
+            if (abs < 365) return `${Math.floor(abs / 30)} months ago`;
+            return `${Math.floor(abs / 365)} year${Math.floor(abs / 365) > 1 ? "s" : ""} ago`;
+          }
+          if (days === 0) return "today";
+          if (days === 1) return "tomorrow";
+          if (days < 7) return `in ${days} days`;
+          if (days < 14) return "in 1 week";
+          if (days < 30) return `in ${Math.floor(days / 7)} weeks`;
+          if (days < 60) return "in 1 month";
+          if (days < 365) return `in ${Math.floor(days / 30)} months`;
+          const yrs = Math.floor(days / 365);
+          return `in ${yrs} year${yrs > 1 ? "s" : ""}`;
+        }
+
         async function fetchBills() {
-          const bills = await apiAll("/api/v1/bills");
           const now = new Date();
+          const curMonth = now.getMonth();
+          const curYear = now.getFullYear();
+          const monthStart = fmt(new Date(curYear, curMonth, 1));
+          const monthEnd = fmt(new Date(curYear, curMonth + 1, 0));
+          // Pass start/end so Firefly III populates paid_dates & pay_dates
+          const bills = await apiAll("/api/v1/bills", {
+            start: monthStart,
+            end: monthEnd,
+          });
           let totalMin = 0,
             totalMax = 0;
+          let thisMonthMin = 0,
+            thisMonthMax = 0;
           const items = bills
             .map((b) => {
               const a = b.attributes || {};
@@ -4733,6 +5405,35 @@
                       : freq === "yearly"
                         ? 1 / 12
                         : 1;
+              // paid_dates is populated because we pass start/end
+              const paidDates = a.paid_dates || [];
+              const paidThisMonth = paidDates.some((pd) => {
+                const d = new Date(pd.date || pd);
+                return d.getMonth() === curMonth && d.getFullYear() === curYear;
+              });
+              // pay_dates lists expected payment dates in the range
+              const payDates = a.pay_dates || [];
+              // Strictly check pay_dates fall in current month
+              const hasPayDateThisMonth = payDates.some((pd) => {
+                const d = new Date(pd.date || pd);
+                return d.getMonth() === curMonth && d.getFullYear() === curYear;
+              });
+              const dueThisMonth =
+                hasPayDateThisMonth ||
+                (nextDate
+                  ? nextDate.getMonth() === curMonth &&
+                    nextDate.getFullYear() === curYear
+                  : false) ||
+                paidThisMonth;
+              // Pending = due this month and not yet paid
+              const isPending = !paidThisMonth && dueThisMonth;
+              // Next month detection
+              const nextMonth = (curMonth + 1) % 12;
+              const nextMonthYear = curMonth === 11 ? curYear + 1 : curYear;
+              const dueNextMonth = nextDate
+                ? nextDate.getMonth() === nextMonth &&
+                  nextDate.getFullYear() === nextMonthYear
+                : false;
               return {
                 name: a.name,
                 min,
@@ -4743,6 +5444,10 @@
                 currency: a.currency_symbol || S.detectedCurrency,
                 active: a.active,
                 mult,
+                paidThisMonth,
+                dueThisMonth,
+                isPending,
+                dueNextMonth,
               };
             })
             .filter((b) => b.active !== false)
@@ -4750,11 +5455,35 @@
           items.forEach((b) => {
             totalMin += b.min * b.mult;
             totalMax += b.max * b.mult;
+            if (b.dueThisMonth) {
+              thisMonthMin += b.min;
+              thisMonthMax += b.max;
+            }
           });
+          const pendingItems = items.filter((b) => b.isPending);
+          let pendingMin = 0,
+            pendingMax = 0;
+          pendingItems.forEach((b) => {
+            pendingMin += b.min;
+            pendingMax += b.max;
+          });
+          const paidItems = items.filter((b) => b.paidThisMonth);
+          const thisMonthItems = items.filter((b) => b.dueThisMonth);
           // expose for badge update
           S._billsData = { items };
           updateBillsBadge(items);
-          return { items, totalMin, totalMax };
+          return {
+            items,
+            totalMin,
+            totalMax,
+            pendingItems,
+            pendingMin,
+            pendingMax,
+            paidItems,
+            thisMonthItems,
+            thisMonthMin,
+            thisMonthMax,
+          };
         }
 
         function updateBillsBadge(items) {
@@ -4793,17 +5522,23 @@
             (b) => b.daysUntil !== null && b.daysUntil >= 0 && b.daysUntil <= 7,
           );
           if (overdue.length) {
-            h += `<div class="alert-banner danger fade-in"><div class="alert-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="alert-banner-body"><div class="alert-banner-title">${overdue.length} bill${overdue.length > 1 ? "s" : ""} overdue</div><div class="alert-banner-items">${overdue.map((b) => `<span>${esc(b.name)} &mdash; ${Math.abs(b.daysUntil)}d ago &middot; ${fc(b.max, b.currency)}</span>`).join("")}</div></div></div>`;
+            h += `<div class="alert-banner danger fade-in"><div class="alert-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="alert-banner-body"><div class="alert-banner-title">${overdue.length} bill${overdue.length > 1 ? "s" : ""} overdue</div><div class="alert-banner-items">${overdue.map((b) => `<span>${esc(b.name)} - ${relativeTime(b.daysUntil)} &middot; ${fc(b.max, b.currency)}</span>`).join("")}</div></div></div>`;
           }
           if (dueSoon.length) {
-            h += `<div class="alert-banner fade-in"><div class="alert-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="alert-banner-body"><div class="alert-banner-title">Due within 7 days</div><div class="alert-banner-items">${dueSoon.map((b) => `<span>${esc(b.name)} &mdash; ${b.daysUntil === 0 ? "today" : "in " + b.daysUntil + "d"} &middot; ${fc(b.max, b.currency)}</span>`).join("")}</div></div></div>`;
+            h += `<div class="alert-banner fade-in"><div class="alert-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="alert-banner-body"><div class="alert-banner-title">Due within 7 days</div><div class="alert-banner-items">${dueSoon.map((b) => `<span>${esc(b.name)} - ${relativeTime(b.daysUntil)} &middot; ${fc(b.max, b.currency)}</span>`).join("")}</div></div></div>`;
           }
 
           if (d.items.length) {
+            const monthName = new Date().toLocaleDateString(undefined, {
+              month: "long",
+            });
+            const paidCount = d.paidItems.length;
+            const thisMonthCount = d.thisMonthItems.length;
             h += `<div class="summary-grid">
                     <div class="summary-card bills-total fade-in stagger-1"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="card-label">Monthly Estimate</div><div class="card-value">${fc(d.totalMin, sym)}${d.totalMin !== d.totalMax ? " - " + fc(d.totalMax, sym) : ""}</div><div class="card-sub">${d.items.length} active bills</div></div>
-                    ${overdue.length ? `<div class="summary-card fade-in stagger-2"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="card-label">Overdue</div><div class="card-value" style="color:var(--danger)">${overdue.length}</div><div class="card-sub">Need attention</div></div>` : ""}
-                    ${dueSoon.length ? `<div class="summary-card fade-in stagger-3"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="card-label">Due This Week</div><div class="card-value" style="color:var(--warning)">${dueSoon.length}</div><div class="card-sub">Coming up soon</div></div>` : ""}
+                    ${thisMonthCount ? `<div class="summary-card bills-total fade-in stagger-2"><div class="card-icon" style="font-size:16px;font-weight:700">${esc(sym)}</div><div class="card-label">${esc(monthName)} Payable</div><div class="card-value">${fc(d.thisMonthMin, sym)}${d.thisMonthMin !== d.thisMonthMax ? " - " + fc(d.thisMonthMax, sym) : ""}</div><div class="card-sub">${thisMonthCount} bill${thisMonthCount !== 1 ? "s" : ""} this month${paidCount ? ` · <span style="color:var(--success)">${paidCount} paid</span>` : ""}</div></div>` : ""}
+                    ${d.pendingItems.length ? `<div class="summary-card bills-total fade-in stagger-3" style="border-left:3px solid var(--warning)"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="card-label">Pending Payment</div><div class="card-value" style="color:var(--warning)">${fc(d.pendingMax, sym)}</div><div class="card-sub">${d.pendingItems.length} bill${d.pendingItems.length !== 1 ? "s" : ""} unpaid</div></div>` : ""}
+                    ${overdue.length ? `<div class="summary-card fade-in stagger-4"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="card-label">Overdue</div><div class="card-value" style="color:var(--danger)">${overdue.length}</div><div class="card-sub">Need attention</div></div>` : ""}
                 </div>`;
           }
 
@@ -4824,16 +5559,31 @@
               const dueText =
                 b.daysUntil !== null
                   ? b.daysUntil < 0
-                    ? `${Math.abs(b.daysUntil)}d overdue`
-                    : b.daysUntil === 0
-                      ? "Due today"
-                      : `in ${b.daysUntil}d`
+                    ? `${relativeTime(b.daysUntil)} - overdue`
+                    : relativeTime(b.daysUntil)
                   : "";
+              const nextLabel = b.nextDate
+                ? b.nextDate.toLocaleDateString(undefined, {
+                    day: "numeric",
+                    month: "short",
+                    year:
+                      b.nextDate.getFullYear() !== new Date().getFullYear()
+                        ? "numeric"
+                        : undefined,
+                  })
+                : "";
+              const paidBadge = b.paidThisMonth
+                ? '<span style="display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:var(--success-bg);color:var(--success)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg>Paid</span>'
+                : b.isPending
+                  ? '<span style="padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:var(--warning-bg);color:var(--warning)">Pending</span>'
+                  : b.dueNextMonth
+                    ? '<span style="padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:var(--accent-bg);color:var(--accent)">Next Month</span>'
+                    : "";
               const amt =
                 b.min === b.max
                   ? fc(b.min, b.currency)
                   : `${fc(b.min, b.currency)} - ${fc(b.max, b.currency)}`;
-              h += `<div class="list-item"><div class="list-info"><div class="list-name">${esc(b.name)}</div><div class="list-meta"><span class="bill-freq">${freqLabel(b.freq)}</span>${dueText ? ` &middot; <span class="bill-due ${dueClass}">${dueText}</span>` : ""}</div></div><span class="list-value">${amt}</span></div>`;
+              h += `<div class="list-item"><div class="list-info"><div class="list-name">${esc(b.name)} ${paidBadge}</div><div class="list-meta"><span class="bill-freq">${freqLabel(b.freq)}</span>${dueText ? ` &middot; <span class="bill-due ${dueClass}">${dueText}</span>` : ""}${nextLabel ? ` &middot; <span style="color:var(--text-muted)">${nextLabel}</span>` : ""}</div></div><span class="list-value">${amt}</span></div>`;
             });
           h += "</div></div>";
           return h;
@@ -4910,7 +5660,7 @@
             // Normalize description: lowercase so casing differences don't break grouping
             const descKey = desc.toLowerCase();
             const key = `${dest}|||${descKey}|||${amtKey}`;
-            // Prefer description as display name — it's more specific than the payee
+            // Prefer description as display name - it's more specific than the payee
             const displayName = desc || dest;
             if (!groups[key])
               groups[key] = {
@@ -5198,10 +5948,11 @@
                     <div class="form-group" style="margin-bottom:0"><label>From</label><input type="date" class="form-input" id="searchStart" value="${toolState.searchStart || ""}" style="width:100%"></div>
                     <div class="form-group" style="margin-bottom:0"><label>To</label><input type="date" class="form-input" id="searchEnd" value="${toolState.searchEnd || ""}" style="width:100%"></div>
                 </div>
-                <div style="display:flex;gap:8px;margin-bottom:20px">
+                <div style="display:flex;gap:8px;margin-bottom:12px">
                     <button class="btn btn-primary" id="searchBtn">Search</button>
                     <button class="btn btn-ghost" id="searchClear">Clear filters</button>
-                </div>`;
+                </div>
+                ${renderSearchHistoryChips()}`;
 
           if (!d.results) {
             h +=
@@ -5266,12 +6017,28 @@
             toolState.searchMaxAmt = "";
             loadTool("search");
           });
-          $("searchBtn")?.addEventListener("click", triggerSearch);
+          $("searchBtn")?.addEventListener("click", () => {
+            triggerSearch();
+            addSearchHistory(toolState.searchQuery);
+          });
           $("searchInput")?.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
               e.preventDefault();
               triggerSearch();
+              addSearchHistory($("searchInput")?.value?.trim());
             }
+          });
+          // Search history chip clicks
+          document.querySelectorAll(".search-chip").forEach((chip) => {
+            chip.addEventListener("click", (e) => {
+              if (e.target.classList.contains("chip-x")) {
+                removeSearchHistory(e.target.dataset.remove);
+                loadTool("search");
+                return;
+              }
+              toolState.searchQuery = chip.dataset.query;
+              loadTool("search");
+            });
           });
           $("searchExport")?.addEventListener("click", () => {
             if (!d.results?.length) return;
@@ -5966,6 +6733,7 @@
             if (S.connected) route();
             else connectAndRoute();
           });
+          $("exportBtn").addEventListener("click", exportSnapshot);
           $("toggleKeyVis").addEventListener("click", () => {
             const i = $("settingsKey");
             i.type = i.type === "password" ? "text" : "password";
@@ -6064,6 +6832,7 @@
           document.addEventListener("keydown", (e) => {
             if (e.key === "Escape") {
               closeDrawer();
+              closeKbdModal();
               $("sidebar").classList.remove("mobile-open");
               return;
             }
@@ -6104,6 +6873,18 @@
               setTimeout(() => $("searchInput")?.focus(), 100);
               return;
             }
+            if (e.key === "e") {
+              e.preventDefault();
+              track("keyboard_shortcut", { key: "e", action: "export" });
+              exportSnapshot();
+              return;
+            }
+            if (e.key === "?") {
+              e.preventDefault();
+              track("keyboard_shortcut", { key: "?", action: "help" });
+              openKbdModal();
+              return;
+            }
           });
           window.addEventListener("hashchange", route);
 
@@ -6133,6 +6914,16 @@
 
           if (isReturning) connectAndRoute();
           else render();
+
+          // Init offline detection
+          initOfflineDetection();
+          // Init pull-to-refresh for mobile
+          initPullToRefresh();
+          // Wire up keyboard shortcuts modal
+          $("kbdClose")?.addEventListener("click", closeKbdModal);
+          $("kbdOverlay")?.addEventListener("click", (e) => {
+            if (e.target === $("kbdOverlay")) closeKbdModal();
+          });
         }
 
         document.addEventListener("DOMContentLoaded", init);

@@ -1,12 +1,13 @@
 # FireDash
 
-A fast, privacy-first web dashboard for [Firefly III](https://www.firefly-iii.org/) — the open-source personal finance manager.
+A fast, privacy-first web dashboard for [Firefly III](https://www.firefly-iii.org/) - the open-source personal finance manager.
 
 **Live:** [firedash.yemzikk.in](https://firedash.yemzikk.in)
 
 ## Features
 
 ### Monthly Report
+
 - Spending, earnings, net change, and net worth summary cards
 - Category breakdown with ranked bars
 - Budget tracking with progress bars and over/under indicators
@@ -14,6 +15,7 @@ A fast, privacy-first web dashboard for [Firefly III](https://www.firefly-iii.or
 - Month/year selector auto-populated from your actual data range
 
 ### Tag Explorer
+
 - Analyze spending **or income** by tag with a type filter (Spending / Income / All)
 - Budget breakdown for spending; source breakdown for income
 - Auto-detected date range from your transaction data
@@ -21,33 +23,39 @@ A fast, privacy-first web dashboard for [Firefly III](https://www.firefly-iii.or
 - CSV export of all transactions
 
 ### Accounts
+
 - Grouped by type: Asset, Liability, Revenue
 - Net worth calculation (assets minus liabilities)
 - Click any account to expand and see recent transactions inline
 - CSV export
 
 ### Savings Goals
+
 - Piggy bank progress tracking with visual bars
 - Total saved vs total target summary
 - CSV export
 
 ### Bills & Subscriptions
+
 - All active bills with frequency and next due date
 - Monthly cost estimate (normalized across weekly/quarterly/yearly)
 - Overdue/upcoming color coding
 - CSV export
 
 ### Transaction Search
+
 - Full-text search across all transactions
 - Filter by type (withdrawal, deposit, transfer) and date range
 - CSV export of search results
 
 ### Spending Trends
-- Pure CSS bar chart — no chart libraries
+
+- Pure CSS bar chart - no chart libraries
 - Compare 6 or 12 months of spending, income, or net change
 - Average, highest, and lowest month summary
 
 ### Budget Explorer
+
 - Select any budget to analyze its spending over a date range
 - Spent vs limit summary cards with usage progress bar
 - Category breakdown of spending within the budget
@@ -56,6 +64,7 @@ A fast, privacy-first web dashboard for [Firefly III](https://www.firefly-iii.or
 - CSV export
 
 ### Category Explorer
+
 - Select any category to analyze spending **or income** with a type filter
 - Budget breakdown for spending; source breakdown for income
 - Quick date presets: 1M, 3M, 6M, YTD, 1Y
@@ -63,15 +72,16 @@ A fast, privacy-first web dashboard for [Firefly III](https://www.firefly-iii.or
 - CSV export
 
 ### UX
+
 - Dark mode with system preference detection
 - Responsive layout with mobile sidebar
-- Keyboard shortcuts: `1` Monthly Report, `2` Trends, `3` Budget, `4` Category, `5` Tags, `6` Accounts, `7` Savings, `8` Bills, `9` Search — `R` refresh, `S` settings, `/` focus search
+- Keyboard shortcuts: `1` Monthly Report, `2` Trends, `3` Budget, `4` Category, `5` Tags, `6` Accounts, `7` Savings, `8` Bills, `9` Search - `R` refresh, `S` settings, `/` focus search
 - Remembers your last viewed tool
 - Server version display after connecting
 
 ## How It Works
 
-FireDash is a **single HTML file** — no build tools, no frameworks, no dependencies (except the Inter font). It runs entirely in your browser.
+FireDash is a **single HTML file** - no build tools, no frameworks, no dependencies (except the Inter font). It runs entirely in your browser.
 
 API requests go through a built-in **Cloudflare Pages Function** proxy to avoid CORS issues. Your Firefly III URL and token are stored **only in your browser's localStorage** and never sent to any server other than your own Firefly III instance.
 
@@ -87,7 +97,7 @@ Browser  →  Cloudflare Pages Proxy  →  Your Firefly III Server
 3. Enter a Personal Access Token (create one at Firefly III → Profile → OAuth)
 4. Click Connect
 
-> FireDash only reads data — it never creates, modifies, or deletes anything.
+> FireDash only reads data - it never creates, modifies, or deletes anything.
 
 ## Self-Hosting
 
