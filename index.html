@@ -1547,6 +1547,143 @@
       .spin {
         animation: spin 1s linear infinite;
       }
+
+      /* ===== LOADING SCREEN ===== */
+      .loading-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 60vh;
+        gap: 32px;
+        animation: fadeIn 0.4s ease;
+      }
+      .loading-logo {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, #6366f1, #a78bfa);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.25);
+      }
+      .loading-pulse-ring {
+        position: relative;
+      }
+      .loading-pulse-ring::after {
+        content: "";
+        position: absolute;
+        inset: -8px;
+        border-radius: 24px;
+        border: 2px solid var(--accent);
+        opacity: 0;
+        animation: loadPulse 2s ease-out infinite;
+      }
+      @keyframes loadPulse {
+        0% {
+          transform: scale(0.95);
+          opacity: 0.6;
+        }
+        100% {
+          transform: scale(1.15);
+          opacity: 0;
+        }
+      }
+      .loading-status {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .loading-status-text {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .loading-sub {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .loading-bar {
+        width: 200px;
+        height: 3px;
+        background: var(--bg-input);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .loading-bar-fill {
+        height: 100%;
+        width: 30%;
+        background: linear-gradient(90deg, var(--accent), #a78bfa);
+        border-radius: 3px;
+        animation: loadBarSlide 1.8s ease-in-out infinite;
+      }
+      @keyframes loadBarSlide {
+        0% {
+          transform: translateX(-100%);
+          width: 30%;
+        }
+        50% {
+          width: 60%;
+        }
+        100% {
+          transform: translateX(400%);
+          width: 30%;
+        }
+      }
+      .dyk-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 20px 24px;
+        max-width: 380px;
+        width: 100%;
+        text-align: left;
+        box-shadow: var(--shadow-sm);
+        animation: fadeIn 0.5s ease 0.3s both;
+      }
+      .dyk-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .dyk-text {
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text-secondary);
+      }
+      .dyk-inline {
+        background: var(--accent-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 12px 16px;
+        margin-top: 16px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--text-secondary);
+        animation: fadeIn 0.4s ease 0.5s both;
+      }
+      .dyk-inline-icon {
+        flex-shrink: 0;
+        color: var(--accent);
+        margin-top: 1px;
+      }
       .status-dot {
         width: 7px;
         height: 7px;
@@ -2609,6 +2746,147 @@
           }
         }
 
+        // =============== DID YOU KNOW TIPS ===============
+        const DYK_TIPS = [
+          {
+            icon: "⌨️",
+            text: "Press number keys <strong>1-9</strong> to instantly switch between tools. Press <strong>R</strong> to refresh data.",
+          },
+          {
+            icon: "📊",
+            text: "The <strong>Trends</strong> tool lets you compare spending and income across multiple months with interactive charts.",
+          },
+          {
+            icon: "💳",
+            text: 'Credit cards are auto-detected from Firefly III. Set account role to <strong>"Credit Card Asset"</strong> to see them.',
+          },
+          {
+            icon: "🎯",
+            text: "Track your <strong>Savings Goals</strong> with visual progress bars. Piggy banks from Firefly III are displayed automatically.",
+          },
+          {
+            icon: "📅",
+            text: "The <strong>Bills Tracker</strong> shows upcoming, overdue, and paid bills with a calendar timeline view.",
+          },
+          {
+            icon: "🏷️",
+            text: "Use <strong>Tag Explorer</strong> to drill into spending by tags. Great for tracking trips, projects, or events.",
+          },
+          {
+            icon: "🔍",
+            text: "Press <strong>/</strong> to jump to the <strong>Search</strong> tool and find any transaction instantly.",
+          },
+          {
+            icon: "📈",
+            text: "<strong>Budget Explorer</strong> compares your set budgets vs actual spending with visual breakdowns.",
+          },
+          {
+            icon: "🌙",
+            text: "Toggle between <strong>light and dark themes</strong> with the theme button in the header.",
+          },
+          {
+            icon: "📤",
+            text: "Every tool supports <strong>CSV export</strong>. Look for the CSV button in the top-right corner.",
+          },
+          {
+            icon: "🔒",
+            text: "Your API credentials are stored <strong>only in your browser</strong>. Nothing is saved on any server.",
+          },
+          {
+            icon: "🗂️",
+            text: "Click any account in <strong>Accounts</strong> to drill down and see its recent transactions inline.",
+          },
+          {
+            icon: "📉",
+            text: "<strong>Category Explorer</strong> shows your top spending categories with month-over-month comparisons.",
+          },
+          {
+            icon: "🔄",
+            text: "<strong>Recurring Transactions</strong> lets you track repeating income and expenses with frequency details.",
+          },
+          {
+            icon: "↔️",
+            text: "On mobile, <strong>swipe right from the left edge</strong> to open the sidebar navigation.",
+          },
+          {
+            icon: "📋",
+            text: "The <strong>Monthly Report</strong> shows spent, earned, net change, and net worth — with <strong>YTD</strong> totals at a glance.",
+          },
+          {
+            icon: "📌",
+            text: "FireDash remembers your <strong>last viewed tool</strong> and opens it automatically on your next visit.",
+          },
+          {
+            icon: "🧮",
+            text: "Your <strong>net worth</strong> is calculated automatically from all asset accounts minus liabilities and credit card balances.",
+          },
+          {
+            icon: "📱",
+            text: "FireDash is fully <strong>responsive</strong> — use it on your phone, tablet, or desktop with the same experience.",
+          },
+          {
+            icon: "⚡",
+            text: "Data is <strong>cached per session</strong> so switching between tools is instant. Press <strong>R</strong> to force a fresh fetch.",
+          },
+          {
+            icon: "🏦",
+            text: "The <strong>Accounts</strong> page groups your accounts by type — assets, credit cards, liabilities, and revenue.",
+          },
+          {
+            icon: "💡",
+            text: "Hover over sidebar icons when the sidebar is <strong>collapsed</strong> to see tooltip labels for each tool.",
+          },
+          {
+            icon: "🔗",
+            text: "FireDash connects through a <strong>secure proxy</strong> — your Firefly III server doesn't need to be publicly exposed.",
+          },
+          {
+            icon: "📆",
+            text: "Use the <strong>date presets</strong> (3M, 6M, YTD, 1Y) in Trends to quickly change the analysis period.",
+          },
+          {
+            icon: "🃏",
+            text: "Credit cards display as <strong>realistic card mockups</strong> with auto-detected network logos (Visa, Mastercard, Amex, etc.).",
+          },
+          {
+            icon: "⚙️",
+            text: "Set a <strong>custom currency symbol</strong> in Settings if auto-detection picks the wrong one.",
+          },
+          {
+            icon: "🧹",
+            text: "Use <strong>Clear Data</strong> in Settings to remove all saved credentials and start fresh.",
+          },
+          {
+            icon: "📊",
+            text: "Top spending categories in the Monthly Report include <strong>mini bar charts</strong> for visual comparison.",
+          },
+          {
+            icon: "🔔",
+            text: "The <strong>Bills</strong> nav icon shows a <strong>red badge</strong> when you have overdue bills that need attention.",
+          },
+          {
+            icon: "🎨",
+            text: "Each credit card gets a <strong>unique gradient</strong> generated from its name — no two cards look the same.",
+          },
+        ];
+        function getRandomTip() {
+          return DYK_TIPS[Math.floor(Math.random() * DYK_TIPS.length)];
+        }
+        function renderDYKCard() {
+          const tip = getRandomTip();
+          return `<div class="dyk-card">
+            <div class="dyk-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Did you know?</div>
+            <div class="dyk-text">${tip.icon} ${tip.text}</div>
+          </div>`;
+        }
+        function renderDYKInline() {
+          const tip = getRandomTip();
+          return `<div class="dyk-inline">
+            <span class="dyk-inline-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+            <span><strong style="color:var(--accent);font-size:10px;text-transform:uppercase;letter-spacing:0.5px">Tip:</strong> ${tip.text}</span>
+          </div>`;
+        }
+
         // =============== CONNECT & ROUTE ===============
         async function connectAndRoute() {
           if (!S.url || !S.token) {
@@ -2629,6 +2907,22 @@
           S.loading = true;
           S.connected = false;
           updStatus();
+          // Show full-page loading screen
+          showSidebar(false);
+          const main = $("mainContent");
+          main.innerHTML = `
+            <div class="loading-screen">
+              <div class="loading-pulse-ring"><div class="loading-logo"><img src="favicon.svg" alt="Logo"></div></div>
+              <div class="loading-status">
+                <div class="loading-status-text">
+                  <svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                  Connecting to Firefly III
+                </div>
+                <div class="loading-sub">Verifying credentials &amp; detecting data range...</div>
+                <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+              </div>
+              ${renderDYKCard()}
+            </div>`;
           const ok = await testConn();
           S.loading = false;
           btns.forEach((b) => {
@@ -2740,7 +3034,8 @@
           return `<div class="tool-header"><h1>${esc(title)}</h1></div>
                 <div id="loadProgress" style="text-align:center;padding:16px 0;color:var(--text-muted);font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px"><svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Loading...</div>
                 <div class="summary-grid">${'<div class="skeleton skel-card"></div>'.repeat(4)}</div>
-                <div class="two-col"><div>${'<div class="skeleton skel-row"></div>'.repeat(5)}</div><div>${'<div class="skeleton skel-row"></div>'.repeat(5)}</div></div>`;
+                <div class="two-col"><div>${'<div class="skeleton skel-row"></div>'.repeat(5)}</div><div>${'<div class="skeleton skel-row"></div>'.repeat(5)}</div></div>
+                ${renderDYKInline()}`;
         }
 
         // =============== SIDEBAR VISIBILITY ===============
