@@ -2214,6 +2214,280 @@
           height: auto !important;
         }
       }
+
+      /* ===== PIN LOCK SCREEN ===== */
+      .pin-lock-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: var(--bg-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.3s ease,
+          visibility 0.3s ease;
+      }
+      .pin-lock-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+      .pin-lock-box {
+        text-align: center;
+        max-width: 340px;
+        width: 100%;
+        padding: 0 20px;
+      }
+      .pin-lock-icon {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 20px;
+        background: var(--accent-bg);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+      }
+      .pin-lock-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: var(--text-primary);
+      }
+      .pin-lock-subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-bottom: 28px;
+      }
+      .pin-dots {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+      .pin-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        background: transparent;
+        transition: all 0.2s ease;
+      }
+      .pin-dot.filled {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      .pin-dot.error {
+        border-color: var(--danger);
+        background: var(--danger);
+        animation: pinShake 0.4s ease;
+      }
+      @keyframes pinShake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20%,
+        60% {
+          transform: translateX(-6px);
+        }
+        40%,
+        80% {
+          transform: translateX(6px);
+        }
+      }
+      .pin-keypad {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        max-width: 260px;
+        margin: 0 auto;
+      }
+      .pin-key {
+        width: 100%;
+        aspect-ratio: 1.4;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text-primary);
+        font-family: inherit;
+        font-size: 20px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition);
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .pin-key:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--accent);
+      }
+      .pin-key:active {
+        transform: scale(0.95);
+        background: var(--accent-bg);
+      }
+      .pin-key.empty {
+        visibility: hidden;
+      }
+      .pin-key.backspace {
+        font-size: 16px;
+        color: var(--text-secondary);
+      }
+      .pin-error-msg {
+        font-size: 12px;
+        color: var(--danger);
+        margin-top: 12px;
+        min-height: 18px;
+      }
+      .pin-lock-actions {
+        margin-top: 24px;
+      }
+      .pin-lock-actions button {
+        background: none;
+        border: none;
+        color: var(--accent);
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 6px 12px;
+      }
+      .pin-lock-actions button:hover {
+        text-decoration: underline;
+      }
+
+      /* PIN Setup Modal */
+      .pin-setup-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 300;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.3s ease,
+          visibility 0.3s ease;
+      }
+      .pin-setup-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+      .pin-setup-modal {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 28px;
+        max-width: 360px;
+        width: calc(100% - 40px);
+        box-shadow: var(--shadow-xl);
+        text-align: center;
+      }
+      .pin-setup-modal h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .pin-setup-modal p {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+      }
+      .pin-setup-modal .pin-dots {
+        margin-bottom: 20px;
+      }
+      .pin-setup-modal .pin-keypad {
+        margin-bottom: 16px;
+      }
+      .pin-setup-step {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+        font-weight: 500;
+      }
+      .pin-setup-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 8px;
+      }
+
+      /* Auto-lock settings */
+      .setting-section {
+        border-top: 1px solid var(--border);
+        padding-top: 18px;
+        margin-top: 18px;
+      }
+      .setting-section-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .setting-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
+      }
+      .setting-row label {
+        font-size: 12px;
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+      .setting-row .hint {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 1px;
+      }
+      .toggle-switch {
+        position: relative;
+        width: 38px;
+        height: 22px;
+        flex-shrink: 0;
+      }
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+      }
+      .toggle-slider {
+        position: absolute;
+        inset: 0;
+        background: var(--border);
+        border-radius: 11px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+      .toggle-slider::before {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        left: 3px;
+        top: 3px;
+        transition: transform 0.2s ease;
+      }
+      .toggle-switch input:checked + .toggle-slider {
+        background: var(--accent);
+      }
+      .toggle-switch input:checked + .toggle-slider::before {
+        transform: translateX(16px);
+      }
     </style>
   </head>
   <body>
@@ -2304,6 +2578,26 @@
             <line x1="12" y1="15" x2="12" y2="3" />
           </svg>
         </button>
+        <button
+          class="btn-icon"
+          id="lockBtn"
+          title="Lock (L)"
+          style="display: none"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            width="14"
+            height="14"
+          >
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        </button>
         <button class="btn-icon" id="settingsBtn" title="Settings">
           <svg
             viewBox="0 0 24 24"
@@ -2385,10 +2679,90 @@
           <span>Export / Print</span><span class="kbd-key">E</span>
         </div>
         <div class="kbd-row">
+          <span>Lock app</span><span class="kbd-key">L</span>
+        </div>
+        <div class="kbd-row">
           <span>This help</span><span class="kbd-key">?</span>
         </div>
         <div class="kbd-row">
           <span>Close / Dismiss</span><span class="kbd-key">Esc</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIN Lock Screen -->
+    <div class="pin-lock-overlay" id="pinLockOverlay">
+      <div class="pin-lock-box">
+        <div class="pin-lock-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            width="28"
+            height="28"
+          >
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        </div>
+        <div class="pin-lock-title">Locked</div>
+        <div class="pin-lock-subtitle">Enter your PIN to unlock</div>
+        <div class="pin-dots" id="pinUnlockDots">
+          <div class="pin-dot"></div>
+          <div class="pin-dot"></div>
+          <div class="pin-dot"></div>
+          <div class="pin-dot"></div>
+        </div>
+        <div class="pin-keypad" id="pinUnlockKeypad">
+          <button class="pin-key" data-key="1">1</button>
+          <button class="pin-key" data-key="2">2</button>
+          <button class="pin-key" data-key="3">3</button>
+          <button class="pin-key" data-key="4">4</button>
+          <button class="pin-key" data-key="5">5</button>
+          <button class="pin-key" data-key="6">6</button>
+          <button class="pin-key" data-key="7">7</button>
+          <button class="pin-key" data-key="8">8</button>
+          <button class="pin-key" data-key="9">9</button>
+          <button class="pin-key empty"></button>
+          <button class="pin-key" data-key="0">0</button>
+          <button class="pin-key backspace" data-key="back">⌫</button>
+        </div>
+        <div class="pin-error-msg" id="pinUnlockError"></div>
+      </div>
+    </div>
+
+    <!-- PIN Setup Modal -->
+    <div class="pin-setup-overlay" id="pinSetupOverlay">
+      <div class="pin-setup-modal">
+        <h3 id="pinSetupTitle">Set PIN</h3>
+        <p id="pinSetupDesc">Choose a 4-digit PIN to lock the app</p>
+        <div class="pin-setup-step" id="pinSetupStep">Enter PIN</div>
+        <div class="pin-dots" id="pinSetupDots">
+          <div class="pin-dot"></div>
+          <div class="pin-dot"></div>
+          <div class="pin-dot"></div>
+          <div class="pin-dot"></div>
+        </div>
+        <div class="pin-keypad" id="pinSetupKeypad">
+          <button class="pin-key" data-key="1">1</button>
+          <button class="pin-key" data-key="2">2</button>
+          <button class="pin-key" data-key="3">3</button>
+          <button class="pin-key" data-key="4">4</button>
+          <button class="pin-key" data-key="5">5</button>
+          <button class="pin-key" data-key="6">6</button>
+          <button class="pin-key" data-key="7">7</button>
+          <button class="pin-key" data-key="8">8</button>
+          <button class="pin-key" data-key="9">9</button>
+          <button class="pin-key empty"></button>
+          <button class="pin-key" data-key="0">0</button>
+          <button class="pin-key backspace" data-key="back">⌫</button>
+        </div>
+        <div class="pin-error-msg" id="pinSetupError"></div>
+        <div class="pin-setup-actions">
+          <button class="btn btn-secondary" id="pinSetupCancel">Cancel</button>
         </div>
       </div>
     </div>
@@ -2508,6 +2882,107 @@
             cross-origin restrictions. No configuration needed on your Firefly
             III server. Your URL must use <strong>HTTPS</strong>.
           </p>
+        </div>
+
+        <!-- PIN Lock Settings -->
+        <div class="setting-section">
+          <div class="setting-section-title">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              width="14"
+              height="14"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            PIN Lock
+          </div>
+          <div class="setting-row">
+            <div>
+              <label>Enable PIN Lock</label>
+              <div class="hint">Protect the app with a 4-digit PIN</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="pinEnableToggle" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div id="pinLockOptions" style="display: none">
+            <div class="setting-row">
+              <div>
+                <label>Lock on tab switch</label>
+                <div class="hint">Lock when you switch to another tab</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="pinLockOnTabSwitch" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="setting-row">
+              <div>
+                <label>Lock after inactivity</label>
+                <div class="hint">Auto-lock after idle time</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="pinLockOnInactive" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div
+              id="pinInactiveTimeRow"
+              style="display: none; padding: 4px 0 8px"
+            >
+              <label
+                style="
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: var(--text-primary);
+                  display: block;
+                  margin-bottom: 4px;
+                "
+                >Inactivity timeout</label
+              >
+              <select
+                class="form-select"
+                id="pinInactiveTime"
+                style="width: 100%"
+              >
+                <option value="60">1 minute</option>
+                <option value="120">2 minutes</option>
+                <option value="300" selected>5 minutes</option>
+                <option value="600">10 minutes</option>
+                <option value="900">15 minutes</option>
+                <option value="1800">30 minutes</option>
+              </select>
+            </div>
+            <div style="margin-top: 8px">
+              <button
+                class="btn btn-secondary"
+                id="pinChangeBtn"
+                style="width: 100%; justify-content: center; font-size: 12px"
+              >
+                Change PIN
+              </button>
+              <button
+                class="btn btn-secondary"
+                id="pinRemoveBtn"
+                style="
+                  width: 100%;
+                  justify-content: center;
+                  font-size: 12px;
+                  margin-top: 6px;
+                  color: var(--danger);
+                "
+              >
+                Remove PIN
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="drawer-footer">
@@ -2801,6 +3276,7 @@
           connected: false,
           loading: false,
           detectedCurrency: "₹",
+          _credsNeedReEncrypt: false,
           // per-tool caches
           cache: {},
         };
@@ -3017,6 +3493,513 @@
           }, 3500);
         }
 
+        // =============== PIN LOCK ===============
+        const PIN_HASH_KEY = "ff3_pin_hash";
+        const PIN_SALT_KEY = "ff3_pin_salt";
+        const PIN_SETTINGS_KEY = "ff3_pin_settings";
+        const PIN_ENC_KEY = "ff3_enc_creds";
+        const PIN_LENGTH = 4;
+        let _pinLocked = false;
+        let _pinInactivityTimer = null;
+        let _pinFailCount = 0;
+        let _pinLockoutUntil = 0;
+        let _pinCryptoKey = null; // Cached AES-GCM key for re-encryption on lock
+
+        async function hashPin(pin, salt) {
+          const enc = new TextEncoder();
+          const data = enc.encode(salt + pin);
+          const buf = await crypto.subtle.digest("SHA-256", data);
+          return Array.from(new Uint8Array(buf))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+        }
+
+        function generateSalt() {
+          const arr = new Uint8Array(16);
+          crypto.getRandomValues(arr);
+          return Array.from(arr)
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+        }
+
+        // ── AES-GCM credential encryption ──
+        async function deriveKey(pin, salt) {
+          const enc = new TextEncoder();
+          const keyMaterial = await crypto.subtle.importKey(
+            "raw",
+            enc.encode(pin),
+            "PBKDF2",
+            false,
+            ["deriveKey"],
+          );
+          return crypto.subtle.deriveKey(
+            {
+              name: "PBKDF2",
+              salt: enc.encode(salt),
+              iterations: 100000,
+              hash: "SHA-256",
+            },
+            keyMaterial,
+            { name: "AES-GCM", length: 256 },
+            false,
+            ["encrypt", "decrypt"],
+          );
+        }
+
+        async function encryptCredentials(pin, url, token) {
+          const salt = localStorage.getItem(PIN_SALT_KEY);
+          if (!salt) return;
+          const key = await deriveKey(pin, salt);
+          _pinCryptoKey = key;
+          await encryptWithKey(key, url, token);
+        }
+
+        async function encryptWithKey(key, url, token) {
+          const iv = crypto.getRandomValues(new Uint8Array(12));
+          const enc = new TextEncoder();
+          const plaintext = JSON.stringify({ url, token });
+          const cipherBuf = await crypto.subtle.encrypt(
+            { name: "AES-GCM", iv },
+            key,
+            enc.encode(plaintext),
+          );
+          const payload = {
+            iv: Array.from(iv)
+              .map((b) => b.toString(16).padStart(2, "0"))
+              .join(""),
+            data: Array.from(new Uint8Array(cipherBuf))
+              .map((b) => b.toString(16).padStart(2, "0"))
+              .join(""),
+          };
+          localStorage.setItem(PIN_ENC_KEY, JSON.stringify(payload));
+          localStorage.removeItem("ff3_url");
+          localStorage.removeItem("ff3_token");
+        }
+
+        async function decryptCredentials(pin) {
+          const salt = localStorage.getItem(PIN_SALT_KEY);
+          const raw = localStorage.getItem(PIN_ENC_KEY);
+          if (!salt || !raw) return null;
+          try {
+            const { iv, data } = JSON.parse(raw);
+            const key = await deriveKey(pin, salt);
+            _pinCryptoKey = key;
+            const ivArr = new Uint8Array(
+              iv.match(/.{2}/g).map((h) => parseInt(h, 16)),
+            );
+            const dataArr = new Uint8Array(
+              data.match(/.{2}/g).map((h) => parseInt(h, 16)),
+            );
+            const plainBuf = await crypto.subtle.decrypt(
+              { name: "AES-GCM", iv: ivArr },
+              key,
+              dataArr,
+            );
+            return JSON.parse(new TextDecoder().decode(plainBuf));
+          } catch {
+            return null;
+          }
+        }
+
+        function hasEncryptedCredentials() {
+          return !!localStorage.getItem(PIN_ENC_KEY);
+        }
+
+        function getPinSettings() {
+          try {
+            return (
+              JSON.parse(localStorage.getItem(PIN_SETTINGS_KEY) || "null") || {
+                lockOnTabSwitch: false,
+                lockOnInactive: false,
+                inactiveTime: 300,
+              }
+            );
+          } catch {
+            return {
+              lockOnTabSwitch: false,
+              lockOnInactive: false,
+              inactiveTime: 300,
+            };
+          }
+        }
+
+        function savePinSettings(s) {
+          localStorage.setItem(PIN_SETTINGS_KEY, JSON.stringify(s));
+        }
+
+        function hasPinSet() {
+          return !!localStorage.getItem(PIN_HASH_KEY);
+        }
+
+        async function verifyPin(pin) {
+          const storedHash = localStorage.getItem(PIN_HASH_KEY);
+          const salt = localStorage.getItem(PIN_SALT_KEY);
+          if (!storedHash || !salt) return false;
+          const h = await hashPin(pin, salt);
+          // Constant-time comparison isn't critical for a 4-digit PIN in browser,
+          // but we use it anyway for good practice
+          if (h.length !== storedHash.length) return false;
+          let result = 0;
+          for (let i = 0; i < h.length; i++)
+            result |= h.charCodeAt(i) ^ storedHash.charCodeAt(i);
+          return result === 0;
+        }
+
+        async function savePin(pin) {
+          const salt = generateSalt();
+          const h = await hashPin(pin, salt);
+          localStorage.setItem(PIN_SALT_KEY, salt);
+          localStorage.setItem(PIN_HASH_KEY, h);
+          // Encrypt credentials with the new PIN
+          if (S.url && S.token) {
+            await encryptCredentials(pin, S.url, S.token);
+          }
+        }
+
+        function removePin() {
+          // Restore plaintext credentials before removing encryption
+          if (S.url) localStorage.setItem("ff3_url", S.url);
+          if (S.token) localStorage.setItem("ff3_token", S.token);
+          localStorage.removeItem(PIN_HASH_KEY);
+          localStorage.removeItem(PIN_SALT_KEY);
+          localStorage.removeItem(PIN_SETTINGS_KEY);
+          localStorage.removeItem(PIN_ENC_KEY);
+          _pinLocked = false;
+          _pinFailCount = 0;
+          _pinCryptoKey = null;
+          S._credsNeedReEncrypt = false;
+          stopInactivityTimer();
+        }
+
+        async function lockApp() {
+          if (!hasPinSet() || _pinLocked) return;
+          _pinLocked = true;
+          _pinFailCount = 0;
+          // Re-encrypt credentials if they were changed while unlocked
+          if (S._credsNeedReEncrypt && _pinCryptoKey && S.url && S.token) {
+            try {
+              await encryptWithKey(_pinCryptoKey, S.url, S.token);
+            } catch {}
+            S._credsNeedReEncrypt = false;
+          }
+          // Wipe credentials from memory so DevTools bypass is useless
+          S.url = "";
+          S.token = "";
+          S.connected = false;
+          S.cache = {};
+          _pinCryptoKey = null;
+          $("pinLockOverlay").classList.add("active");
+          updatePinDots("pinUnlockDots", 0);
+          $("pinUnlockError").textContent = "";
+          _unlockBuffer = "";
+          track("pin_locked");
+        }
+
+        let _unlockBuffer = "";
+        async function handleUnlockKey(key) {
+          if (Date.now() < _pinLockoutUntil) {
+            const sec = Math.ceil((_pinLockoutUntil - Date.now()) / 1000);
+            $("pinUnlockError").textContent = `Too many attempts. Wait ${sec}s`;
+            return;
+          }
+          if (key === "back") {
+            _unlockBuffer = _unlockBuffer.slice(0, -1);
+            updatePinDots("pinUnlockDots", _unlockBuffer.length);
+            $("pinUnlockError").textContent = "";
+            return;
+          }
+          if (_unlockBuffer.length >= PIN_LENGTH) return;
+          _unlockBuffer += key;
+          updatePinDots("pinUnlockDots", _unlockBuffer.length);
+          if (_unlockBuffer.length === PIN_LENGTH) {
+            const ok = await verifyPin(_unlockBuffer);
+            if (ok) {
+              // Decrypt credentials back into memory
+              const creds = await decryptCredentials(_unlockBuffer);
+              if (creds) {
+                S.url = creds.url;
+                S.token = creds.token;
+              }
+              _pinLocked = false;
+              _pinFailCount = 0;
+              $("pinLockOverlay").classList.remove("active");
+              _unlockBuffer = "";
+              resetInactivityTimer();
+              track("pin_unlocked");
+              // Reconnect after decrypting credentials
+              if (S.url && S.token) connectAndRoute();
+            } else {
+              _pinFailCount++;
+              showPinError("pinUnlockDots");
+              $("pinUnlockError").textContent = "Incorrect PIN";
+              if (_pinFailCount >= 5) {
+                // Lockout: 30 seconds after 5 failures
+                _pinLockoutUntil = Date.now() + 30000;
+                $("pinUnlockError").textContent = "Too many attempts. Wait 30s";
+                _pinFailCount = 0;
+              }
+              setTimeout(() => {
+                _unlockBuffer = "";
+                updatePinDots("pinUnlockDots", 0);
+              }, 400);
+            }
+          }
+        }
+
+        // Re-encrypt credentials when PIN changes
+        async function reEncryptCredentials(newPin) {
+          if (S.url && S.token) {
+            const salt = localStorage.getItem(PIN_SALT_KEY);
+            if (!salt) return;
+            const key = await deriveKey(newPin, salt);
+            _pinCryptoKey = key;
+            await encryptWithKey(key, S.url, S.token);
+          }
+        }
+
+        function updatePinDots(containerId, count) {
+          const dots = $(containerId).querySelectorAll(".pin-dot");
+          dots.forEach((d, i) => {
+            d.classList.toggle("filled", i < count);
+            d.classList.remove("error");
+          });
+        }
+
+        function showPinError(containerId) {
+          const dots = $(containerId).querySelectorAll(".pin-dot");
+          dots.forEach((d) => {
+            d.classList.remove("filled");
+            d.classList.add("error");
+          });
+        }
+
+        // PIN Setup flow
+        let _setupStep = 0; // 0=enter, 1=confirm
+        let _setupPin = "";
+        let _setupBuffer = "";
+        let _setupMode = "new"; // "new" or "change"
+
+        function openPinSetup(mode) {
+          _setupMode = mode || "new";
+          _setupStep = 0;
+          _setupPin = "";
+          _setupBuffer = "";
+          $("pinSetupTitle").textContent =
+            mode === "change" ? "Change PIN" : "Set PIN";
+          $("pinSetupDesc").textContent =
+            "Choose a 4-digit PIN to lock the app";
+          $("pinSetupStep").textContent = "Enter new PIN";
+          $("pinSetupError").textContent = "";
+          updatePinDots("pinSetupDots", 0);
+          $("pinSetupOverlay").classList.add("active");
+        }
+
+        function closePinSetup() {
+          $("pinSetupOverlay").classList.remove("active");
+          _setupPin = "";
+          _setupBuffer = "";
+        }
+
+        async function handleSetupKey(key) {
+          if (key === "back") {
+            _setupBuffer = _setupBuffer.slice(0, -1);
+            updatePinDots("pinSetupDots", _setupBuffer.length);
+            $("pinSetupError").textContent = "";
+            return;
+          }
+          if (_setupBuffer.length >= PIN_LENGTH) return;
+          _setupBuffer += key;
+          updatePinDots("pinSetupDots", _setupBuffer.length);
+          if (_setupBuffer.length === PIN_LENGTH) {
+            if (_setupStep === 0) {
+              _setupPin = _setupBuffer;
+              _setupBuffer = "";
+              _setupStep = 1;
+              $("pinSetupStep").textContent = "Confirm PIN";
+              setTimeout(() => updatePinDots("pinSetupDots", 0), 200);
+            } else {
+              if (_setupBuffer === _setupPin) {
+                if (_setupMode === "change") {
+                  // Save new PIN hash, then re-encrypt with new PIN
+                  const salt = generateSalt();
+                  const h = await hashPin(_setupPin, salt);
+                  localStorage.setItem(PIN_SALT_KEY, salt);
+                  localStorage.setItem(PIN_HASH_KEY, h);
+                  await reEncryptCredentials(_setupPin);
+                } else {
+                  await savePin(_setupPin);
+                }
+                closePinSetup();
+                toast("PIN set successfully", "success");
+                track("pin_set", { mode: _setupMode });
+                syncPinUI();
+                resetInactivityTimer();
+              } else {
+                showPinError("pinSetupDots");
+                $("pinSetupError").textContent = "PINs don't match. Try again.";
+                _setupStep = 0;
+                _setupPin = "";
+                setTimeout(() => {
+                  _setupBuffer = "";
+                  $("pinSetupStep").textContent = "Enter new PIN";
+                  updatePinDots("pinSetupDots", 0);
+                }, 600);
+              }
+            }
+          }
+        }
+
+        function syncPinUI() {
+          const has = hasPinSet();
+          const toggle = $("pinEnableToggle");
+          toggle.checked = has;
+          $("pinLockOptions").style.display = has ? "block" : "none";
+          $("lockBtn").style.display = has ? "" : "none";
+          if (has) {
+            const ps = getPinSettings();
+            $("pinLockOnTabSwitch").checked = ps.lockOnTabSwitch;
+            $("pinLockOnInactive").checked = ps.lockOnInactive;
+            $("pinInactiveTime").value = String(ps.inactiveTime || 300);
+            $("pinInactiveTimeRow").style.display = ps.lockOnInactive
+              ? "block"
+              : "none";
+          }
+        }
+
+        // Inactivity timer
+        function resetInactivityTimer() {
+          stopInactivityTimer();
+          if (!hasPinSet()) return;
+          const ps = getPinSettings();
+          if (!ps.lockOnInactive) return;
+          const ms = (ps.inactiveTime || 300) * 1000;
+          _pinInactivityTimer = setTimeout(() => lockApp(), ms);
+        }
+
+        function stopInactivityTimer() {
+          if (_pinInactivityTimer) {
+            clearTimeout(_pinInactivityTimer);
+            _pinInactivityTimer = null;
+          }
+        }
+
+        function initPinLock() {
+          // Unlock keypad
+          $("pinUnlockKeypad").addEventListener("click", (e) => {
+            const btn = e.target.closest(".pin-key");
+            if (!btn || btn.classList.contains("empty")) return;
+            handleUnlockKey(btn.dataset.key);
+          });
+          // Setup keypad
+          $("pinSetupKeypad").addEventListener("click", (e) => {
+            const btn = e.target.closest(".pin-key");
+            if (!btn || btn.classList.contains("empty")) return;
+            handleSetupKey(btn.dataset.key);
+          });
+          $("pinSetupCancel").addEventListener("click", () => {
+            closePinSetup();
+            // If cancelling initial setup, uncheck the toggle
+            if (!hasPinSet()) $("pinEnableToggle").checked = false;
+          });
+
+          // Keyboard support for PIN lock screen
+          document.addEventListener("keydown", (e) => {
+            if ($("pinSetupOverlay").classList.contains("active")) {
+              if (e.key >= "0" && e.key <= "9") handleSetupKey(e.key);
+              else if (e.key === "Backspace") handleSetupKey("back");
+              else if (e.key === "Escape") closePinSetup();
+              return;
+            }
+            if (!_pinLocked) return;
+            if (e.key >= "0" && e.key <= "9") {
+              e.preventDefault();
+              handleUnlockKey(e.key);
+            } else if (e.key === "Backspace") {
+              e.preventDefault();
+              handleUnlockKey("back");
+            }
+          });
+
+          // Toggle enable
+          $("pinEnableToggle").addEventListener("change", (e) => {
+            if (e.target.checked) {
+              openPinSetup("new");
+            } else {
+              removePin();
+              syncPinUI();
+              toast("PIN removed", "info");
+              track("pin_removed");
+            }
+          });
+
+          // Settings toggles
+          $("pinLockOnTabSwitch").addEventListener("change", (e) => {
+            const ps = getPinSettings();
+            ps.lockOnTabSwitch = e.target.checked;
+            savePinSettings(ps);
+            track("pin_setting", { lockOnTabSwitch: e.target.checked });
+          });
+          $("pinLockOnInactive").addEventListener("change", (e) => {
+            const ps = getPinSettings();
+            ps.lockOnInactive = e.target.checked;
+            savePinSettings(ps);
+            $("pinInactiveTimeRow").style.display = e.target.checked
+              ? "block"
+              : "none";
+            if (e.target.checked) resetInactivityTimer();
+            else stopInactivityTimer();
+            track("pin_setting", { lockOnInactive: e.target.checked });
+          });
+          $("pinInactiveTime").addEventListener("change", (e) => {
+            const ps = getPinSettings();
+            ps.inactiveTime = parseInt(e.target.value, 10);
+            savePinSettings(ps);
+            resetInactivityTimer();
+            track("pin_setting", { inactiveTime: ps.inactiveTime });
+          });
+
+          // Change PIN
+          $("pinChangeBtn").addEventListener("click", () =>
+            openPinSetup("change"),
+          );
+
+          // Remove PIN
+          $("pinRemoveBtn").addEventListener("click", () => {
+            removePin();
+            syncPinUI();
+            toast("PIN removed", "info");
+            track("pin_removed");
+          });
+
+          // Tab visibility → lock
+          document.addEventListener("visibilitychange", () => {
+            if (
+              document.hidden &&
+              hasPinSet() &&
+              getPinSettings().lockOnTabSwitch
+            ) {
+              lockApp();
+            }
+          });
+
+          // Inactivity → reset timer on interaction
+          ["mousemove", "keydown", "touchstart", "scroll"].forEach((evt) => {
+            document.addEventListener(
+              evt,
+              () => {
+                if (!_pinLocked && hasPinSet()) resetInactivityTimer();
+              },
+              { passive: true },
+            );
+          });
+
+          // Init UI state
+          syncPinUI();
+
+          // Auto-lock on load if PIN is set
+          if (hasPinSet()) lockApp();
+        }
+
         // =============== THEME ===============
         function initTheme() {
           const saved = localStorage.getItem("ff3_theme");
@@ -3067,8 +4050,19 @@
           S.url = url;
           S.token = token;
           S.currency = currency;
-          localStorage.setItem("ff3_url", url);
-          localStorage.setItem("ff3_token", token);
+          // If PIN is set, encrypt credentials; otherwise store plaintext
+          if (hasPinSet() && _pinCryptoKey) {
+            localStorage.removeItem("ff3_url");
+            localStorage.removeItem("ff3_token");
+            encryptWithKey(_pinCryptoKey, url, token).catch(() => {});
+          } else if (hasPinSet()) {
+            localStorage.removeItem("ff3_url");
+            localStorage.removeItem("ff3_token");
+            S._credsNeedReEncrypt = true;
+          } else {
+            localStorage.setItem("ff3_url", url);
+            localStorage.setItem("ff3_token", token);
+          }
           localStorage.setItem("ff3_currency", currency);
           S.cache = {};
           toolState = { month: toolState.month, year: toolState.year };
@@ -3078,9 +4072,19 @@
           connectAndRoute();
         }
         function clearData() {
-          ["ff3_url", "ff3_token", "ff3_currency"].forEach((k) =>
-            localStorage.removeItem(k),
-          );
+          [
+            "ff3_url",
+            "ff3_token",
+            "ff3_currency",
+            "ff3_stale_dismissed",
+            PIN_HASH_KEY,
+            PIN_SALT_KEY,
+            PIN_SETTINGS_KEY,
+            PIN_ENC_KEY,
+          ].forEach((k) => localStorage.removeItem(k));
+          _pinLocked = false;
+          stopInactivityTimer();
+          syncPinUI();
           S.url = "";
           S.token = "";
           S.currency = "";
@@ -3163,7 +4167,9 @@
         // =============== TRANSACTION STALENESS CHECK ===============
         function checkLastTransaction() {
           if (!S.lastTxDate) return;
-          if (S.staleDismissed) return;
+          // Check if dismissed today
+          const dismissedDate = localStorage.getItem("ff3_stale_dismissed");
+          if (dismissedDate === new Date().toISOString().slice(0, 10)) return;
           const last = new Date(S.lastTxDate);
           const now = new Date();
           const diffMs = now - last;
@@ -3203,7 +4209,10 @@
           banner
             .querySelector(".stale-dismiss")
             .addEventListener("click", () => {
-              S.staleDismissed = true;
+              localStorage.setItem(
+                "ff3_stale_dismissed",
+                new Date().toISOString().slice(0, 10),
+              );
               banner.style.animation = "slideOut 0.3s ease forwards";
               setTimeout(() => banner.remove(), 300);
             });
@@ -3662,6 +4671,12 @@
         // =============== RENDER (setup screen) ===============
         function render() {
           const main = $("mainContent");
+          // If PIN locked with encrypted creds, show a minimal locked state
+          if (hasPinSet() && hasEncryptedCredentials() && !S.url) {
+            showSidebar(false);
+            main.innerHTML = "";
+            return;
+          }
           if (!S.url || !S.token) {
             showSidebar(false);
             main.innerHTML = `
@@ -3697,8 +4712,18 @@
               }
               S.url = url;
               S.token = token;
-              localStorage.setItem("ff3_url", url);
-              localStorage.setItem("ff3_token", token);
+              if (hasPinSet() && _pinCryptoKey) {
+                localStorage.removeItem("ff3_url");
+                localStorage.removeItem("ff3_token");
+                encryptWithKey(_pinCryptoKey, url, token).catch(() => {});
+              } else if (hasPinSet()) {
+                localStorage.removeItem("ff3_url");
+                localStorage.removeItem("ff3_token");
+                S._credsNeedReEncrypt = true;
+              } else {
+                localStorage.setItem("ff3_url", url);
+                localStorage.setItem("ff3_token", token);
+              }
               track("setup_connect_attempt");
               connectAndRoute();
             });
@@ -6734,6 +7759,10 @@
             else connectAndRoute();
           });
           $("exportBtn").addEventListener("click", exportSnapshot);
+          $("lockBtn").addEventListener("click", () => {
+            track("manual_lock");
+            lockApp();
+          });
           $("toggleKeyVis").addEventListener("click", () => {
             const i = $("settingsKey");
             i.type = i.type === "password" ? "text" : "password";
@@ -6879,6 +7908,12 @@
               exportSnapshot();
               return;
             }
+            if (e.key === "l" && hasPinSet()) {
+              e.preventDefault();
+              track("keyboard_shortcut", { key: "l", action: "lock" });
+              lockApp();
+              return;
+            }
             if (e.key === "?") {
               e.preventDefault();
               track("keyboard_shortcut", { key: "?", action: "help" });
@@ -6889,7 +7924,7 @@
           window.addEventListener("hashchange", route);
 
           // ── App-level analytics ──
-          const isReturning = !!(S.url && S.token);
+          const isReturning = !!(S.url && S.token) || hasEncryptedCredentials();
           track("app_init", {
             is_returning_user: isReturning,
             theme: document.documentElement.classList.contains("dark")
@@ -6912,13 +7947,21 @@
             });
           });
 
-          if (isReturning) connectAndRoute();
-          else render();
+          if (isReturning) {
+            // If PIN-locked, don't auto-connect (creds are encrypted)
+            if (hasPinSet() && hasEncryptedCredentials()) {
+              render(); // shows locked placeholder; overlay is on top
+            } else {
+              connectAndRoute();
+            }
+          } else render();
 
           // Init offline detection
           initOfflineDetection();
           // Init pull-to-refresh for mobile
           initPullToRefresh();
+          // Init PIN lock
+          initPinLock();
           // Wire up keyboard shortcuts modal
           $("kbdClose")?.addEventListener("click", closeKbdModal);
           $("kbdOverlay")?.addEventListener("click", (e) => {
