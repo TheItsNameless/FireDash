@@ -7336,6 +7336,7 @@
         //  TOOL: MONEY FLOW (SANKEY)
         // ============================================================
         async function fetchSankey() {
+          const MIN_FLOW_AMOUNT = 0.005; // ignore flows below half a cent
           const now = new Date();
           const defaultStart = fmt(new Date(now.getFullYear(), now.getMonth(), 1));
           const defaultEnd = fmt(new Date(now.getFullYear(), now.getMonth() + 1, 0));
@@ -7389,7 +7390,7 @@
                 incomeFlows.push({ source: src, amount: amt });
               }
             }
-            if (otherIncome > 0.005) incomeFlows.push({ source: "[Other Income]", amount: otherIncome });
+            if (otherIncome > MIN_FLOW_AMOUNT) incomeFlows.push({ source: "[Other Income]", amount: otherIncome });
             incomeFlows.sort((a, b) => b.amount - a.amount);
 
             // ── Expense side: categories ──
@@ -7406,14 +7407,14 @@
               if (!c) continue;
               const a = c.attributes || {};
               const spent = Math.abs(parseFloat(a.spent?.[0]?.sum || "0"));
-              if (spent > 0.005) {
+              if (spent > MIN_FLOW_AMOUNT) {
                 expenseFlows.push({ category: a.name || "?", amount: spent });
                 categorizedExpenses += spent;
               }
             }
             expenseFlows.sort((a, b) => b.amount - a.amount);
             const uncategorized = totalExpenses - categorizedExpenses;
-            if (uncategorized > 0.005) expenseFlows.push({ category: "Uncategorized", amount: uncategorized });
+            if (uncategorized > MIN_FLOW_AMOUNT) expenseFlows.push({ category: "Uncategorized", amount: uncategorized });
 
           } else {
             // ── Account mode: full transaction detail ──
@@ -7452,7 +7453,7 @@
               if (amt < incomeThreshold) otherIncome += amt;
               else incomeFlows.push({ source: src, amount: amt });
             }
-            if (otherIncome > 0.005) incomeFlows.push({ source: "[Other Income]", amount: otherIncome });
+            if (otherIncome > MIN_FLOW_AMOUNT) incomeFlows.push({ source: "[Other Income]", amount: otherIncome });
             incomeFlows.sort((a, b) => b.amount - a.amount);
 
             // Group withdrawals by category → destination
@@ -7469,7 +7470,7 @@
             // Build expenseFlows (All Funds → category) and detailFlows (category → dest)
             for (const [cat, dests] of Object.entries(catDestMap)) {
               const catTotal = Object.values(dests).reduce((s, v) => s + v, 0);
-              if (catTotal > 0.005) {
+              if (catTotal > MIN_FLOW_AMOUNT) {
                 expenseFlows.push({ category: cat, amount: catTotal });
                 const destThreshold = catTotal * 0.01;
                 let otherDest = 0;
@@ -7477,7 +7478,7 @@
                   if (amt < destThreshold) otherDest += amt;
                   else detailFlows.push({ category: cat, account: dest, amount: amt });
                 }
-                if (otherDest > 0.005) detailFlows.push({ category: cat, account: "[Other]", amount: otherDest });
+                if (otherDest > MIN_FLOW_AMOUNT) detailFlows.push({ category: cat, account: "[Other]", amount: otherDest });
               }
             }
             expenseFlows.sort((a, b) => b.amount - a.amount);
