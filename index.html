@@ -7133,9 +7133,13 @@
           const months = parseInt(toolState.trendMonths) || 6;
           const mode = toolState.trendMode || "spent";
           const now = new Date();
-          const data = [];
-          for (let i = months - 1; i >= 0; i--) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          const dataPromises = Array.from({ length: months }, async (_, i) => {
+            const monthOffset = months - 1 - i;
+            const d = new Date(
+              now.getFullYear(),
+              now.getMonth() - monthOffset,
+              1,
+            );
             const { start, end } = dateRange(d.getMonth(), d.getFullYear());
             const sm = await api("/api/v1/summary/basic", { start, end });
             let cc = "";
@@ -7163,15 +7167,16 @@
               "Nov",
               "Dec",
             ];
-            data.push({
+            return {
               label: `${mNames[d.getMonth()]} ${d.getFullYear()}`,
               spent: g("spent"),
               earned: g("earned"),
               balance: parseFloat(
                 sm[`balance-in-${cc}`]?.monetary_value || "0",
               ),
-            });
-          }
+            };
+          });
+          const data = await Promise.all(dataPromises);
           return { data, mode, months };
         }
 
