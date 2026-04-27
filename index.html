@@ -47,20 +47,7 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.12.0/dist/chartjs-chart-sankey.min.js"></script>
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-WYJG0P52V5"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-
-      gtag("config", "G-WYJG0P52V5");
-    </script>
-    <style>
+        <style>
       *,
       *::before,
       *::after {
@@ -3378,21 +3365,7 @@
 
         let currentTool = "";
         let toolState = {}; // tool-specific transient state
-        let _sessionStart = Date.now();
 
-        // =============== ANALYTICS ===============
-        function track(event, params = {}) {
-          try {
-            gtag("event", event, {
-              ...params,
-              session_duration_sec: Math.round(
-                (Date.now() - _sessionStart) / 1000,
-              ),
-            });
-          } catch (e) {
-            /* analytics should never break app */
-          }
-        }
 
         // =============== HELPERS ===============
         const $ = (id) => document.getElementById(id);
@@ -3443,11 +3416,7 @@
           return d.innerHTML;
         }
         function exportCsv(rows, filename) {
-          track("csv_export", {
-            file_name: filename,
-            row_count: rows.length,
-            tool: currentTool,
-          });
+
           const csv = rows
             .map((r) =>
               r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","),
@@ -3499,7 +3468,7 @@
               }
               if ($(startId)) $(startId).value = start || "";
               if ($(endId)) $(endId).value = end;
-              track("date_preset_used", { preset: p, tool: currentTool });
+
               if (onChange) onChange(start, end);
             });
           });
@@ -3718,7 +3687,7 @@
           updatePinDots("pinUnlockDots", 0);
           $("pinUnlockError").textContent = "";
           _unlockBuffer = "";
-          track("pin_locked");
+
         }
 
         let _unlockBuffer = "";
@@ -3751,7 +3720,7 @@
               $("pinLockOverlay").classList.remove("active");
               _unlockBuffer = "";
               resetInactivityTimer();
-              track("pin_unlocked");
+
               // Reconnect after decrypting credentials
               if (S.url && S.token) connectAndRoute();
             } else {
@@ -3857,7 +3826,7 @@
                 }
                 closePinSetup();
                 toast("PIN set successfully", "success");
-                track("pin_set", { mode: _setupMode });
+
                 syncPinUI();
                 resetInactivityTimer();
               } else {
@@ -3954,7 +3923,7 @@
               removePin();
               syncPinUI();
               toast("PIN removed", "info");
-              track("pin_removed");
+
             }
           });
 
@@ -3963,7 +3932,7 @@
             const ps = getPinSettings();
             ps.lockOnTabSwitch = e.target.checked;
             savePinSettings(ps);
-            track("pin_setting", { lockOnTabSwitch: e.target.checked });
+
           });
           $("pinLockOnInactive").addEventListener("change", (e) => {
             const ps = getPinSettings();
@@ -3974,14 +3943,14 @@
               : "none";
             if (e.target.checked) resetInactivityTimer();
             else stopInactivityTimer();
-            track("pin_setting", { lockOnInactive: e.target.checked });
+
           });
           $("pinInactiveTime").addEventListener("change", (e) => {
             const ps = getPinSettings();
             ps.inactiveTime = parseInt(e.target.value, 10);
             savePinSettings(ps);
             resetInactivityTimer();
-            track("pin_setting", { inactiveTime: ps.inactiveTime });
+
           });
 
           // Change PIN
@@ -3994,7 +3963,7 @@
             removePin();
             syncPinUI();
             toast("PIN removed", "info");
-            track("pin_removed");
+
           });
 
           // Tab visibility → lock
@@ -4043,7 +4012,7 @@
             : "light";
           localStorage.setItem("ff3_theme", newTheme);
           updThemeIcon();
-          track("theme_toggle", { theme: newTheme });
+
         }
         function updThemeIcon() {
           $("themeIcon").innerHTML =
@@ -4059,7 +4028,7 @@
           $("settingsCurrency").value = S.currency;
           $("drawerOverlay").classList.add("open");
           $("settingsDrawer").classList.add("open");
-          track("settings_open");
+
         }
         function closeDrawer() {
           $("drawerOverlay").classList.remove("open");
@@ -4094,7 +4063,7 @@
           toolState = { month: toolState.month, year: toolState.year };
           closeDrawer();
           toast("Settings saved", "success");
-          track("settings_save", { has_custom_currency: !!currency });
+
           connectAndRoute();
         }
         function clearData() {
@@ -4119,7 +4088,7 @@
           toolState = {};
           closeDrawer();
           toast("All data cleared", "info");
-          track("data_cleared");
+
           render();
         }
 
@@ -4135,11 +4104,7 @@
             },
           });
           if (!r.ok) {
-            track("api_error", {
-              endpoint,
-              status: r.status,
-              status_text: r.statusText,
-            });
+
             throw new Error(`API ${r.status}: ${r.statusText}`);
           }
           return r.json();
@@ -4347,7 +4312,7 @@
         }
 
         function exportSnapshot() {
-          track("export_snapshot", { tool: S.currentTool });
+
           window.print();
         }
 
@@ -4578,16 +4543,13 @@
             S.connected = false;
             updStatus();
             toast("Connection failed. Check URL and token.", "error");
-            track("connection_failed");
+
             render();
             return;
           }
           S.connected = true;
           updStatus();
-          track("connection_success", {
-            server_version: S.serverVersion || "unknown",
-            data_year_range: `${S.dataYearStart || "?"}-${S.dataYearEnd || "?"}`,
-          });
+
           if (S.serverVersion)
             $("headerTitle").innerHTML =
               `FireDash <span style="font-size:10px;font-weight:400;opacity:0.5">v${esc(S.serverVersion)}</span>`;
@@ -4626,7 +4588,7 @@
           if (TOOLS[hash]) {
             currentTool = hash;
             localStorage.setItem("ff3_lastTool", hash);
-            track("tool_navigate", { tool_name: hash });
+
             loadTool(hash);
           } else {
             location.hash = "#monthly-report";
@@ -4658,22 +4620,16 @@
             startLastUpdatedTimer();
             main.innerHTML = tool.render(data);
             checkLastTransaction();
-            track("tool_loaded", {
-              tool_name: name,
-              load_time_ms: Date.now() - _toolLoadStart,
-            });
+
             if (tool.bind) tool.bind(data);
           } catch (e) {
             console.error(e);
-            track("tool_load_error", {
-              tool_name: name,
-              error_message: e.message,
-            });
+
             main.innerHTML = `<div class="tool-header"><h1>${esc(tool.title)}</h1></div>
                     <div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><p>Error loading data: ${esc(e.message)}</p>
                     <button class="btn btn-primary" style="margin-top:12px" id="retryBtn">Retry</button></div>`;
             $("retryBtn")?.addEventListener("click", () => {
-              track("tool_retry", { tool_name: name });
+
               loadTool(name);
             });
           }
@@ -4750,7 +4706,7 @@
                 localStorage.setItem("ff3_url", url);
                 localStorage.setItem("ff3_token", token);
               }
-              track("setup_connect_attempt");
+
               connectAndRoute();
             });
             $("toggleSetupVis")?.addEventListener("click", () => {
@@ -5087,10 +5043,7 @@
           const triggerLoad = () => {
             toolState.month = parseInt($("mrMonth").value);
             toolState.year = parseInt($("mrYear").value);
-            track("monthly_report_change_period", {
-              month: toolState.month,
-              year: toolState.year,
-            });
+
             loadTool("monthly-report");
           };
           $("mrLoad")?.addEventListener("click", triggerLoad);
@@ -5165,10 +5118,7 @@
                 drill.style.display = "none";
                 return;
               }
-              track("category_drilldown", {
-                category_id: catId,
-                tool: currentTool,
-              });
+
               const sym = S.detectedCurrency;
               const { start, end } = dateRange(toolState.month, toolState.year);
               drill.innerHTML =
@@ -5363,7 +5313,7 @@
             loadTool("tag-explorer");
           };
           $("tagLoad")?.addEventListener("click", () => {
-            track("tag_explorer_load", { tag: toolState.selectedTag });
+
             triggerLoad();
           });
           $("tagSelect")?.addEventListener("keydown", (e) => {
@@ -5389,10 +5339,7 @@
           bindDatePresets("tagStart", "tagEnd");
           $("csvExport")?.addEventListener("click", () => {
             if (!d.transactions?.length) return;
-            track("tag_csv_export", {
-              tag: toolState.selectedTag,
-              count: d.transactions.length,
-            });
+
             const rows = [
               [
                 "Date",
@@ -5559,7 +5506,7 @@
                   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="9 18 15 12 9 6"/></svg>';
                 return;
               }
-              track("account_drilldown", { account_id: accId });
+
               drill.style.display = "block";
               el.querySelector("span:last-child").innerHTML =
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="6 9 12 15 18 9"/></svg>';
@@ -6062,7 +6009,7 @@
             el.addEventListener("click", () => {
               const cardNameDisplay =
                 el.querySelector(".cc-val-name")?.textContent || "Card";
-              track("creditcard_modal_open", { card_name: cardNameDisplay });
+
               const txnData = el.dataset.ccTxn;
               let transactions = [];
               try {
@@ -6159,8 +6106,7 @@
                 const isOpen = drill.style.display !== "none";
                 drill.style.display = isOpen ? "none" : "block";
                 if (arrow) arrow.innerHTML = isOpen ? svgFwd : svgDwn;
-                if (!isOpen) track("cc_category_drilldown", { index: idx });
-              });
+                });
             });
 
           const reload = () => {
@@ -6874,9 +6820,7 @@
               if (!drill) return;
               const isOpen = drill.style.display === "none";
               drill.style.display = isOpen ? "block" : "none";
-              if (isOpen)
-                track("recurring_drilldown", { index: el.dataset.recurIdx });
-            });
+              });
           });
         }
 
@@ -7044,20 +6988,11 @@
               toast("Enter a search term", "error");
               return;
             }
-            track("search_execute", {
-              query_length: toolState.searchQuery.length,
-              type_filter: toolState.searchType,
-              has_date_filter: !!(toolState.searchStart || toolState.searchEnd),
-              has_account_filter: !!toolState.searchAccount,
-              has_category_filter: !!toolState.searchCategory,
-              has_amount_filter: !!(
-                toolState.searchMinAmt || toolState.searchMaxAmt
-              ),
-            });
+
             loadTool("search");
           };
           $("searchClear")?.addEventListener("click", () => {
-            track("search_clear_filters");
+
             toolState.searchQuery = "";
             toolState.searchType = "all";
             toolState.searchStart = "";
@@ -7257,10 +7192,7 @@
           const triggerLoad = () => {
             toolState.trendMode = $("trendMode")?.value || "spent";
             toolState.trendMonths = parseInt($("trendMonths")?.value) || 6;
-            track("trends_update", {
-              mode: toolState.trendMode,
-              months: toolState.trendMonths,
-            });
+
             loadTool("trends");
           };
           $("trendLoad")?.addEventListener("click", triggerLoad);
@@ -7594,7 +7526,7 @@
                 : [...current, level];
               if (next.length < 2) return; // need at least two levels to draw flows
               toolState.sankeyLevels = next;
-              track("sankey_level_change", { levels: next.join(",") });
+
               loadTool("sankey");
             });
           });
@@ -7823,9 +7755,7 @@
               toast("Select a budget first", "error");
               return;
             }
-            track("budget_explorer_load", {
-              budget_id: toolState.selectedBudget,
-            });
+
             loadTool("budget-explorer");
           };
           $("budgetLoad")?.addEventListener("click", triggerLoad);
@@ -8036,10 +7966,7 @@
               toast("Select a category first", "error");
               return;
             }
-            track("category_explorer_load", {
-              category: toolState.selectedCategory,
-              type: toolState.catType,
-            });
+
             loadTool("category-explorer");
           };
           $("categoryLoad")?.addEventListener("click", triggerLoad);
@@ -8110,14 +8037,14 @@
           $("saveSettingsBtn").addEventListener("click", saveSettings);
           $("clearDataBtn").addEventListener("click", clearData);
           $("refreshBtn").addEventListener("click", () => {
-            track("manual_refresh", { tool: currentTool });
+
             S.cache = {};
             if (S.connected) route();
             else connectAndRoute();
           });
           $("exportBtn").addEventListener("click", exportSnapshot);
           $("lockBtn").addEventListener("click", () => {
-            track("manual_lock");
+
             lockApp();
           });
           $("toggleKeyVis").addEventListener("click", () => {
@@ -8154,7 +8081,7 @@
             const next = !isSidebarCollapsed();
             localStorage.setItem("ff3_sidebarCollapsed", next ? "1" : "0");
             applySidebarCollapse(next);
-            track("sidebar_collapse_toggle", { collapsed: next });
+
           });
           $("menuToggle").addEventListener("click", () =>
             $("sidebar").classList.toggle("mobile-open"),
@@ -8232,49 +8159,45 @@
             const num = parseInt(e.key);
             if (num >= 1 && num <= toolKeys.length && S.connected) {
               e.preventDefault();
-              track("keyboard_shortcut", {
-                key: e.key,
-                action: "tool_switch",
-                tool: toolKeys[num - 1],
-              });
+
               location.hash = "#" + toolKeys[num - 1];
               return;
             }
             if (e.key === "r" && S.connected) {
               e.preventDefault();
-              track("keyboard_shortcut", { key: "r", action: "refresh" });
+
               S.cache = {};
               route();
               return;
             }
             if (e.key === "s") {
               e.preventDefault();
-              track("keyboard_shortcut", { key: "s", action: "settings" });
+
               openDrawer();
               return;
             }
             if (e.key === "/" && S.connected) {
               e.preventDefault();
-              track("keyboard_shortcut", { key: "/", action: "search" });
+
               location.hash = "#search";
               setTimeout(() => $("searchInput")?.focus(), 100);
               return;
             }
             if (e.key === "e") {
               e.preventDefault();
-              track("keyboard_shortcut", { key: "e", action: "export" });
+
               exportSnapshot();
               return;
             }
             if (e.key === "l" && hasPinSet()) {
               e.preventDefault();
-              track("keyboard_shortcut", { key: "l", action: "lock" });
+
               lockApp();
               return;
             }
             if (e.key === "?") {
               e.preventDefault();
-              track("keyboard_shortcut", { key: "?", action: "help" });
+
               openKbdModal();
               return;
             }
@@ -8283,26 +8206,11 @@
 
           // ── App-level analytics ──
           const isReturning = !!(S.url && S.token) || hasEncryptedCredentials();
-          track("app_init", {
-            is_returning_user: isReturning,
-            theme: document.documentElement.classList.contains("dark")
-              ? "dark"
-              : "light",
-            sidebar_collapsed:
-              localStorage.getItem("ff3_sidebarCollapsed") === "1",
-            viewport_width: window.innerWidth,
-            viewport_height: window.innerHeight,
-            is_mobile: window.innerWidth <= 768,
-          });
+
 
           // Track when user is about to leave
           window.addEventListener("beforeunload", () => {
-            track("session_end", {
-              duration_sec: Math.round((Date.now() - _sessionStart) / 1000),
-              tools_used: Object.keys(S.cache).length,
-              last_tool: currentTool,
-              was_connected: S.connected,
-            });
+
           });
 
           if (isReturning) {
