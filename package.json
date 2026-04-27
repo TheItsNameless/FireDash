@@ -1,0 +1,9 @@
+{
+  "name": "firedash",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A fast, privacy-first web dashboard for Firefly III",
+  "scripts": {
+    "test": "node --test"
+  }
+}
