@@ -45,7 +45,7 @@
 | `search_execute`               | `query_length`, `type_filter`, `has_date_filter`, `has_account_filter`, `has_category_filter`, `has_amount_filter` | Search feature usage depth       |
 | `search_clear_filters`         | —                                                                                                                  | Filter reset behavior            |
 | `trends_update`                | `mode`, `months`                                                                                                   | Spending/Income/Net preference   |
-| `sankey_mode_change`           | `mode`                                                                                                             | Category vs Account view popularity |
+| `sankey_level_change`          | `levels`                                                                                                           | Active level combination popularity |
 | `budget_explorer_load`         | `budget_id`                                                                                                        | Budget analysis engagement       |
 | `category_explorer_load`       | `category`, `type`                                                                                                 | Category exploration             |
 | `creditcard_modal_open`        | `card_name`                                                                                                        | Credit card detail views         |

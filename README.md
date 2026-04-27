@@ -57,11 +57,12 @@ A fast, privacy-first web dashboard for [Firefly III](https://www.firefly-iii.or
 ### Money Flow (Sankey)
 
 - Interactive Sankey diagram showing income → expense flows
-- **By Category** mode: fast view grouping expenses into categories
-- **By Account** mode: detailed view tracing flows down to individual expense accounts
+- Four configurable levels: Income Accounts → Budgets → Categories → Spending Accounts
+- Toggle any combination of levels to zoom in (e.g. Income Accounts → Categories, or Budgets → Spending Accounts)
+- "All Funds" bridge node inserted automatically when income and expense levels are both active
 - Date range selector with 1M, 3M, 6M, YTD, 1Y presets
 - Hover tooltips showing exact amounts for each flow
-- Small flows (< 1% of total) automatically rolled up into "[Other Income]" / "[Other]" buckets for readability
+- Small income sources (< 1% of total) automatically rolled up into "[Other Income]" for readability
 - Summary cards: Total Income, Total Expenses, Net
 
 ### Budget Explorer
