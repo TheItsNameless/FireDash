@@ -54,6 +54,16 @@ A fast, privacy-first web dashboard for [Firefly III](https://www.firefly-iii.or
 - Compare 6 or 12 months of spending, income, or net change
 - Average, highest, and lowest month summary
 
+### Money Flow (Sankey)
+
+- Interactive Sankey diagram showing income → expense flows
+- **By Category** mode: fast view grouping expenses into categories
+- **By Account** mode: detailed view tracing flows down to individual expense accounts
+- Date range selector with 1M, 3M, 6M, YTD, 1Y presets
+- Hover tooltips showing exact amounts for each flow
+- Small flows (< 1% of total) automatically rolled up into "[Other Income]" / "[Other]" buckets for readability
+- Summary cards: Total Income, Total Expenses, Net
+
 ### Budget Explorer
 
 - Select any budget to analyze its spending over a date range
@@ -75,7 +85,7 @@ A fast, privacy-first web dashboard for [Firefly III](https://www.firefly-iii.or
 
 - Dark mode with system preference detection
 - Responsive layout with mobile sidebar
-- Keyboard shortcuts: `1` Monthly Report, `2` Trends, `3` Budget, `4` Category, `5` Tags, `6` Accounts, `7` Savings, `8` Bills, `9` Search - `R` refresh, `S` settings, `/` focus search
+- Keyboard shortcuts: `1` Monthly Report, `2` Trends, `3` Money Flow, `4` Budget, `5` Category, `6` Tags, `7` Accounts, `8` Savings, `9` Bills - `R` refresh, `S` settings, `/` focus search
 - Remembers your last viewed tool
 - Server version display after connecting
 

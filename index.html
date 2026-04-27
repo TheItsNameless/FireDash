@@ -46,6 +46,7 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.12.0/dist/chartjs-chart-sankey.min.js"></script>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-WYJG0P52V5"
@@ -3032,6 +3033,24 @@
                 <rect x="2" y="13" width="4" height="8" /></svg></span
             ><span class="nav-label"> Trends</span></a
           >
+          <a class="nav-item" href="#sankey" data-tip="Money Flow"
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <path d="M3 3h6v6H3z" />
+                <path d="M15 15h6v6h-6z" />
+                <path d="M9 6h3a3 3 0 0 1 3 3v1" />
+                <path d="M9 18H6a3 3 0 0 1-3-3v-1" /></svg></span
+            ><span class="nav-label"> Money Flow</span></a
+          >
           <a class="nav-item" href="#budget-explorer" data-tip="Budget Explorer"
             ><span class="nav-icon"
               ><svg
@@ -3336,6 +3355,12 @@
             fetch: fetchTrends,
             render: renderTrends,
             bind: bindTrends,
+          },
+          sankey: {
+            title: "Money Flow",
+            fetch: fetchSankey,
+            render: renderSankey,
+            bind: bindSankey,
           },
           "budget-explorer": {
             title: "Budget Explorer",
@@ -7307,6 +7332,341 @@
           }
         }
 
+        // ============================================================
+        //  TOOL: MONEY FLOW (SANKEY)
+        // ============================================================
+        async function fetchSankey() {
+          const now = new Date();
+          const defaultStart = fmt(new Date(now.getFullYear(), now.getMonth(), 1));
+          const defaultEnd = fmt(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+          const start = toolState.sankeyStart || defaultStart;
+          const end = toolState.sankeyEnd || defaultEnd;
+          const mode = toolState.sankeyMode || "category";
+          toolState.sankeyStart = start;
+          toolState.sankeyEnd = end;
+          toolState.sankeyMode = mode;
+
+          // Basic summary for income/expense totals and currency detection
+          const sm = await api("/api/v1/summary/basic", { start, end });
+          let cc = "", sym = "";
+          const ccPattern = /^(?:spent|earned|balance|net-worth)-in-(.+)$/;
+          for (const k of Object.keys(sm)) {
+            const m2 = k.match(ccPattern);
+            if (m2) { cc = m2[1]; sym = sm[k]?.currency_symbol || ""; break; }
+          }
+          S.detectedCurrency = S.currency || sym || cc || S.detectedCurrency || "";
+          const g = (p) => parseFloat(sm[`${p}-in-${cc}`]?.monetary_value || "0");
+          const totalIncome = g("earned");
+          const totalExpenses = Math.abs(g("spent"));
+
+          let incomeFlows = [], expenseFlows = [], detailFlows = [];
+
+          if (mode === "category") {
+            // ── Income side: deposit transactions grouped by source account ──
+            const deposits = await apiAll(
+              "/api/v1/transactions",
+              { type: "deposit", start, end },
+              (page, total, count) => {
+                const el = document.getElementById("loadProgress");
+                if (el) el.innerHTML = `<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Fetching income... page ${page}/${total} (${count} found)`;
+              },
+            );
+            const incomeBySource = {};
+            for (const tx of deposits) {
+              for (const t of tx.attributes?.transactions || []) {
+                const src = t.source_name || "Unknown Income";
+                const amt = parseFloat(t.amount || "0");
+                incomeBySource[src] = (incomeBySource[src] || 0) + amt;
+              }
+            }
+            const incomeTotalRaw = Object.values(incomeBySource).reduce((s, v) => s + v, 0);
+            const incomeThreshold = incomeTotalRaw * 0.01;
+            let otherIncome = 0;
+            for (const [src, amt] of Object.entries(incomeBySource)) {
+              if (amt < incomeThreshold) {
+                otherIncome += amt;
+              } else {
+                incomeFlows.push({ source: src, amount: amt });
+              }
+            }
+            if (otherIncome > 0.005) incomeFlows.push({ source: "[Other Income]", amount: otherIncome });
+            incomeFlows.sort((a, b) => b.amount - a.amount);
+
+            // ── Expense side: categories ──
+            const cats = await apiAll("/api/v1/categories");
+            const catDetails = await Promise.all(
+              cats.map((c) =>
+                api(`/api/v1/categories/${c.id}`, { start, end })
+                  .then((r) => r.data)
+                  .catch(() => null),
+              ),
+            );
+            let categorizedExpenses = 0;
+            for (const c of catDetails) {
+              if (!c) continue;
+              const a = c.attributes || {};
+              const spent = Math.abs(parseFloat(a.spent?.[0]?.sum || "0"));
+              if (spent > 0.005) {
+                expenseFlows.push({ category: a.name || "?", amount: spent });
+                categorizedExpenses += spent;
+              }
+            }
+            expenseFlows.sort((a, b) => b.amount - a.amount);
+            const uncategorized = totalExpenses - categorizedExpenses;
+            if (uncategorized > 0.005) expenseFlows.push({ category: "Uncategorized", amount: uncategorized });
+
+          } else {
+            // ── Account mode: full transaction detail ──
+            const [deposits, withdrawals] = await Promise.all([
+              apiAll(
+                "/api/v1/transactions",
+                { type: "deposit", start, end },
+                (page, total, count) => {
+                  const el = document.getElementById("loadProgress");
+                  if (el) el.innerHTML = `<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Fetching income transactions... page ${page}/${total}`;
+                },
+              ),
+              apiAll(
+                "/api/v1/transactions",
+                { type: "withdrawal", start, end },
+                (page, total, count) => {
+                  const el = document.getElementById("loadProgress");
+                  if (el) el.innerHTML = `<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Fetching expense transactions... page ${page}/${total}`;
+                },
+              ),
+            ]);
+
+            // Group deposits by source_name
+            const incomeBySource = {};
+            for (const tx of deposits) {
+              for (const t of tx.attributes?.transactions || []) {
+                const src = t.source_name || "Unknown Income";
+                const amt = parseFloat(t.amount || "0");
+                incomeBySource[src] = (incomeBySource[src] || 0) + amt;
+              }
+            }
+            const incomeTotalRaw = Object.values(incomeBySource).reduce((s, v) => s + v, 0);
+            const incomeThreshold = incomeTotalRaw * 0.01;
+            let otherIncome = 0;
+            for (const [src, amt] of Object.entries(incomeBySource)) {
+              if (amt < incomeThreshold) otherIncome += amt;
+              else incomeFlows.push({ source: src, amount: amt });
+            }
+            if (otherIncome > 0.005) incomeFlows.push({ source: "[Other Income]", amount: otherIncome });
+            incomeFlows.sort((a, b) => b.amount - a.amount);
+
+            // Group withdrawals by category → destination
+            const catDestMap = {}; // { category: { dest: amount } }
+            for (const tx of withdrawals) {
+              for (const t of tx.attributes?.transactions || []) {
+                const cat = t.category_name || "Uncategorized";
+                const dest = t.destination_name || "Unknown";
+                const amt = Math.abs(parseFloat(t.amount || "0"));
+                if (!catDestMap[cat]) catDestMap[cat] = {};
+                catDestMap[cat][dest] = (catDestMap[cat][dest] || 0) + amt;
+              }
+            }
+            // Build expenseFlows (All Funds → category) and detailFlows (category → dest)
+            for (const [cat, dests] of Object.entries(catDestMap)) {
+              const catTotal = Object.values(dests).reduce((s, v) => s + v, 0);
+              if (catTotal > 0.005) {
+                expenseFlows.push({ category: cat, amount: catTotal });
+                const destThreshold = catTotal * 0.01;
+                let otherDest = 0;
+                for (const [dest, amt] of Object.entries(dests)) {
+                  if (amt < destThreshold) otherDest += amt;
+                  else detailFlows.push({ category: cat, account: dest, amount: amt });
+                }
+                if (otherDest > 0.005) detailFlows.push({ category: cat, account: "[Other]", amount: otherDest });
+              }
+            }
+            expenseFlows.sort((a, b) => b.amount - a.amount);
+          }
+
+          return { incomeFlows, expenseFlows, detailFlows, totalIncome, totalExpenses, mode, dateRange: { start, end } };
+        }
+
+        function renderSankey(d) {
+          const sym = S.detectedCurrency;
+          const { start, end } = d.dateRange;
+          const net = d.totalIncome - d.totalExpenses;
+          const modeOpts = [
+            ["category", "By Category"],
+            ["account", "By Account"],
+          ]
+            .map(([v, l]) => `<option value="${v}"${v === d.mode ? " selected" : ""}>${l}</option>`)
+            .join("");
+
+          let h = `<div class="tool-header"><h1>Money Flow</h1>
+            <div class="tool-controls">
+              <input type="date" class="form-input" id="sankeyStart" value="${esc(start)}" style="width:140px">
+              <input type="date" class="form-input" id="sankeyEnd" value="${esc(end)}" style="width:140px">
+              <select class="form-select" id="sankeyMode" style="width:auto">${modeOpts}</select>
+              <button class="btn btn-primary" id="sankeyLoad">Update</button>
+            </div></div>
+            ${datePresetHtml()}`;
+
+          h += `<div class="summary-grid" style="margin-top:16px">
+            <div class="summary-card earned fade-in stagger-1">
+              <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></div>
+              <div class="card-label">Total Income</div>
+              <div class="card-value val-pos">${fc(d.totalIncome, sym)}</div>
+            </div>
+            <div class="summary-card spent fade-in stagger-2">
+              <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
+              <div class="card-label">Total Expenses</div>
+              <div class="card-value val-neg">${fc(d.totalExpenses, sym)}</div>
+            </div>
+            <div class="summary-card ${net >= 0 ? "balance" : "spent"} fade-in stagger-3">
+              <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg></div>
+              <div class="card-label">Net</div>
+              <div class="card-value ${net >= 0 ? "val-pos" : "val-neg"}">${fc(net, sym)}</div>
+            </div>
+          </div>`;
+
+          const hasData = d.incomeFlows.length > 0 && d.expenseFlows.length > 0;
+          if (!hasData) {
+            h += `<div class="empty-state">
+              <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><path d="M3 3h6v6H3z"/><path d="M15 15h6v6h-6z"/><path d="M9 6h3a3 3 0 0 1 3 3v1"/><path d="M9 18H6a3 3 0 0 1-3-3v-1"/></svg></div>
+              <p>No transaction data found for this period.<br>Try adjusting the date range or switching modes.</p>
+            </div>`;
+            return h;
+          }
+
+          h += `<div class="data-card fade-in stagger-2">
+            <div class="card-head">
+              <h3>Money Flow Diagram</h3>
+              <span style="font-size:11px;color:var(--text-muted)">Hover for amounts</span>
+            </div>
+            <div style="padding:16px 20px;position:relative;height:480px">
+              <canvas id="sankeyChart"></canvas>
+            </div>
+          </div>`;
+
+          // Fallback flow table
+          h += `<div class="data-card fade-in stagger-3">
+            <div class="card-head"><h3>Flow Breakdown</h3></div>`;
+          // Income rows
+          for (const f of d.incomeFlows) {
+            h += `<div class="list-item">
+              <div class="list-info">
+                <div class="list-name">${esc(f.source)} <span style="color:var(--text-muted);font-size:11px">→ All Funds</span></div>
+              </div>
+              <div class="list-value val-pos">${fc(f.amount, sym)}</div>
+            </div>`;
+          }
+          // Expense rows
+          for (const f of d.expenseFlows) {
+            h += `<div class="list-item">
+              <div class="list-info">
+                <div class="list-name"><span style="color:var(--text-muted);font-size:11px">All Funds →</span> ${esc(f.category)}</div>
+              </div>
+              <div class="list-value val-neg">${fc(f.amount, sym)}</div>
+            </div>`;
+          }
+          // Detail rows (account mode)
+          for (const f of d.detailFlows || []) {
+            h += `<div class="list-item" style="padding-left:36px">
+              <div class="list-info">
+                <div class="list-name" style="font-size:12px">${esc(f.category)} <span style="color:var(--text-muted)">→</span> ${esc(f.account)}</div>
+              </div>
+              <div class="list-value val-neg" style="font-size:12px">${fc(f.amount, sym)}</div>
+            </div>`;
+          }
+          h += `</div>`;
+
+          return h;
+        }
+
+        function bindSankey(d) {
+          bindDatePresets("sankeyStart", "sankeyEnd", (start, end) => {
+            toolState.sankeyStart = start;
+            toolState.sankeyEnd = end;
+            loadTool("sankey");
+          });
+
+          const triggerLoad = () => {
+            toolState.sankeyStart = $("sankeyStart")?.value || "";
+            toolState.sankeyEnd = $("sankeyEnd")?.value || "";
+            const newMode = $("sankeyMode")?.value || "category";
+            if (newMode !== d.mode) {
+              track("sankey_mode_change", { mode: newMode });
+            }
+            toolState.sankeyMode = newMode;
+            loadTool("sankey");
+          };
+          $("sankeyLoad")?.addEventListener("click", triggerLoad);
+          $("sankeyMode")?.addEventListener("change", triggerLoad);
+
+          const hasData = d.incomeFlows.length > 0 && d.expenseFlows.length > 0;
+          if (!hasData || !document.getElementById("sankeyChart")) return;
+
+          const isDark = document.documentElement.classList.contains("dark");
+          const labelColor = isDark ? "#94a3b8" : "#6b7280";
+          const sym = S.detectedCurrency;
+
+          // Build flat data array: income → All Funds, All Funds → category, [category → account]
+          const flowData = [
+            ...d.incomeFlows.map((f) => ({ from: f.source, to: "All Funds", flow: f.amount })),
+            ...d.expenseFlows.map((f) => ({ from: "All Funds", to: f.category, flow: f.amount })),
+            ...(d.detailFlows || []).map((f) => ({ from: f.category, to: f.account, flow: f.amount })),
+          ];
+
+          // Per-node color assignment
+          const incomeNodes = new Set(d.incomeFlows.map((f) => f.source));
+          const categoryNodes = new Set(d.expenseFlows.map((f) => f.category));
+          const accountNodes = new Set((d.detailFlows || []).map((f) => f.account));
+
+          function nodeColor(label) {
+            if (label === "All Funds") return "#6366f1";
+            if (incomeNodes.has(label)) return "#10b981";
+            if (accountNodes.has(label)) return "#ef4444";
+            if (categoryNodes.has(label)) return "#f59e0b";
+            return "#6b7280";
+          }
+
+          makeChart("sankeyChart", {
+            type: "sankey",
+            data: {
+              datasets: [
+                {
+                  label: "Money Flow",
+                  data: flowData,
+                  colorFrom: (ctx) => {
+                    const item = ctx.dataset.data[ctx.dataIndex];
+                    return item ? nodeColor(item.from) : "#6b7280";
+                  },
+                  colorTo: (ctx) => {
+                    const item = ctx.dataset.data[ctx.dataIndex];
+                    return item ? nodeColor(item.to) : "#6b7280";
+                  },
+                  colorMode: "gradient",
+                  borderWidth: 0,
+                  nodeWidth: 12,
+                  nodePadding: 12,
+                  color: labelColor,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: (ctx) => {
+                      const item = ctx.dataset.data[ctx.dataIndex];
+                      if (!item) return "";
+                      return `${item.from} → ${item.to}: ${fc(item.flow, sym)}`;
+                    },
+                  },
+                },
+              },
+            },
+          });
+        }
+
         // =============== BUDGET EXPLORER ===============
         async function fetchBudgetExplorer() {
           if (!toolState.budgets)
@@ -7849,6 +8209,7 @@
           const toolKeys = [
             "monthly-report",
             "trends",
+            "sankey",
             "budget-explorer",
             "category-explorer",
             "tag-explorer",
