@@ -1,6 +1,6 @@
 # FireDash Analytics Events Reference
 
-> **35 total events** tracked via Google Analytics (`gtag`).  
+> **36 total events** tracked via Google Analytics (`gtag`).  
 > All events automatically include `session_duration_sec` via the `track()` helper.  
 > All calls are wrapped in try/catch so analytics can never break the app.
 
@@ -33,7 +33,7 @@
 | `tool_retry`        | `tool_name`                  | User resilience after errors |
 | `keyboard_shortcut` | `key`, `action`, `tool`      | Power-user adoption          |
 
-## Feature Interactions (13)
+## Feature Interactions (14)
 
 | Event                          | Params                                                                                                             | Purpose                          |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
@@ -45,6 +45,7 @@
 | `search_execute`               | `query_length`, `type_filter`, `has_date_filter`, `has_account_filter`, `has_category_filter`, `has_amount_filter` | Search feature usage depth       |
 | `search_clear_filters`         | —                                                                                                                  | Filter reset behavior            |
 | `trends_update`                | `mode`, `months`                                                                                                   | Spending/Income/Net preference   |
+| `sankey_level_change`          | `levels`                                                                                                           | Active level combination popularity |
 | `budget_explorer_load`         | `budget_id`                                                                                                        | Budget analysis engagement       |
 | `category_explorer_load`       | `category`, `type`                                                                                                 | Category exploration             |
 | `creditcard_modal_open`        | `card_name`                                                                                                        | Credit card detail views         |

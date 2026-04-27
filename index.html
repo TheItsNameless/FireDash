@@ -46,6 +46,7 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.12.0/dist/chartjs-chart-sankey.min.js"></script>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-WYJG0P52V5"
@@ -3032,6 +3033,24 @@
                 <rect x="2" y="13" width="4" height="8" /></svg></span
             ><span class="nav-label"> Trends</span></a
           >
+          <a class="nav-item" href="#sankey" data-tip="Money Flow"
+            ><span class="nav-icon"
+              ><svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                width="16"
+                height="16"
+              >
+                <path d="M3 3h6v6H3z" />
+                <path d="M15 15h6v6h-6z" />
+                <path d="M9 6h3a3 3 0 0 1 3 3v1" />
+                <path d="M9 18H6a3 3 0 0 1-3-3v-1" /></svg></span
+            ><span class="nav-label"> Money Flow</span></a
+          >
           <a class="nav-item" href="#budget-explorer" data-tip="Budget Explorer"
             ><span class="nav-icon"
               ><svg
@@ -3336,6 +3355,12 @@
             fetch: fetchTrends,
             render: renderTrends,
             bind: bindTrends,
+          },
+          sankey: {
+            title: "Money Flow",
+            fetch: fetchSankey,
+            render: renderSankey,
+            bind: bindSankey,
           },
           "budget-explorer": {
             title: "Budget Explorer",
@@ -7307,6 +7332,337 @@
           }
         }
 
+        // ============================================================
+        //  TOOL: MONEY FLOW (SANKEY)
+        // ============================================================
+
+        // Ordered level definitions (left → right in the diagram)
+        const SANKEY_LEVEL_DEFS = [
+          { id: "income",   label: "Income Accounts"  },
+          { id: "budget",   label: "Budgets"           },
+          { id: "category", label: "Categories"        },
+          { id: "spending", label: "Spending Accounts" },
+        ];
+        const SANKEY_MIN_FLOW = 0.005; // ignore flows below half a cent
+
+        // Build Sankey edges from normalized data based on selected levels.
+        // "All Funds" is inserted automatically as a bridge between the income
+        // side and the expense side whenever both are present.
+        function buildSankeyFlows(incomeFlows, withdrawalTxs, levels) {
+          const EXPENSE_IDS = ["budget", "category", "spending"];
+          const activeExpense = EXPENSE_IDS.filter((l) => levels.includes(l));
+          const showIncome = levels.includes("income");
+
+          function getField(tx, level) {
+            if (level === "budget")   return tx.budget;
+            if (level === "category") return tx.category;
+            if (level === "spending") return tx.destination;
+            return "";
+          }
+
+          const flows = [];
+
+          // Expense-side chain: edges between each adjacent pair of selected expense levels
+          for (let i = 0; i < activeExpense.length - 1; i++) {
+            const fromLevel = activeExpense[i];
+            const toLevel   = activeExpense[i + 1];
+            const agg = {};
+            for (const tx of withdrawalTxs) {
+              const from = getField(tx, fromLevel);
+              const to   = getField(tx, toLevel);
+              const key  = `${from}\x00${to}`;
+              if (!agg[key]) agg[key] = { from, to, flow: 0 };
+              agg[key].flow += tx.amount;
+            }
+            for (const v of Object.values(agg)) {
+              if (v.flow > SANKEY_MIN_FLOW) flows.push(v);
+            }
+          }
+
+          // Income side: income_sources → "All Funds" → first active expense level
+          if (showIncome) {
+            for (const f of incomeFlows) {
+              flows.push({ from: f.source, to: "All Funds", flow: f.amount });
+            }
+            if (activeExpense.length > 0) {
+              const firstExp = activeExpense[0];
+              const agg = {};
+              for (const tx of withdrawalTxs) {
+                const key = getField(tx, firstExp);
+                agg[key] = (agg[key] || 0) + tx.amount;
+              }
+              for (const [to, flow] of Object.entries(agg)) {
+                if (flow > SANKEY_MIN_FLOW) flows.push({ from: "All Funds", to, flow });
+              }
+            }
+          }
+
+          return flows;
+        }
+
+        async function fetchSankey() {
+          const now = new Date();
+          const defaultStart = fmt(new Date(now.getFullYear(), now.getMonth(), 1));
+          const defaultEnd   = fmt(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+          const start  = toolState.sankeyStart  || defaultStart;
+          const end    = toolState.sankeyEnd    || defaultEnd;
+          // Default: all four levels active
+          const levels = toolState.sankeyLevels || SANKEY_LEVEL_DEFS.map((l) => l.id);
+          toolState.sankeyStart  = start;
+          toolState.sankeyEnd    = end;
+          toolState.sankeyLevels = levels;
+
+          // Currency / totals
+          const sm = await api("/api/v1/summary/basic", { start, end });
+          let cc = "", sym = "";
+          const ccPattern = /^(?:spent|earned|balance|net-worth)-in-(.+)$/;
+          for (const k of Object.keys(sm)) {
+            const m2 = k.match(ccPattern);
+            if (m2) { cc = m2[1]; sym = sm[k]?.currency_symbol || ""; break; }
+          }
+          S.detectedCurrency = S.currency || sym || cc || S.detectedCurrency || "";
+          const g = (p) => parseFloat(sm[`${p}-in-${cc}`]?.monetary_value || "0");
+          const totalIncome   = g("earned");
+          const totalExpenses = Math.abs(g("spent"));
+
+          // Cache raw transactions per date range so toggling levels doesn't re-fetch
+          const cacheKey = `${start}|${end}`;
+          if (toolState.sankeyCacheKey !== cacheKey) {
+            toolState.sankeyCacheKey        = cacheKey;
+            toolState.sankeyRawDeposits     = null;
+            toolState.sankeyRawWithdrawals  = null;
+          }
+
+          if (!toolState.sankeyRawDeposits) {
+            toolState.sankeyRawDeposits = await apiAll(
+              "/api/v1/transactions",
+              { type: "deposit", start, end },
+              (page, totalPages) => {
+                const el = document.getElementById("loadProgress");
+                if (el) el.innerHTML = `<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Fetching income... ${page}/${totalPages}`;
+              },
+            );
+          }
+
+          if (!toolState.sankeyRawWithdrawals) {
+            toolState.sankeyRawWithdrawals = await apiAll(
+              "/api/v1/transactions",
+              { type: "withdrawal", start, end },
+              (page, totalPages) => {
+                const el = document.getElementById("loadProgress");
+                if (el) el.innerHTML = `<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Fetching expenses... ${page}/${totalPages}`;
+              },
+            );
+          }
+
+          // Normalize deposits → income flows (aggregate by source, roll up < 1%)
+          const incomeBySource = {};
+          for (const tx of toolState.sankeyRawDeposits) {
+            for (const t of tx.attributes?.transactions || []) {
+              const src = t.source_name || "Unknown Income";
+              const amt = parseFloat(t.amount || "0");
+              incomeBySource[src] = (incomeBySource[src] || 0) + amt;
+            }
+          }
+          const incomeTotalRaw  = Object.values(incomeBySource).reduce((s, v) => s + v, 0);
+          const incomeThreshold = incomeTotalRaw * 0.01;
+          const incomeFlows     = [];
+          let   otherIncome     = 0;
+          for (const [src, amt] of Object.entries(incomeBySource)) {
+            if (amt < incomeThreshold) otherIncome += amt;
+            else incomeFlows.push({ source: src, amount: amt });
+          }
+          if (otherIncome > SANKEY_MIN_FLOW) incomeFlows.push({ source: "[Other Income]", amount: otherIncome });
+          incomeFlows.sort((a, b) => b.amount - a.amount);
+
+          // Normalize withdrawals → per-transaction records with all four fields
+          const withdrawalTxs = [];
+          for (const tx of toolState.sankeyRawWithdrawals) {
+            for (const t of tx.attributes?.transactions || []) {
+              const amt = Math.abs(parseFloat(t.amount || "0"));
+              if (amt > SANKEY_MIN_FLOW) {
+                withdrawalTxs.push({
+                  budget:      t.budget_name      || "No Budget",
+                  category:    t.category_name    || "Uncategorized",
+                  destination: t.destination_name || "Unknown",
+                  amount: amt,
+                });
+              }
+            }
+          }
+
+          return { incomeFlows, withdrawalTxs, totalIncome, totalExpenses, levels, dateRange: { start, end } };
+        }
+
+        function renderSankey(d) {
+          const sym          = S.detectedCurrency;
+          const { start, end } = d.dateRange;
+          const net          = d.totalIncome - d.totalExpenses;
+
+          // Level toggle buttons — clicking immediately reloads with updated levels
+          const levelBtns = SANKEY_LEVEL_DEFS.map(({ id, label }) => {
+            const active = d.levels.includes(id);
+            return `<button class="btn${active ? " btn-primary" : ""} sankey-lvl" data-level="${id}" style="font-size:12px;padding:4px 10px">${label}</button>`;
+          }).join("");
+
+          let h = `<div class="tool-header"><h1>Money Flow</h1>
+            <div class="tool-controls">
+              <input type="date" class="form-input" id="sankeyStart" value="${esc(start)}" style="width:140px">
+              <input type="date" class="form-input" id="sankeyEnd" value="${esc(end)}" style="width:140px">
+              <button class="btn btn-primary" id="sankeyLoad">Update</button>
+            </div></div>
+            ${datePresetHtml()}
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0 4px">
+              <span style="font-size:12px;color:var(--text-muted)">Levels:</span>
+              ${levelBtns}
+            </div>`;
+
+          h += `<div class="summary-grid" style="margin-top:16px">
+            <div class="summary-card earned fade-in stagger-1">
+              <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></div>
+              <div class="card-label">Total Income</div>
+              <div class="card-value val-pos">${fc(d.totalIncome, sym)}</div>
+            </div>
+            <div class="summary-card spent fade-in stagger-2">
+              <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
+              <div class="card-label">Total Expenses</div>
+              <div class="card-value val-neg">${fc(d.totalExpenses, sym)}</div>
+            </div>
+            <div class="summary-card ${net >= 0 ? "balance" : "spent"} fade-in stagger-3">
+              <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg></div>
+              <div class="card-label">Net</div>
+              <div class="card-value ${net >= 0 ? "val-pos" : "val-neg"}">${fc(net, sym)}</div>
+            </div>
+          </div>`;
+
+          const flows = buildSankeyFlows(d.incomeFlows, d.withdrawalTxs, d.levels);
+          if (!flows.length) {
+            h += `<div class="empty-state">
+              <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><path d="M3 3h6v6H3z"/><path d="M15 15h6v6h-6z"/><path d="M9 6h3a3 3 0 0 1 3 3v1"/><path d="M9 18H6a3 3 0 0 1-3-3v-1"/></svg></div>
+              <p>No transaction data found for this period or level combination.<br>Select at least two levels, or adjust the date range.</p>
+            </div>`;
+            return h;
+          }
+
+          h += `<div class="data-card fade-in stagger-2">
+            <div class="card-head">
+              <h3>Money Flow Diagram</h3>
+              <span style="font-size:11px;color:var(--text-muted)">Hover for amounts</span>
+            </div>
+            <div style="padding:16px 20px;position:relative;height:480px">
+              <canvas id="sankeyChart"></canvas>
+            </div>
+          </div>`;
+
+          // Fallback flow table
+          h += `<div class="data-card fade-in stagger-3">
+            <div class="card-head"><h3>Flow Breakdown</h3></div>`;
+          for (const f of flows) {
+            const isIncomeSide = f.to === "All Funds";
+            h += `<div class="list-item">
+              <div class="list-info">
+                <div class="list-name">${esc(f.from)} <span style="color:var(--text-muted);font-size:11px">→</span> ${esc(f.to)}</div>
+              </div>
+              <div class="list-value ${isIncomeSide ? "val-pos" : "val-neg"}">${fc(f.flow, sym)}</div>
+            </div>`;
+          }
+          h += `</div>`;
+
+          return h;
+        }
+
+        function bindSankey(d) {
+          bindDatePresets("sankeyStart", "sankeyEnd", (start, end) => {
+            toolState.sankeyStart = start;
+            toolState.sankeyEnd   = end;
+            loadTool("sankey");
+          });
+
+          $("sankeyLoad")?.addEventListener("click", () => {
+            toolState.sankeyStart = $("sankeyStart")?.value || "";
+            toolState.sankeyEnd   = $("sankeyEnd")?.value || "";
+            loadTool("sankey");
+          });
+
+          // Level toggle buttons: clicking toggles that level and immediately reloads
+          document.querySelectorAll(".sankey-lvl").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const level   = btn.dataset.level;
+              const current = toolState.sankeyLevels || SANKEY_LEVEL_DEFS.map((l) => l.id);
+              const next    = current.includes(level)
+                ? current.filter((l) => l !== level)
+                : [...current, level];
+              if (next.length < 2) return; // need at least two levels to draw flows
+              toolState.sankeyLevels = next;
+              track("sankey_level_change", { levels: next.join(",") });
+              loadTool("sankey");
+            });
+          });
+
+          const flows = buildSankeyFlows(d.incomeFlows, d.withdrawalTxs, d.levels);
+          if (!flows.length || !document.getElementById("sankeyChart")) return;
+
+          const isDark     = document.documentElement.classList.contains("dark");
+          const labelColor = isDark ? "#94a3b8" : "#6b7280";
+          const sym        = S.detectedCurrency;
+
+          // Per-node color assignment by level
+          const incomeNodes   = new Set(d.incomeFlows.map((f) => f.source));
+          const budgetNodes   = new Set(d.withdrawalTxs.map((t) => t.budget));
+          const categoryNodes = new Set(d.withdrawalTxs.map((t) => t.category));
+          const spendingNodes = new Set(d.withdrawalTxs.map((t) => t.destination));
+
+          function nodeColor(label) {
+            if (label === "All Funds")       return "#6366f1"; // indigo
+            if (incomeNodes.has(label))      return "#10b981"; // green
+            if (budgetNodes.has(label))      return "#3b82f6"; // blue
+            if (categoryNodes.has(label))    return "#f59e0b"; // amber
+            if (spendingNodes.has(label))    return "#ef4444"; // red
+            return "#6b7280";
+          }
+
+          makeChart("sankeyChart", {
+            type: "sankey",
+            data: {
+              datasets: [
+                {
+                  label: "Money Flow",
+                  data: flows,
+                  colorFrom: (ctx) => {
+                    const item = ctx.dataset.data[ctx.dataIndex];
+                    return item ? nodeColor(item.from) : "#6b7280";
+                  },
+                  colorTo: (ctx) => {
+                    const item = ctx.dataset.data[ctx.dataIndex];
+                    return item ? nodeColor(item.to) : "#6b7280";
+                  },
+                  colorMode: "gradient",
+                  borderWidth: 0,
+                  nodeWidth: 12,
+                  nodePadding: 12,
+                  color: labelColor,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: (ctx) => {
+                      const item = ctx.dataset.data[ctx.dataIndex];
+                      if (!item) return "";
+                      return `${item.from} → ${item.to}: ${fc(item.flow, sym)}`;
+                    },
+                  },
+                },
+              },
+            },
+          });
+        }
+
         // =============== BUDGET EXPLORER ===============
         async function fetchBudgetExplorer() {
           if (!toolState.budgets)
@@ -7849,6 +8205,7 @@
           const toolKeys = [
             "monthly-report",
             "trends",
+            "sankey",
             "budget-explorer",
             "category-explorer",
             "tag-explorer",
