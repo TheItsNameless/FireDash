@@ -4838,7 +4838,6 @@
             .filter((b) => b && (b.limit > 0 || b.spent > 0))
             .sort((a, b) => b.spent - a.spent);
           // Net worth trend: last 6 months up to selected month
-          const nwHistory = [];
           const mNames2 = [
             "Jan",
             "Feb",
@@ -4853,32 +4852,37 @@
             "Nov",
             "Dec",
           ];
-          for (let i = 5; i >= 0; i--) {
-            const d2 = new Date(y, m - i, 1);
-            const { end: nwEnd } = dateRange(d2.getMonth(), d2.getFullYear());
-            try {
-              const sm2 = await api("/api/v1/summary/basic", {
-                start: new Date(d2.getFullYear(), d2.getMonth(), 1)
-                  .toISOString()
-                  .split("T")[0],
-                end: nwEnd,
-              });
-              let cc2 = "";
-              for (const k of Object.keys(sm2)) {
-                const m2 = k.match(ccPattern);
-                if (m2) {
-                  cc2 = m2[1];
-                  break;
+          const nwHistory = await Promise.all(
+            Array.from({ length: 6 }, (_, idx) => {
+              const i = 5 - idx;
+              const d2 = new Date(y, m - i, 1);
+              const { end: nwEnd } = dateRange(d2.getMonth(), d2.getFullYear());
+              return (async () => {
+                try {
+                  const sm2 = await api("/api/v1/summary/basic", {
+                    start: new Date(d2.getFullYear(), d2.getMonth(), 1)
+                      .toISOString()
+                      .split("T")[0],
+                    end: nwEnd,
+                  });
+                  let cc2 = "";
+                  for (const k of Object.keys(sm2)) {
+                    const m2 = k.match(ccPattern);
+                    if (m2) {
+                      cc2 = m2[1];
+                      break;
+                    }
+                  }
+                  const nw = parseFloat(
+                    sm2[`net-worth-in-${cc2}`]?.monetary_value || "0",
+                  );
+                  return { label: mNames2[d2.getMonth()], nw };
+                } catch {
+                  return { label: mNames2[d2.getMonth()], nw: 0 };
                 }
-              }
-              const nw = parseFloat(
-                sm2[`net-worth-in-${cc2}`]?.monetary_value || "0",
-              );
-              nwHistory.push({ label: mNames2[d2.getMonth()], nw });
-            } catch {
-              nwHistory.push({ label: mNames2[d2.getMonth()], nw: 0 });
-            }
-          }
+              })();
+            }),
+          );
           // Fetch previous month for comparison badges
           let prevMonthly = null;
           try {
